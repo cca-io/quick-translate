@@ -22,6 +22,21 @@ button:hover {
   color: white;
 }
 
+.Content {
+  display: flex;
+  flex: 1;
+}
+
+.with-margin {
+  padding-right: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.with-margin > span {
+  padding-bottom: 16px;
+}
+
 
 .cell.read-only {
   width: 250px;
