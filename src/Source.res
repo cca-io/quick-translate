@@ -34,3 +34,9 @@ let add = (target: array<Js.Json.t>, data: array<array<Cell.t>>, fileName) => {
 
   [header]->Array.concat(body)
 }
+
+
+let update = (data, changes) => data->DataSheet.update(changes)
+
+let empty = () => []
+
