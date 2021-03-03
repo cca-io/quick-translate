@@ -11,7 +11,15 @@
     "re:watch": "bsb -make-world -clean-world -w",
     "re:clean": "bsb -clean-world"
   },
+  "dependencies": {
+    "@rescript/react": "^0.10.1",
+    "prop-types": "15",
+    "react": "^17.0.0",
+    "react-datasheet": "^1.4.9",
+    "react-dom": "^17.0.0"
+  },
   "devDependencies": {
+    "@vitejs/plugin-react-refresh": "^1.1.0",
     "bs-platform": "^9",
     "npm-run-all": "^4.1.5",
     "vite": "^2.0.0"

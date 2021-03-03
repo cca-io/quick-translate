@@ -1,6 +1,9 @@
 {
   "name": "quick-translate",
   "version": "0.1.0",
+  "reason": {
+    "react-jsx": 3
+  },
   "sources": {
     "dir": "src",
     "subdirs": true
@@ -12,6 +15,7 @@
     }
   ],
   "suffix": ".bs.js",
+  "bs-dependencies": ["@rescript/react"],
   "warnings": {
     "error": "+101"
   }
