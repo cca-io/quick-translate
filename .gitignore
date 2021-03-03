@@ -1,0 +1,15 @@
+dist/
+node_modules/
+
+# BuckleScript
+lib/
+*.bs.js
+.merlin
+.bsb.lock
+
+# misc
+.DS_Store
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
