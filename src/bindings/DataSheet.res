@@ -13,7 +13,7 @@ module Cell = {
     width: None,
   }
 
-  let makeRO = (~expr=None, value) => {...make(~expr, value), readOnly: true}
+  let makeRO = value => {...make(value), readOnly: true}
 
   let empty = () => {
     value: `\u00A0`,

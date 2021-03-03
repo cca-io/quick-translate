@@ -2,7 +2,7 @@
 set -e
 
 if [[ $# -eq 0 ]] ; then
-    echo "Usage: yarn intf MyRescriptFile" 
+    echo "Usage: npm run intf MyRescriptFile" 
     exit 1
 fi
 
