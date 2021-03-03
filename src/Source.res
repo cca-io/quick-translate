@@ -36,6 +36,21 @@ let add = (target: array<Js.Json.t>, data: array<array<Cell.t>>, fileName) => {
 }
 
 
+let getColIndex = (data: array<array<Cell.t>>, column) =>
+  data[0]->Option.getWithDefault([])->Array.getIndexBy(col => col.value === column)
+
+let remove = (data: array<array<Cell.t>>, column: string) => {
+  let colIndex = getColIndex(data, column)
+
+  switch colIndex {
+  | Some(index) =>
+    data->Array.map(row =>
+      row->Array.mapWithIndex((i, col) => index === i ? None : Some(col))->Array.keepMap(col => col)
+    )
+  | None => data
+  }
+}
+
 let update = (data, changes) => data->DataSheet.update(changes)
 
 let empty = () => []
