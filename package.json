@@ -1,11 +1,12 @@
 {
   "name": "quick-translate",
+  "homepage": "https://fhammerschmidt.github.io/quick-translate",
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "dev": "run-p re:watch vite:serve",
     "build": "run-s re:build vite:build",
-    "createDemo": "cp -r ./dist/* docs/", 
+    "createDemo": "cp -r ./dist/* docs/",
     "intf": "./scripts/createInterface.sh",
     "vite:serve": "vite --port 8083",
     "vite:build": "vite build",
