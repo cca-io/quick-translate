@@ -2,6 +2,12 @@
 
 Translate multiple languages at once in a spreadsheet. Supports JSON and CSV.
 
+### Demo
+
+[https://fhammerschmidt.github.io/quick-translate/](https://fhammerschmidt.github.io/quick-translate/)
+
+## Documentation
+
 This web application is specifically tailored to translate a list of language strings to multiple target languages at once.
 
 The input format is JSON with the following layout:
