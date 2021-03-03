@@ -2,6 +2,8 @@
 
 Translate multiple languages at once in a spreadsheet. Supports JSON and CSV.
 
+![quick-translate screenshot](https://user-images.githubusercontent.com/18074327/109850853-4368bf00-7c53-11eb-800d-137aa583302e.png)
+
 ### Demo
 
 [https://fhammerschmidt.github.io/quick-translate/](https://fhammerschmidt.github.io/quick-translate/)
