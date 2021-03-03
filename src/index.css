@@ -22,6 +22,35 @@ button:hover {
   color: white;
 }
 
+
+.ImportOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+
+.HoverHighlight {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-size: 4em;
+  text-align: center;
+  background-color: darkgrey;
+  color: #3c3c3c;
+  opacity: 0.5;
+}
+
+.dragging {
+  opacity: 0.8;
+}
+
 .Content {
   display: flex;
   flex: 1;
