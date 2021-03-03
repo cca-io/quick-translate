@@ -33,6 +33,19 @@ button:hover {
   flex-direction: row;
 }
 
+.NoDataView {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 4em;
+  padding: 8px;
+  text-align: center;
+  background-color: darkgrey;
+  color: #3c3c3c;
+  opacity: 0.5;
+}
 
 .HoverHighlight {
   display: flex;
