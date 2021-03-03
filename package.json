@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "run-p re:watch vite:serve",
     "build": "run-s re:build vite:build",
-    "createDemo": "cp -r ./dist/* docs/",
+    "predeploy": "run-s re:build vite:buildCI",
+    "deploy": "cp -r ./dist/* docs/",
     "intf": "./scripts/createInterface.sh",
     "vite:serve": "vite --port 8083",
     "vite:build": "vite build",
+    "vite:buildCI": "vite build --base=/quick-translate/",
     "re:build": "bsb -make-world -clean-world",
     "re:watch": "bsb -make-world -clean-world -w",
     "re:clean": "bsb -clean-world"
