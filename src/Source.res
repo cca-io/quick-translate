@@ -55,3 +55,19 @@ let update = (data, changes) => data->DataSheet.update(changes)
 
 let empty = () => []
 
+let getColData = (data: array<array<Cell.t>>, column: string) => {
+  let colIndex = getColIndex(data, column)
+  let body = data->Array.sliceToEnd(1)
+
+  switch colIndex {
+  | Some(index) =>
+    body->Array.keepMap(row =>
+      switch (row[0], row[index]) {
+      | (Some(key), Some(source)) => {Message.id: key.value, defaultMessage: source.value}->Some
+      | _ => None
+      }
+    )
+
+  | None => []
+  }
+}
