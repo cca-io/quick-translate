@@ -35,6 +35,19 @@ let add = (target: array<Js.Json.t>, data: array<array<Cell.t>>, fileName) => {
   [header]->Array.concat(body)
 }
 
+let fromCsv = str => {
+  let rows = str->CSV.toArray
+  let header = rows[1]->Option.mapWithDefault([], hd => hd->Array.map(Cell.makeRO))
+
+  let body =
+    rows
+    ->Array.sliceToEnd(2)
+    ->Array.map(row =>
+      row->Array.mapWithIndex((i, text) => i > 0 ? text->Cell.make : text->Cell.makeRO)
+    )
+
+  [header]->Array.concat(body)
+}
 
 let getColIndex = (data: array<array<Cell.t>>, column) =>
   data[0]->Option.getWithDefault([])->Array.getIndexBy(col => col.value === column)
