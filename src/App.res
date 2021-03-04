@@ -72,34 +72,19 @@ let make = () => {
     setData(_ => dataSheet)
   }
 
-  let onExport = col => {
-    let colData = data->Source.getColData(col)->Message.toJson->Js.Json.stringifyWithSpace(2)
-
-    let uri = "data:text/json;charset=utf-8," ++ Js.Global.encodeURIComponent(colData)
-    uri->FileUtils.download(~download={col ++ ".json"})
-  }
-
+  let onExport = col => data->Export.dataToJson(col)->FileUtils.download(~download={col ++ ".json"})
+Js.String2.rep
   let onExportAll = _evt => {
     data[0]
     ->Option.getWithDefault([])
     ->Array.forEachWithIndex((i, cell) =>
       if i > 0 {
-        onExport(cell.value)
+        data->Export.dataToJson(cell.value)->FileUtils.download(~download={cell.value ++ ".json"})
       }
     )
   }
 
-  let onExportCsv = _evt => {
-    let csvData =
-      data
-      ->Array.map(row =>
-        row->Array.map(cell => `"${cell.value}"`)->Js.Array2.joinWith(CSV.separator)
-      )
-      ->Js.Array2.joinWith("\n")
-
-    let uri = `data:text/csv;charset=utf-8,\uFEFF${Js.Global.encodeURI(csvData)}`
-    uri->FileUtils.download(~download={"export.csv"})
-  }
+  let onExportCsv = _evt => data->Export.dataToCsv->FileUtils.download(~download={"export.csv"})
 
   let sheetRenderer = (props: DataSheet.SheetProps.t) => {
     <table className={props.className}>
