@@ -6,6 +6,11 @@ let add: (
   Js.String2.t,
 ) => array<array<DataSheet.Cell.t>>
 
+let addMultiple: (
+  array<(string, array<Js.Json.t>)>,
+  array<array<DataSheet.Cell.t>>,
+) => array<array<DataSheet.Cell.t>>
+
 let fromCsv: string => array<array<DataSheet.Cell.t>>
 let remove: (array<array<DataSheet.Cell.t>>, string) => array<array<DataSheet.Cell.t>>
 let update: (array<array<DataSheet.Cell.t>>, DataSheet.Change.t) => unit

@@ -35,6 +35,10 @@ let add = (target: array<Js.Json.t>, data: array<array<Cell.t>>, fileName) => {
   [header]->Array.concat(body)
 }
 
+let addMultiple = (targets: array<(string, array<Js.Json.t>)>, data: array<array<Cell.t>>) => {
+  targets->Array.reduce(data, (newData, (fileName, target)) => target->add(newData, fileName))
+}
+
 let fromCsv = str => {
   let rows = str->CSV.toArray
   let header = rows[1]->Option.mapWithDefault([], hd => hd->Array.map(Cell.makeRO))

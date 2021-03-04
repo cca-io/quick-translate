@@ -37,6 +37,21 @@ let make = () => {
 
       | _ => ()
       }
+    } else {
+      files
+      ->Array.map(file =>
+        Promise.exec(resolve =>
+          if fileType === Target && file->File.isJson {
+            File.read(file, resolve)
+          }
+        )->Promise.map(res =>
+          res->File.resultToJson->Option.flatMap(result => Some(file.name, result))
+        )
+      )
+      ->Promise.allArray
+      ->Promise.get(results =>
+        setData(_ => results->Array.keepMap(a => a)->Source.addMultiple(data))
+      )
     }
 
     setDragging(_ => false)
@@ -73,7 +88,7 @@ let make = () => {
   }
 
   let onExport = col => data->Export.dataToJson(col)->FileUtils.download(~download={col ++ ".json"})
-Js.String2.rep
+
   let onExportAll = _evt => {
     data[0]
     ->Option.getWithDefault([])
