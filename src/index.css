@@ -9,7 +9,8 @@ body {
 
 button {
   border-radius: 5px;
-  padding: 8px;
+  padding: 4px 8px;
+  margin: 4px 4px 4px 0;
   border: 2px solid black;
   font-weight: bold;
   background: none;
@@ -98,7 +99,7 @@ button:hover {
   height: 100px;
   border-radius: 10px;
   border-width: 4px;
-  font-size: 1em;
+  font-size: 0.84em;
   box-shadow: 10px 10px 15px silver;
 }
 
