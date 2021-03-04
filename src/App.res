@@ -111,7 +111,7 @@ let make = () => {
             <th key={i->Int.toString}>
               {i > 0
                 ? <>
-                    <button onClick={evt => onExport(col.value)}> {"Export as JSON"->s} </button>
+                    <button onClick={evt => onExport(col.value)}> {"Export JSON"->s} </button>
                     {" "->s}
                     <button onClick={evt => onRemoveTarget(col.value)}> {"Remove"->s} </button>
                   </>
@@ -132,7 +132,7 @@ let make = () => {
       <ImportOverlay dragging sourceAvailable onDragLeave handleDrop />
     </Content>
     <Sidebar sourceAvailable>
-      <Sidebar.Button onClick=onCreateTarget> {"Add column"->s} </Sidebar.Button>
+      <Sidebar.Button onClick=onCreateTarget> {"Add language"->s} </Sidebar.Button>
       <Sidebar.Button onClick=onExportCsv> {"Export CSV"->s} </Sidebar.Button>
       <Sidebar.Button onClick=onExportAll> {"Export all JSON"->s} </Sidebar.Button>
     </Sidebar>
