@@ -77,7 +77,7 @@ button:hover {
 }
 
 .with-margin {
-  padding-right: 16px;
+  padding: 0 16px;
   overflow-y: auto;
   overflow-x: hidden;
 }
