@@ -1,17 +1,28 @@
 open Belt
 open DataSheet
 
-let make = (data: array<Js.Json.t>, fileName): array<array<Cell.t>> => {
+let make = (data: array<Message.t>, fileName): array<array<Cell.t>> => {
   data
-  ->Message.fromJson
-  ->Array.map(({id, defaultMessage}) => [Cell.makeRO(id), Cell.make(defaultMessage)])
-  ->Array.concat([[Cell.makeRO("ID"), Cell.makeRO(fileName->FileUtils.fileNameWithoutExt)]], _)
+  ->Array.map(({id, defaultMessage, description}) => [
+    Cell.makeRO(id),
+    Cell.make(~className="description", description->Option.getWithDefault("")),
+    Cell.make(defaultMessage),
+  ])
+  ->Array.concat(
+    [
+      [
+        Cell.makeRO("ID"),
+        Cell.makeRO("Description"),
+        Cell.makeRO(fileName->FileUtils.fileNameWithoutExt),
+      ],
+    ],
+    _,
+  )
 }
 
-let add = (target: array<Js.Json.t>, data: array<array<Cell.t>>, fileName) => {
+let add = (target: array<Message.t>, data: array<array<Cell.t>>, fileName) => {
   let targetMap =
     target
-    ->Message.fromJson
     ->Array.map(({Message.id: id, defaultMessage}) => (id, defaultMessage))
     ->Map.String.fromArray
 
@@ -36,12 +47,14 @@ let add = (target: array<Js.Json.t>, data: array<array<Cell.t>>, fileName) => {
 }
 
 let addMultiple = (targets: array<(string, array<Js.Json.t>)>, data: array<array<Cell.t>>) => {
-  targets->Array.reduce(data, (newData, (fileName, target)) => target->add(newData, fileName))
+  targets->Array.reduce(data, (newData, (fileName, target)) =>
+    target->Message.fromJson->add(newData, fileName)
+  )
 }
 
 let fromCsv = str => {
   let rows = str->CSV.toArray
-  let header = rows[1]->Option.mapWithDefault([], hd => hd->Array.map(Cell.makeRO))
+  let header = rows[1]->Option.mapWithDefault([], hd => hd->Array.map(value => Cell.makeRO(value)))
 
   let body =
     rows
@@ -79,8 +92,13 @@ let getColData = (data: array<array<Cell.t>>, column: string) => {
   switch colIndex {
   | Some(index) =>
     body->Array.keepMap(row =>
-      switch (row[0], row[index]) {
-      | (Some(key), Some(source)) => {Message.id: key.value, defaultMessage: source.value}->Some
+      switch (row[0], row[1], row[index]) {
+      | (Some(key), Some(desc), Some(source)) =>
+        Message.make(
+          ~description=desc.value->Js.String.length > 0 ? Some(desc.value) : None,
+          key.value,
+          source.value,
+        )->Some
       | _ => None
       }
     )

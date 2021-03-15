@@ -1,7 +1,7 @@
-let make: (array<Js.Json.t>, Js.String2.t) => array<array<DataSheet.Cell.t>>
+let make: (array<Message.t>, Js.String2.t) => array<array<DataSheet.Cell.t>>
 
 let add: (
-  array<Js.Json.t>,
+  array<Message.t>,
   array<array<DataSheet.Cell.t>>,
   Js.String2.t,
 ) => array<array<DataSheet.Cell.t>>

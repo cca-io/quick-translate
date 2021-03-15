@@ -4,13 +4,15 @@ module Cell = {
     expr: option<string>,
     readOnly: bool,
     width: option<int>,
+    className: string,
   }
 
-  let make = (~expr=None, value) => {
+  let make = (~expr=None, ~readOnly=false, ~className="", value) => {
     value: value,
     expr: expr,
-    readOnly: false,
+    readOnly: readOnly,
     width: None,
+    className: className,
   }
 
   let makeRO = value => {...make(value), readOnly: true}
@@ -20,6 +22,7 @@ module Cell = {
     expr: None,
     readOnly: false,
     width: Some(100),
+    className: "",
   }
 
   let emptyRO = () => {...empty(), readOnly: true}
