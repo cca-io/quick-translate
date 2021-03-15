@@ -1,6 +1,39 @@
 open Belt
 open ReactUtils
 
+module HeaderCol = {
+  @react.component
+  let make = (~index, ~value, ~onExport, ~onRemoveTarget, ~onRemoveSource) => {
+    <th>
+      <div className="ButtonRow">
+        {if index === 0 {
+          <IconButton onClick=onRemoveSource title={"Remove source"} icon=#trash />
+        } else if index > 1 {
+          <>
+            <div className="ExportButtonRow">
+              <IconButton title={"Export JSON file"} onClick={evt => onExport(value)} icon=#json />
+              // <IconButton title={"Export XML file"} onClick={evt => onExport(value)} icon=#xml />
+              <IconButton
+                title={"Export Properties file"} onClick={evt => onExport(value)} icon=#properties
+              />
+              // <IconButton
+              //   title={"Export Strings file"} onClick={evt => onExport(value)} icon=#strings
+              // />
+            </div>
+            <div className="ActionButtonRow">
+              <IconButton
+                title={"Remove column"} onClick={evt => onRemoveTarget(value)} icon=#trash
+              />
+            </div>
+          </>
+        } else {
+          React.null
+        }}
+      </div>
+    </th>
+  }
+}
+
 @react.component
 let make = () => {
   let (data, setData) = React.useState(() => Source.empty())
@@ -107,16 +140,8 @@ let make = () => {
         <tr>
           {data[0]
           ->Option.getWithDefault([])
-          ->Array.mapWithIndex((i, col) =>
-            <th key={i->Int.toString}>
-              {i > 0
-                ? <>
-                    <button onClick={evt => onExport(col.value)}> {"Export JSON"->s} </button>
-                    {" "->s}
-                    <button onClick={evt => onRemoveTarget(col.value)}> {"Remove"->s} </button>
-                  </>
-                : <button onClick={onRemoveSource}> {"Remove source"->s} </button>}
-            </th>
+          ->Array.mapWithIndex((i, {value}) =>
+            <HeaderCol key={i->Int.toString} index=i value onExport onRemoveTarget onRemoveSource />
           )
           ->React.array}
         </tr>
@@ -132,9 +157,9 @@ let make = () => {
       <ImportOverlay dragging sourceAvailable onDragLeave handleDrop />
     </Content>
     <Sidebar sourceAvailable>
-      <Sidebar.Button onClick=onCreateTarget> {"Add language"->s} </Sidebar.Button>
-      <Sidebar.Button onClick=onExportCsv> {"Export CSV"->s} </Sidebar.Button>
-      <Sidebar.Button onClick=onExportAll> {"Export all JSON"->s} </Sidebar.Button>
+      <IconButton title={"Add new language"} size=#Large onClick={onCreateTarget} icon=#plus />
+      <IconButton title={"Export to CSV"} size=#Large onClick={onExportCsv} icon=#csv />
+      <IconButton title={"Export all JSON files"} size=#Large onClick={onExportAll} icon=#json />
     </Sidebar>
   </div>
 }

@@ -7,22 +7,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-button {
-  border-radius: 5px;
-  padding: 4px 8px;
-  margin: 4px 4px 4px 0;
-  border: 2px solid black;
-  font-weight: bold;
-  background: none;
-  cursor: pointer;
-  text-transform: uppercase;
-}
-
-button:hover {
-  background: black;
-  color: white;
-}
-
 .App {
   text-align: left;
   display: flex;
@@ -93,18 +77,49 @@ button:hover {
   flex-direction: column;
 }
 
-.SidebarButton {
+.IconButton {
+  width: 50px;
+  padding: 4px 0 1px 0;
+  margin: 4px;
+  background: none;
+  border: 1px solid rgb(143, 143, 143);
+  border-radius: 5px;
+  box-shadow: 4px 4px 7px silver;
+}
+
+.IconButtonLarge {
   margin: 8px;
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  border-width: 4px;
-  font-size: 0.84em;
   box-shadow: 10px 10px 15px silver;
 }
 
-.SidebarButton.disabled,
-.SidebarButton.disabled:hover {
+.IconButton:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.ButtonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 8px;
+}
+
+.ExportButtonRow {
+  padding-right: 8px;
+  display: flex;
+  flex: 1;
+}
+
+.ActionButtonRow {
+  padding-left: 8px;
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+}
+
   background: none;
   border-color: rgb(143, 143, 143);
   color: rgb(143, 143, 143);
