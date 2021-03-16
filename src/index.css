@@ -140,6 +140,15 @@ body {
   text-align: left !important;
 }
 
+.data-grid > thead > tr > th:nth-child(3),
+.data-grid > tbody > tr > td:nth-child(3) {
+  border-right: 4px solid black !important;
+}
+
+.data-grid > thead > tr > th,
+.data-grid > tbody > tr > td {
+  padding-left: 4px !important;
+}
 
 .description.cell {
   width: 250px;

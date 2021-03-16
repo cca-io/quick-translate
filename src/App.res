@@ -137,6 +137,9 @@ let make = () => {
   let sheetRenderer = (props: DataSheet.SheetProps.t) => {
     <table className={props.className}>
       <thead>
+        {sourceAvailable
+          ? <tr> <th> {"Source"->s} </th> <th /> <th /> <th> {"Targets"->s} </th> </tr>
+          : React.null}
         <tr>
           {data[0]
           ->Option.getWithDefault([])
