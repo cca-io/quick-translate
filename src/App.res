@@ -20,11 +20,15 @@ module HeaderCol = {
               //   title={"Export Strings file"} onClick={evt => onExport(value)} icon=#strings
               // />
             </div>
-            <div className="ActionButtonRow">
-              <IconButton
-                title={"Remove column"} onClick={evt => onRemoveTarget(value)} icon=#trash
-              />
-            </div>
+            {if index > 2 {
+              <div className="ActionButtonRow">
+                <IconButton
+                  title={"Remove column"} onClick={evt => onRemoveTarget(value)} icon=#trash
+                />
+              </div>
+            } else {
+              React.null
+            }}
           </>
         } else {
           React.null
