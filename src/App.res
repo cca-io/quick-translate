@@ -41,32 +41,71 @@ let make = () => {
 
   let sourceAvailable = data->Array.length > 0
 
-  let handleDrop = (e, fileType) => {
+  let handleDrop = (e, sourceOrTarget) => {
     e->cancelMouseEvent
     let files = e->File.fromMouseEvent
 
     if files->Array.length === 1 {
-      switch (files[0], fileType) {
-      | (Some(file), FileUtils.Source) if file->File.isJson =>
+      let file = files[0]
+      let fileType = file->Option.flatMap(File.getFileType)
+
+      switch (file, fileType) {
+      | (Some(file), Some(Json)) =>
         File.read(file, result =>
           setData(_ =>
             result
             ->File.resultToJson
-            ->Option.mapWithDefault(data, result => result->Source.make(file.name))
+            ->Option.mapWithDefault(data, result =>
+              switch sourceOrTarget {
+              | FileUtils.Source => result->Message.fromJson->Source.make(file.name)
+              | Target => result->Message.fromJson->Source.add(data, file.name)
+              }
+            )
           )
         )
 
-      | (Some(file), Source) if file->File.isCsv =>
-        File.read(file, result => setData(_ => result->Source.fromCsv))
+      | (Some(file), Some(Csv)) =>
+        File.read(file, result => setData(_ => result->File.FileResult.toString->Source.fromCsv))
 
-      | (Some(file), Target) if file->File.isJson =>
-        File.read(file, result =>
+      | (Some(_file), Some(Xml)) => Js.Console.warn("Not implemented yet!")
+
+      | (Some(_file), Some(Strings)) => Js.Console.warn("Not implemented yet!")
+
+      | (Some(file), Some(Properties)) =>
+        file->File.read(~encoding=#"ISO-8859-1", result => {
+          let source = result->File.FileResult.toString
+
+          let newResult = []
+          let regex = "(.+|\r?\n|\r|^)\=(.+|\r\n)"
+          let pattern = RegExp.make(regex, "gi")
+
+          let rec loop = () => {
+            switch pattern->Js.Re.exec_(source) {
+            | None => ()
+            | Some(re) =>
+              let arr = re->Js.Re.captures
+              let key = arr[1]->Option.flatMap(key => key->Js.Nullable.toOption)
+              let value = arr[2]->Option.flatMap(value => value->Js.Nullable.toOption)
+
+              switch (key, value) {
+              | (Some(key), Some(value)) =>
+                newResult->Js.Array2.push(Message.make(key, value))->ignore
+              | _ => ()
+              }
+
+              loop()
+            }
+          }
+
+          loop()
+
           setData(_ =>
-            result
-            ->File.resultToJson
-            ->Option.mapWithDefault(data, result => result->Source.add(data, file.name))
+            switch sourceOrTarget {
+            | FileUtils.Source => newResult->Source.make(file.name)
+            | Target => newResult->Source.add(data, file.name)
+            }
           )
-        )
+        })
 
       | _ => ()
       }
@@ -74,7 +113,7 @@ let make = () => {
       files
       ->Array.map(file =>
         Promise.exec(resolve =>
-          if fileType === Target && file->File.isJson {
+          if sourceOrTarget === Target && file->File.isJson {
             File.read(file, resolve)
           }
         )->Promise.map(res =>
