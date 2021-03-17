@@ -105,7 +105,7 @@ module Properties = {
     let propsData =
       data
       ->Source.getColData(col)
-      ->Array.map(({id, defaultMessage}) => `${id}: ${defaultMessage}`)
+      ->Array.map(({id, defaultMessage}) => `${id}=${defaultMessage}`)
       ->Js.Array2.joinWith("\n")
 
     "data:text/plain;charset=ISO-8859-1," ++ Js.Global.encodeURIComponent(propsData)
