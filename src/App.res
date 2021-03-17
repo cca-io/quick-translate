@@ -16,9 +16,6 @@ module HeaderCol = {
                 onClick={evt => onExport(value, File.FileType.Json)}
                 icon=#json
               />
-              // <IconButton
-              //   title={"Export XML file"} onClick={evt => onExport(value, Xml)} icon=#xml
-              // />
               <IconButton
                 title={"Export Properties file"}
                 onClick={evt => onExport(value, Properties)}
@@ -28,6 +25,11 @@ module HeaderCol = {
                 title={"Export Strings file"}
                 onClick={evt => onExport(value, Strings)}
                 icon=#strings
+              />
+              <IconButton
+                title={"Export Android XML resources file"}
+                onClick={evt => onExport(value, Xml)}
+                icon=#xml
               />
             </div>
             {if index > 2 {
@@ -85,7 +87,17 @@ let make = () => {
           setData(_ => source->Source.fromCsv)
         })
 
-      | (Some(_file), Some(Xml)) => Js.Console.warn("Not implemented yet!")
+      | (Some(file), Some(Xml)) =>
+        file->File.read(result => {
+          let source = result->File.FileResult.toString->Convert.Xml.toArray
+
+          setData(_ =>
+            switch sourceOrTarget {
+            | Source => source->Source.make(file.name)
+            | Target => source->Source.add(data, file.name)
+            }
+          )
+        })
 
       | (Some(file), Some(Strings)) =>
         file->File.read(result => {
@@ -164,14 +176,13 @@ let make = () => {
   }
 
   let onExport = (col, fileType) => {
+    let download = col ++ fileType->File.FileType.toExtension
+
     switch fileType {
-    | File.FileType.Json =>
-      data->Convert.Json.fromData(col)->FileUtils.download(~download={col ++ ".json"})
-    | Properties =>
-      data->Convert.Properties.fromData(col)->FileUtils.download(~download={col ++ ".properties"})
-    | Xml
-    | Strings =>
-      data->Convert.Strings.fromData(col)->FileUtils.download(~download={col ++ ".strings"})
+    | Json => data->Convert.Json.fromData(col)->FileUtils.download(~download)
+    | Properties => data->Convert.Properties.fromData(col)->FileUtils.download(~download)
+    | Strings => data->Convert.Strings.fromData(col)->FileUtils.download(~download)
+    | Xml => data->Convert.Xml.fromData(col)->FileUtils.download(~download)
     | _ => ()
     }
   }

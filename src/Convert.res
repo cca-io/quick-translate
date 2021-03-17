@@ -115,6 +115,8 @@ module Properties = {
 }
 
 module Strings = {
+  let regex = "\"(.+|\r?\n|\r|^)\".\=.\"(.+|\r\n)\";"
+
   let fromData = (data, col) => {
     let propsData =
       data
@@ -125,7 +127,23 @@ module Strings = {
     "data:text/plain;charset=utf-8," ++ Js.Global.encodeURIComponent(propsData)
   }
 
-  let regex = "\"(.+|\r?\n|\r|^)\".\=.\"(.+|\r\n)\";"
+  let toArray = str => toArrayHelper(~regex, str)
+}
+
+module Xml = {
+  let regex = "<string name=\"(.+|\r?\n|\r|^)\">(.+|\r\n)<\/string>"
+
+  let fromData = (data, col) => {
+    let propsData =
+      data
+      ->Source.getColData(col)
+      ->Array.map(({id, defaultMessage}) => `    <string name="${id}">${defaultMessage}</string>`)
+      ->Js.Array2.joinWith("\n")
+
+    let propsData = "<resources>\n" ++ propsData ++ "\n</resources>"
+
+    "data:text/xml;charset=utf-8," ++ Js.Global.encodeURIComponent(propsData)
+  }
 
   let toArray = str => toArrayHelper(~regex, str)
 }
