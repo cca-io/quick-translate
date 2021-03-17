@@ -31,12 +31,23 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 4em;
+  font-size: 4rem;
   padding: 8px;
   text-align: center;
   background-color: darkgrey;
   color: #3c3c3c;
   opacity: 0.5;
+}
+
+.FileTypes {
+  padding-top: 32px;
+  font-size: 2rem;
+  text-align: left;
+}
+
+.FileTypes > ul {
+  font-size: 1.4rem;
+  margin-top: 4px
 }
 
 .HoverHighlight {
@@ -120,11 +131,6 @@ body {
   flex: 1;
 }
 
-  background: none;
-  border-color: rgb(143, 143, 143);
-  color: rgb(143, 143, 143);
-  cursor: default;
-}
 
 .cell.read-only {
   width: 250px;
