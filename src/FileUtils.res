@@ -25,3 +25,11 @@ let download = (~download, ~blankTarget=true, url) => {
   | _ => ()
   }
 }
+
+let timestampFilename = filename => {
+  let timestamp = Js.Date.make()->Js.Date.toISOString->Js.String2.split(".")
+  let formatted =
+    timestamp[0]->Js.String2.replace("T", "_")->Js.String2.replaceByRe(%re("/:/g"), "-")
+
+  formatted ++ "-" ++ filename
+}

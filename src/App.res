@@ -11,14 +11,24 @@ module HeaderCol = {
         } else if index > 1 {
           <>
             <div className="ExportButtonRow">
-              <IconButton title={"Export JSON file"} onClick={evt => onExport(value)} icon=#json />
-              // <IconButton title={"Export XML file"} onClick={evt => onExport(value)} icon=#xml />
               <IconButton
-                title={"Export Properties file"} onClick={evt => onExport(value)} icon=#properties
+                title={"Export JSON file"}
+                onClick={evt => onExport(value, File.FileType.Json)}
+                icon=#json
               />
               // <IconButton
-              //   title={"Export Strings file"} onClick={evt => onExport(value)} icon=#strings
+              //   title={"Export XML file"} onClick={evt => onExport(value, Xml)} icon=#xml
               // />
+              <IconButton
+                title={"Export Properties file"}
+                onClick={evt => onExport(value, Properties)}
+                icon=#properties
+              />
+              <IconButton
+                title={"Export Strings file"}
+                onClick={evt => onExport(value, Strings)}
+                icon=#strings
+              />
             </div>
             {if index > 2 {
               <div className="ActionButtonRow">
@@ -45,7 +55,7 @@ let make = () => {
 
   let sourceAvailable = data->Array.length > 0
 
-  let handleDrop = (e, sourceOrTarget) => {
+  let handleDrop = (e, sourceOrTarget: FileUtils.file) => {
     e->cancelMouseEvent
     let files = e->File.fromMouseEvent
 
@@ -61,7 +71,7 @@ let make = () => {
             ->File.resultToJson
             ->Option.mapWithDefault(data, result =>
               switch sourceOrTarget {
-              | FileUtils.Source => result->Message.fromJson->Source.make(file.name)
+              | Source => result->Message.fromJson->Source.make(file.name)
               | Target => result->Message.fromJson->Source.add(data, file.name)
               }
             )
@@ -69,44 +79,34 @@ let make = () => {
         )
 
       | (Some(file), Some(Csv)) =>
-        File.read(file, result => setData(_ => result->File.FileResult.toString->Source.fromCsv))
+        File.read(file, result => {
+          let source = result->File.FileResult.toString->Convert.CSV.toArray
+
+          setData(_ => source->Source.fromCsv)
+        })
 
       | (Some(_file), Some(Xml)) => Js.Console.warn("Not implemented yet!")
 
-      | (Some(_file), Some(Strings)) => Js.Console.warn("Not implemented yet!")
-
-      | (Some(file), Some(Properties)) =>
-        file->File.read(~encoding=#"ISO-8859-1", result => {
-          let source = result->File.FileResult.toString
-
-          let newResult = []
-          let regex = "(.+|\r?\n|\r|^)\=(.+|\r\n)"
-          let pattern = RegExp.make(regex, "gi")
-
-          let rec loop = () => {
-            switch pattern->Js.Re.exec_(source) {
-            | None => ()
-            | Some(re) =>
-              let arr = re->Js.Re.captures
-              let key = arr[1]->Option.flatMap(key => key->Js.Nullable.toOption)
-              let value = arr[2]->Option.flatMap(value => value->Js.Nullable.toOption)
-
-              switch (key, value) {
-              | (Some(key), Some(value)) =>
-                newResult->Js.Array2.push(Message.make(key, value))->ignore
-              | _ => ()
-              }
-
-              loop()
-            }
-          }
-
-          loop()
+      | (Some(file), Some(Strings)) =>
+        file->File.read(result => {
+          let source = result->File.FileResult.toString->Convert.Strings.toArray
 
           setData(_ =>
             switch sourceOrTarget {
-            | FileUtils.Source => newResult->Source.make(file.name)
-            | Target => newResult->Source.add(data, file.name)
+            | Source => source->Source.make(file.name)
+            | Target => source->Source.add(data, file.name)
+            }
+          )
+        })
+
+      | (Some(file), Some(Properties)) =>
+        file->File.read(~encoding=#"ISO-8859-1", result => {
+          let source = result->File.FileResult.toString->Convert.Properties.toArray
+
+          setData(_ =>
+            switch sourceOrTarget {
+            | Source => source->Source.make(file.name)
+            | Target => source->Source.add(data, file.name)
             }
           )
         })
@@ -163,19 +163,35 @@ let make = () => {
     setData(_ => dataSheet)
   }
 
-  let onExport = col => data->Export.dataToJson(col)->FileUtils.download(~download={col ++ ".json"})
+  let onExport = (col, fileType) => {
+    switch fileType {
+    | File.FileType.Json =>
+      data->Convert.Json.fromData(col)->FileUtils.download(~download={col ++ ".json"})
+    | Properties =>
+      data->Convert.Properties.fromData(col)->FileUtils.download(~download={col ++ ".properties"})
+    | Xml
+    | Strings =>
+      data->Convert.Strings.fromData(col)->FileUtils.download(~download={col ++ ".strings"})
+    | _ => ()
+    }
+  }
 
   let onExportAll = _evt => {
     data[0]
     ->Option.getWithDefault([])
     ->Array.forEachWithIndex((i, cell) =>
       if i > 0 {
-        data->Export.dataToJson(cell.value)->FileUtils.download(~download={cell.value ++ ".json"})
+        data
+        ->Convert.Json.fromData(cell.value)
+        ->FileUtils.download(~download={cell.value ++ ".json"})
       }
     )
   }
 
-  let onExportCsv = _evt => data->Export.dataToCsv->FileUtils.download(~download={"export.csv"})
+  let onExportCsv = _evt =>
+    data
+    ->Convert.CSV.fromData
+    ->FileUtils.download(~download={FileUtils.timestampFilename("export.csv")})
 
   let sheetRenderer = (props: DataSheet.SheetProps.t) => {
     <table className={props.className}>

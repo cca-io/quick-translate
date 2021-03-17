@@ -52,8 +52,7 @@ let addMultiple = (targets: array<(string, array<Js.Json.t>)>, data: array<array
   )
 }
 
-let fromCsv = str => {
-  let rows = str->CSV.toArray
+let fromCsv = rows => {
   let header = rows[1]->Option.mapWithDefault([], hd => hd->Array.map(value => Cell.makeRO(value)))
 
   let body =
