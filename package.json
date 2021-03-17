@@ -7,7 +7,7 @@
     "dev": "run-p re:watch vite:serve",
     "build": "run-s re:build vite:build",
     "predeploy": "run-s re:build vite:buildCI",
-    "deploy": "cp -r ./dist/* docs/",
+    "deploy": "rm -r ./docs/* && cp -r ./dist/* docs/",
     "intf": "./scripts/createInterface.sh",
     "vite:serve": "vite --port 8083",
     "vite:build": "vite build",
