@@ -32,6 +32,16 @@ Some.Message.id=Some message
 "some_message_id" = "Some message"
 ```
 
+#### XML (Android resources strings)
+
+```xml
+<resources>
+    <string name="message_hello">Hello</string>
+    <string name="message_world">World!</string>
+    <string name="some_message_id">Some message</string>
+</resources>
+```
+
 #### JSON
 
 ```json
