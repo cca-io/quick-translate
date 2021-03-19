@@ -151,6 +151,11 @@ body {
   border-right: 4px solid black !important;
 }
 
+.data-grid.withoutDescription > thead > tr > th:nth-child(2),
+.data-grid.withoutDescription > tbody > tr > td:nth-child(2) {
+  display: none;
+}
+
 .data-grid > thead > tr > th,
 .data-grid > tbody > tr > td {
   padding-left: 4px !important;

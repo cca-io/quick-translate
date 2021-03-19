@@ -19,7 +19,7 @@ let make = (~sourceAvailable, ~dragging) =>
           {"Supported file types:"->s}
           <ul>
             {fileTypes
-            ->Belt.Array.map(((ft, desc)) => <li> <b> {ft->s} </b> {desc->s} </li>)
+            ->Belt.Array.map(((ft, desc)) => <li key=ft> <b> {ft->s} </b> {desc->s} </li>)
             ->React.array}
           </ul>
         </div>

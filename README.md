@@ -66,10 +66,10 @@ which is exactly what [bs-react-intl-extractor](https://github.com/cknitt/bs-rea
 
 ### Workflow
 
-The app has a notion of sources and targets. Basically, the first JSON you drag and drop into the web app is the source file.
+The app has a notion of sources and targets. Basically, the first file you drag and drop into the web app is the source file.
 
 The app takes the `id`s or keys of all entries and puts it into the first column of the spreadsheet (read-only).
-In the second column, the values or `defaultMessage`s will appear.
+In the second column, the values or `defaultMessage`s will appear. If you use a JSON as source, you can show/hide a description column between the first and second columns. Descriptions are hints for the translator about what to keep in mind when translating the corresponding source texts.s 
 
 Then you can either add a new target column with the button on the right, or drag another (partially) translated file into the app,
 which will also appear as another column.

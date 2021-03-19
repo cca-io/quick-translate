@@ -1,59 +1,17 @@
 open Belt
 open ReactUtils
 
-module HeaderCol = {
-  @react.component
-  let make = (~index, ~value, ~onExport, ~onRemoveTarget, ~onRemoveSource) => {
-    <th>
-      <div className="ButtonRow">
-        {if index === 0 {
-          <IconButton onClick=onRemoveSource title={"Remove source"} icon=#trash />
-        } else if index > 1 {
-          <>
-            <div className="ExportButtonRow">
-              <IconButton
-                title={"Export JSON file"}
-                onClick={evt => onExport(value, File.FileType.Json)}
-                icon=#json
-              />
-              <IconButton
-                title={"Export Properties file"}
-                onClick={evt => onExport(value, Properties)}
-                icon=#properties
-              />
-              <IconButton
-                title={"Export Strings file"}
-                onClick={evt => onExport(value, Strings)}
-                icon=#strings
-              />
-              <IconButton
-                title={"Export Android XML resources file"}
-                onClick={evt => onExport(value, Xml)}
-                icon=#xml
-              />
-            </div>
-            {if index > 2 {
-              <div className="ActionButtonRow">
-                <IconButton
-                  title={"Remove column"} onClick={evt => onRemoveTarget(value)} icon=#trash
-                />
-              </div>
-            } else {
-              React.null
-            }}
-          </>
-        } else {
-          React.null
-        }}
-      </div>
-    </th>
-  }
-}
+type mode = Json | Other
 
 @react.component
 let make = () => {
   let (data, setData) = React.useState(() => Source.empty())
   let (dragging, setDragging, onDragOver, onDragLeave) = Hooks.useDrag()
+  let (useDescription, setUseDescription) = React.useState(() => false)
+  let (mode, setMode) = React.useState(() => Other)
+
+  let canToggleDescription = mode === Json
+  let showDescriptionCol = useDescription && canToggleDescription
 
   let sourceAvailable = data->Array.length > 0
 
@@ -73,7 +31,9 @@ let make = () => {
             ->File.resultToJson
             ->Option.mapWithDefault(data, result =>
               switch sourceOrTarget {
-              | Source => result->Message.fromJson->Source.make(file.name)
+              | Source =>
+                setMode(_ => Json)
+                result->Message.fromJson->Source.make(file.name)
               | Target => result->Message.fromJson->Source.add(data, file.name)
               }
             )
@@ -145,6 +105,8 @@ let make = () => {
     setDragging(_ => false)
   }
 
+  let onToggleDescriptions = _evt => setUseDescription(value => !value)
+
   let onCreateTarget = _evt => {
     let lc = Window.prompt("Enter file name for target")
 
@@ -163,6 +125,7 @@ let make = () => {
     let shallDelete = Window.confirm("Remove source?")
 
     if shallDelete {
+      setMode(_ => Other)
       setData(_ => Source.empty())
     }
   }
@@ -205,7 +168,7 @@ let make = () => {
     ->FileUtils.download(~download={FileUtils.timestampFilename("export.csv")})
 
   let sheetRenderer = (props: DataSheet.SheetProps.t) => {
-    <table className={props.className}>
+    <table className={props.className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
       <thead>
         {sourceAvailable
           ? <tr> <th> {"Source"->s} </th> <th /> <th /> <th> {"Targets"->s} </th> </tr>
@@ -214,7 +177,17 @@ let make = () => {
           {data[0]
           ->Option.getWithDefault([])
           ->Array.mapWithIndex((i, {value}) =>
-            <HeaderCol key={i->Int.toString} index=i value onExport onRemoveTarget onRemoveSource />
+            <HeaderCol
+              key={i->Int.toString}
+              index={i}
+              useDescription
+              canToggleDescription
+              value
+              onExport
+              onRemoveTarget
+              onRemoveSource
+              onToggleDescriptions
+            />
           )
           ->React.array}
         </tr>

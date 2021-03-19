@@ -1,4 +1,8 @@
-type t = {id: string, defaultMessage: string, description: option<string>}
+type t = {
+  id: string,
+  defaultMessage: string,
+  description: option<string>,
+}
 
 let make = (id, ~description=None, defaultMessage) => {
   id: id,
