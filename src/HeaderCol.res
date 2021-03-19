@@ -52,17 +52,11 @@ module IdButtonRow = {
 }
 
 @react.component
-let make = (
-  ~index,
-  ~useDescription,
-  ~canToggleDescription,
-  ~value,
-  ~onExport,
-  ~onRemoveTarget,
-  ~onRemoveSource,
-  ~onToggleDescriptions,
-) => {
+let make = (~index, ~useDescription, ~canToggleDescription, ~value, ~onExport, ~dispatch) => {
   let colType = getColType(index, canToggleDescription)
+  let onToggleDescriptions = _evt => dispatch(AppState.ToggleUseDescription)
+  let onRemoveTarget = column => dispatch(OpenRemoveTargetDialog(column))
+  let onRemoveSource = _evt => dispatch(ToggleRemoveSourceDialog)
 
   <th>
     <div className="ButtonRow">

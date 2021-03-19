@@ -1,19 +1,16 @@
 open Belt
 open ReactUtils
 
-type mode = Json | Other
-
 @react.component
 let make = () => {
-  let (data, setData) = React.useState(() => Source.empty())
+  let (state, dispatch) = React.useReducer(AppState.reducer, AppState.initialState)
   let (dragging, setDragging, onDragOver, onDragLeave) = Hooks.useDrag()
-  let (useDescription, setUseDescription) = React.useState(() => false)
-  let (mode, setMode) = React.useState(() => Other)
+  let {data, useDescription} = state
 
-  let canToggleDescription = mode === Json
-  let showDescriptionCol = useDescription && canToggleDescription
-
+  let canToggleDescription = state.mode === Json
+  let showDescriptionCol = state.useDescription && canToggleDescription
   let sourceAvailable = data->Array.length > 0
+  let onCreateTarget = _evt => dispatch(ToggleCreateTargetDialog)
 
   let handleDrop = (e, sourceOrTarget: FileUtils.file) => {
     e->cancelMouseEvent
@@ -26,17 +23,20 @@ let make = () => {
       switch (file, fileType) {
       | (Some(file), Some(Json)) =>
         File.read(file, result =>
-          setData(_ =>
-            result
-            ->File.resultToJson
-            ->Option.mapWithDefault(data, result =>
-              switch sourceOrTarget {
-              | Source =>
-                setMode(_ => Json)
-                result->Message.fromJson->Source.make(file.name)
-              | Target => result->Message.fromJson->Source.add(data, file.name)
-              }
-            )
+          dispatch(
+            SetData(
+              result
+              ->File.resultToJson
+              ->Option.mapWithDefault(data, result =>
+                switch sourceOrTarget {
+                | Source =>
+                  dispatch(SetMode(Json))
+
+                  result->Message.fromJson->Source.make(file.name)
+                | Target => result->Message.fromJson->Source.add(data, file.name)
+                }
+              ),
+            ),
           )
         )
 
@@ -44,18 +44,20 @@ let make = () => {
         File.read(file, result => {
           let source = result->File.FileResult.toString->Convert.CSV.toArray
 
-          setData(_ => source->Source.fromCsv)
+          dispatch(SetData(source->Source.fromCsv))
         })
 
       | (Some(file), Some(Xml)) =>
         file->File.read(result => {
           let source = result->File.FileResult.toString->Convert.Xml.toArray
 
-          setData(_ =>
-            switch sourceOrTarget {
-            | Source => source->Source.make(file.name)
-            | Target => source->Source.add(data, file.name)
-            }
+          dispatch(
+            SetData(
+              switch sourceOrTarget {
+              | Source => source->Source.make(file.name)
+              | Target => source->Source.add(data, file.name)
+              },
+            ),
           )
         })
 
@@ -63,11 +65,13 @@ let make = () => {
         file->File.read(result => {
           let source = result->File.FileResult.toString->Convert.Strings.toArray
 
-          setData(_ =>
-            switch sourceOrTarget {
-            | Source => source->Source.make(file.name)
-            | Target => source->Source.add(data, file.name)
-            }
+          dispatch(
+            SetData(
+              switch sourceOrTarget {
+              | Source => source->Source.make(file.name)
+              | Target => source->Source.add(data, file.name)
+              },
+            ),
           )
         })
 
@@ -75,11 +79,13 @@ let make = () => {
         file->File.read(~encoding=#"ISO-8859-1", result => {
           let source = result->File.FileResult.toString->Convert.Properties.toArray
 
-          setData(_ =>
-            switch sourceOrTarget {
-            | Source => source->Source.make(file.name)
-            | Target => source->Source.add(data, file.name)
-            }
+          dispatch(
+            SetData(
+              switch sourceOrTarget {
+              | Source => source->Source.make(file.name)
+              | Target => source->Source.add(data, file.name)
+              },
+            ),
           )
         })
 
@@ -98,36 +104,11 @@ let make = () => {
       )
       ->Promise.allArray
       ->Promise.get(results =>
-        setData(_ => results->Array.keepMap(a => a)->Source.addMultiple(data))
+        dispatch(SetData(results->Array.keepMap(a => a)->Source.addMultiple(data)))
       )
     }
 
     setDragging(_ => false)
-  }
-
-  let onToggleDescriptions = _evt => setUseDescription(value => !value)
-
-  let onCreateTarget = _evt => {
-    let lc = Window.prompt("Enter file name for target")
-
-    lc->Option.forEach(lc => setData(_ => []->Source.add(data, lc)))
-  }
-
-  let onRemoveTarget = column => {
-    let shallDelete = Window.confirm(`Delete column "${column}"?`)
-
-    if shallDelete {
-      setData(_ => data->Source.remove(column))
-    }
-  }
-
-  let onRemoveSource = _evt => {
-    let shallDelete = Window.confirm("Remove source?")
-
-    if shallDelete {
-      setMode(_ => Other)
-      setData(_ => Source.empty())
-    }
   }
 
   let onCellsChanged = changes => {
@@ -135,7 +116,7 @@ let make = () => {
 
     changes->Array.forEach(change => dataSheet->Source.update(change))
 
-    setData(_ => dataSheet)
+    dispatch(SetData(dataSheet))
   }
 
   let onExport = (col, fileType) => {
@@ -167,7 +148,7 @@ let make = () => {
     ->Convert.CSV.fromData
     ->FileUtils.download(~download={FileUtils.timestampFilename("export.csv")})
 
-  let sheetRenderer = (props: DataSheet.SheetProps.t) => {
+  let sheetRenderer = (props: DataSheet.SheetProps.t) =>
     <table className={props.className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
       <thead>
         {sourceAvailable
@@ -184,9 +165,7 @@ let make = () => {
               canToggleDescription
               value
               onExport
-              onRemoveTarget
-              onRemoveSource
-              onToggleDescriptions
+              dispatch
             />
           )
           ->React.array}
@@ -194,7 +173,6 @@ let make = () => {
       </thead>
       <tbody> {props.children} </tbody>
     </table>
-  }
 
   <div className="App" onDragOver>
     <Content sourceAvailable>
@@ -207,5 +185,6 @@ let make = () => {
       <IconButton title={"Export to CSV"} size=#Large onClick={onExportCsv} icon=#csv />
       <IconButton title={"Export all JSON files"} size=#Large onClick={onExportAll} icon=#json />
     </Sidebar>
+    <Dialogs dialog=state.dialog data dispatch />
   </div>
 }

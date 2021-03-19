@@ -1,7 +1,9 @@
 open Belt
 open DataSheet
 
-let make = (data: array<Message.t>, fileName): array<array<Cell.t>> => {
+type t = array<array<Cell.t>>
+
+let make = (data: array<Message.t>, fileName): t => {
   data
   ->Array.map(({id, defaultMessage, description}) => [
     Cell.makeRO(id),
@@ -20,7 +22,7 @@ let make = (data: array<Message.t>, fileName): array<array<Cell.t>> => {
   )
 }
 
-let add = (target: array<Message.t>, data: array<array<Cell.t>>, fileName) => {
+let add = (target: array<Message.t>, data: t, fileName) => {
   let targetMap =
     target
     ->Array.map(({Message.id: id, defaultMessage}) => (id, defaultMessage))
@@ -46,7 +48,7 @@ let add = (target: array<Message.t>, data: array<array<Cell.t>>, fileName) => {
   [header]->Array.concat(body)
 }
 
-let addMultiple = (targets: array<(string, array<Js.Json.t>)>, data: array<array<Cell.t>>) => {
+let addMultiple = (targets: array<(string, array<Js.Json.t>)>, data: t) => {
   targets->Array.reduce(data, (newData, (fileName, target)) =>
     target->Message.fromJson->add(newData, fileName)
   )
@@ -65,10 +67,10 @@ let fromCsv = rows => {
   [header]->Array.concat(body)
 }
 
-let getColIndex = (data: array<array<Cell.t>>, column) =>
+let getColIndex = (data: t, column) =>
   data[0]->Option.getWithDefault([])->Array.getIndexBy(col => col.value === column)
 
-let remove = (data: array<array<Cell.t>>, column: string) => {
+let remove = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)
 
   switch colIndex {
@@ -84,7 +86,7 @@ let update = (data, changes) => data->DataSheet.update(changes)
 
 let empty = () => []
 
-let getColData = (data: array<array<Cell.t>>, column: string) => {
+let getColData = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)
   let body = data->Array.sliceToEnd(1)
 
