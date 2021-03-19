@@ -41,8 +41,8 @@ module IdButtonRow = {
   @react.component
   let make = (~useDescription, ~canToggleDescription, ~onRemoveSource, ~onToggleDescriptions) => {
     let (title, icon) = useDescription
-      ? ("Hide descriptions", #trash)
-      : ("Show descriptions", #trash)
+      ? ("Hide descriptions", #hideDescription)
+      : ("Show descriptions", #showDescription)
 
     <div className="IdButtonRow">
       <IconButton onClick=onRemoveSource title={"Remove source"} icon=#trash />

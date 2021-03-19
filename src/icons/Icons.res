@@ -1,4 +1,7 @@
+module Action = Icons_Action
 module Csv = Icons_Csv
+module ShowDescription = Icons_ShowDescription
+module HideDescription = Icons_HideDescription
 module File = Icons_File
 module Json = Icons_Json
 module Plus = Icons_Plus
