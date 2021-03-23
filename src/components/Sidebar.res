@@ -4,6 +4,5 @@ module Spacer = {
 }
 
 @react.component
-let make = (~sourceAvailable, ~children) => {
+let make = (~sourceAvailable, ~children) =>
   sourceAvailable ? <aside className="Sidebar"> {children} </aside> : React.null
-}

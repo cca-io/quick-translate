@@ -10,7 +10,12 @@ let make = () => {
   let canToggleDescription = state.mode === Json
   let showDescriptionCol = state.useDescription && canToggleDescription
   let sourceAvailable = data->Array.length > 0
-  let onCreateTarget = _evt => dispatch(ToggleCreateTargetDialog)
+  let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
+
+  Hooks.useMultiKeyPress(["Control", "Shift", "?"], () => dispatch(SetDialog(Help)))
+  Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
+  Hooks.useMultiKeyPress(["Control", "Shift", "R"], () => dispatch(SetDialog(RemoveSource)))
+  Hooks.useMultiKeyPress(["Control", "Shift", "D"], () => dispatch(ToggleUseDescription))
 
   let handleDrop = (e, sourceOrTarget: FileUtils.file) => {
     e->cancelMouseEvent

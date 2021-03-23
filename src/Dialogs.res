@@ -2,12 +2,12 @@ open ReactUtils
 
 @react.component
 let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
-  let onClose = _evt => dispatch(AppState.CloseDialog)
+  let onClose = _evt => dispatch(AppState.SetDialog(Closed))
 
   switch dialog {
   | Closed => React.null
 
-  | CreateTargetDialog =>
+  | CreateTarget =>
     <Dialog.Prompt
       open_=true
       title={"Create new target"}
@@ -16,7 +16,7 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       onSubmit={value => dispatch(SetData([]->Source.add(data, value)))}
     />
 
-  | RemoveTargetDialog(column) =>
+  | RemoveTarget(column) =>
     <Dialog.Confirm
       open_=true
       title={"Remove target"}
@@ -25,7 +25,7 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       onSubmit={_ => dispatch(SetData(data->Source.remove(column)))}
     />
 
-  | RemoveSourceDialog =>
+  | RemoveSource =>
     <Dialog.Confirm
       open_=true
       title={"Remove source"}
@@ -33,5 +33,10 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       onSubmit={_ => dispatch(SetData(Source.empty()))}
       onClose
     />
+
+  | Help =>
+    <Dialog.Info open_=true title={"Help"} onClose>
+      <div> {"Keyboard shortcuts"->s} </div>
+    </Dialog.Info>
   }
 }

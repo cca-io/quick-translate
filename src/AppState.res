@@ -2,9 +2,10 @@ type mode = Json | Other
 
 type dialog =
   | Closed
-  | CreateTargetDialog
-  | RemoveTargetDialog(string)
-  | RemoveSourceDialog
+  | CreateTarget
+  | RemoveTarget(string)
+  | RemoveSource
+  | Help
 
 type state = {
   data: Source.t,
@@ -17,20 +18,14 @@ type action =
   | SetMode(mode)
   | SetData(Source.t)
   | ToggleUseDescription
-  | ToggleCreateTargetDialog
-  | OpenRemoveTargetDialog(string)
-  | CloseDialog
-  | ToggleRemoveSourceDialog
+  | SetDialog(dialog)
 
 let reducer = (state, action) =>
   switch action {
   | SetMode(mode) => {...state, mode: mode}
   | SetData(data) => {...state, data: data, dialog: Closed}
   | ToggleUseDescription => {...state, useDescription: !state.useDescription}
-  | ToggleCreateTargetDialog => {...state, dialog: CreateTargetDialog}
-  | OpenRemoveTargetDialog(column) => {...state, dialog: RemoveTargetDialog(column)}
-  | CloseDialog => {...state, dialog: Closed}
-  | ToggleRemoveSourceDialog => {...state, dialog: RemoveSourceDialog}
+  | SetDialog(dialog) => {...state, dialog: dialog}
   }
 
 let initialState = {

@@ -1,16 +1,9 @@
 open ReactUtils
 
-module Internal = {
+module Info = {
   @react.component
   let make = (~open_, ~title, ~onClose, ~children) => {
-    let escPress = Hooks.useKeyPress("Escape")
-
-    React.useEffect1(() => {
-      if escPress {
-        onClose()
-      }
-      None
-    }, [escPress])
+    Hooks.useKeyPress(~omiTextfields=false, "Escape", () => onClose())
 
     open_
       ? <div className="Dialog">
@@ -41,32 +34,25 @@ module Prompt = {
         }
       )
 
-    <Internal open_ title onClose>
+    <Info open_ title onClose>
       <div> {label} </div>
       <div> <input autoFocus=true type_="text" value onChange onKeyPress /> </div>
       <div> <button disabled onClick> {"OK"->s} </button> </div>
-    </Internal>
+    </Info>
   }
 }
 
 module Confirm = {
   @react.component
   let make = (~open_, ~title, ~label, ~onSubmit, ~onClose) => {
-    let enterPress = Hooks.useKeyPress("Enter")
+    Hooks.useKeyPress(~omiTextfields=false, "Enter", () => onSubmit())
 
-    React.useEffect1(() => {
-      if enterPress {
-        onSubmit()
-      }
-      None
-    }, [enterPress])
-
-    <Internal open_ title onClose>
+    <Info open_ title onClose>
       {<div> {label} </div>}
       {<div>
         <button onClick={_evt => onClose()}> {"NO"->s} </button>
         <button onClick={_evt => onSubmit()}> {"YES"->s} </button>
       </div>}
-    </Internal>
+    </Info>
   }
 }
