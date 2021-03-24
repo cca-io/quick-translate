@@ -1,5 +1,19 @@
 open ReactUtils
 
+module Shortcut = {
+  @react.component
+  let make = (~title, ~single=false, ~keycap) =>
+    <div className="Shortcut">
+      <div className="ShortcutKeycaps">
+        {single
+          ? React.null
+          : <> <kbd> {"Ctrl"->s} </kbd> {" + "->s} <kbd> {"Shift"->s} </kbd> {" + "->s} </>}
+        <kbd> {keycap->s} </kbd>
+      </div>
+      <div> {title->s} </div>
+    </div>
+}
+
 @react.component
 let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
   let onClose = _evt => dispatch(AppState.SetDialog(Closed))
@@ -36,7 +50,15 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
 
   | Help =>
     <Dialog.Info open_=true title={"Help"} onClose>
-      <div> {"Keyboard shortcuts"->s} </div>
+      <h3> {"Keyboard shortcuts"->s} </h3>
+      <h4> {"Main view"->s} </h4>
+      <Shortcut keycap={"?"} title="Help dialog" />
+      <Shortcut keycap={"N"} title="Create a new target" />
+      <Shortcut keycap={"R"} title="Remove source" />
+      <Shortcut keycap={"D"} title="Toggle Description column" />
+      <h4> {"Dialogs"->s} </h4>
+      <Shortcut single=true keycap={"Esc"} title="Close dialog" />
+      <Shortcut single=true keycap={"Enter"} title="Confirm dialog" />
     </Dialog.Info>
   }
 }
