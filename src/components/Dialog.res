@@ -25,11 +25,11 @@ module Prompt = {
     let (value, setValue) = React.useState(() => "")
     let onChange = evt => setValue(_ => evt->valueFromEvent)
     let onClick = _evt => onSubmit(value)
-    let disabled = value->Js.String.length === 0
+    let disabled = value->String.length === 0
 
     let onKeyPress = evt =>
       evt->doOnEnterHit(() =>
-        if value->Js.String.trim !== "" {
+        if value->String.trim !== "" {
           onSubmit(value)
         }
       )

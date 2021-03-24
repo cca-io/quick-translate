@@ -1,4 +1,4 @@
-open Belt
+open Stdlib
 
 let useDragOver = () => {
   let (dragging, setDragging) = React.useState(() => false)
@@ -46,7 +46,7 @@ let blacklistedTargets = ["INPUT", "TEXTAREA"]
 
 let isTargetOk = (~omiTextfields=true, evt) =>
   !omiTextfields ||
-  !(blacklistedTargets->Js.Array2.includes((evt->KeyboardEvent.target)["tagName"]))
+  !(blacklistedTargets->Array.Unsafe.includes((evt->KeyboardEvent.target)["tagName"]))
 
 let useKeyPress = (~omiTextfields=true, targetKey: string, callback: unit => unit) => {
   let (keyPressed, setKeyPressed) = React.useState(() => false)

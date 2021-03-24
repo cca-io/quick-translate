@@ -1,13 +1,15 @@
+open Stdlib
+
 type file = Source | Target
 
 let fileNameWithoutExt = fileName => {
-  let fileNameArray = fileName->Js.String2.split(".")
+  let fileNameArray = fileName->String.split(".")
 
   fileNameArray->Array.length === 1
     ? fileName
     : fileNameArray
-      ->Belt.Array.slice(~offset=0, ~len=fileNameArray->Array.length - 1)
-      ->Js.Array2.joinWith("")
+      ->Array.slice(~offset=0, ~len=fileNameArray->Array.length - 1)
+      ->Array.Unsafe.joinWith("")
 }
 
 let download = (~download, ~blankTarget=true, url) => {
@@ -27,9 +29,9 @@ let download = (~download, ~blankTarget=true, url) => {
 }
 
 let timestampFilename = filename => {
-  let timestamp = Js.Date.make()->Js.Date.toISOString->Js.String2.split(".")
+  let timestamp = Date.make()->Date.toISOString->String.split(".")
   let formatted =
-    timestamp[0]->Js.String2.replace("T", "_")->Js.String2.replaceByRe(%re("/:/g"), "-")
+    timestamp->Array.getUnsafe(0)->String.replace("T", "_")->String.replaceByRe(%re("/:/g"), "-")
 
   formatted ++ "-" ++ filename
 }

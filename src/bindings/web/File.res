@@ -1,6 +1,8 @@
+open Stdlib
+
 type t = {
   lastModified: int,
-  lastModifiedDate: Js.Date.t,
+  lastModifiedDate: Date.t,
   name: string,
   size: int,
   \"type": string,
@@ -59,14 +61,14 @@ let fromMouseEvent: ReactEvent.Mouse.t => array<t> = e => {
 }
 
 let getExtension = fileName =>
-  fileName->Js.String2.split(".")->Array.copy->Js.Array.pop->Belt.Option.map(ext => "." ++ ext)
+  fileName->String.split(".")->Array.copy->Array.Unsafe.pop->Option.map(ext => "." ++ ext)
 
 let getFileType = (file: t) => {
   let type_ = file.\"type"
 
-  type_->Js.String.length > 0
+  type_->String.length > 0
     ? type_->FileType.fromMimetype
-    : file.name->getExtension->Belt.Option.flatMap(FileType.fromExtension)
+    : file.name->getExtension->Option.flatMap(FileType.fromExtension)
 }
 
 let isJson = (file: t) => file.\"type" === "application/json"
@@ -78,4 +80,4 @@ let read = (file: t, ~encoding=#"UTF-8", cb) => {
 }
 
 let resultToJson = (result: FileResult.t) =>
-  result->FileResult.toString->Js.Json.parseExn->Js.Json.decodeArray
+  result->FileResult.toString->Json.parseExn->Json.decodeArray

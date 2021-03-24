@@ -1,4 +1,4 @@
-open Belt
+open Stdlib
 open ReactUtils
 
 @react.component
@@ -180,18 +180,20 @@ let make = () => {
       <tbody> {props.children} </tbody>
     </table>
 
-  let cellRenderer = (props: DataSheet.CellProps.t) =>
+  let cellRenderer = (
+    {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
+  ) =>
     <td
-      onMouseDown={props.onMouseDown}
-      onMouseOver={props.onMouseOver}
-      onDoubleClick={props.onDoubleClick}
-      className={props.className->Cn.addIf(
-        props.cell.value->Js.String.length === 0 &&
-        !(props.className->Js.String2.includes("description")) &&
-        !(props.className->Js.String2.includes("read-only")),
+      onMouseDown={onMouseDown}
+      onMouseOver={onMouseOver}
+      onDoubleClick={onDoubleClick}
+      className={className->Cn.addIf(
+        cell.value->String.length === 0 &&
+        !(className->String.includes("description")) &&
+        !(className->String.includes("read-only")),
         "blank",
       )}>
-      {props.children}
+      {children}
     </td>
 
   <div className="App" onDragOver>

@@ -1,4 +1,4 @@
-open Belt
+open Stdlib
 open DataSheet
 
 type t = array<array<Cell.t>>
@@ -48,7 +48,7 @@ let add = (target: array<Message.t>, data: t, fileName) => {
   [header]->Array.concat(body)
 }
 
-let addMultiple = (targets: array<(string, array<Js.Json.t>)>, data: t) => {
+let addMultiple = (targets: array<(string, array<Json.t>)>, data: t) => {
   targets->Array.reduce(data, (newData, (fileName, target)) =>
     target->Message.fromJson->add(newData, fileName)
   )
@@ -96,7 +96,7 @@ let getColData = (data: t, column: string) => {
       switch (row[0], row[1], row[index]) {
       | (Some(key), Some(desc), Some(source)) =>
         Message.make(
-          ~description=desc.value->Js.String.length > 0 ? Some(desc.value) : None,
+          ~description=desc.value->String.length > 0 ? Some(desc.value) : None,
           key.value,
           source.value,
         )->Some
