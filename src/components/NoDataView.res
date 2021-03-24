@@ -2,7 +2,7 @@ open Stdlib
 open ReactUtils
 
 let fileTypes = [
-  ("CSV", " (with ; separator)"),
+  ("CSV", ""),
   ("JSON", ""),
   ("Java Properties", ""),
   ("Strings", " (XCode)"),
