@@ -1,6 +1,11 @@
-module Spacer = {
+module Top = {
   @react.component
-  let make = () => <div className="Spacer" />
+  let make = (~children) => <div className="SidebarTop"> {children} </div>
+}
+
+module Bottom = {
+  @react.component
+  let make = (~children) => <div className="SidebarBottom"> {children} </div>
 }
 
 @react.component

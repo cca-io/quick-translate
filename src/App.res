@@ -11,6 +11,7 @@ let make = () => {
   let showDescriptionCol = state.useDescription && canToggleDescription
   let sourceAvailable = data->Array.length > 0
   let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
+  let onOpenHelp = _evt => dispatch(SetDialog(Help))
 
   Hooks.useMultiKeyPress(["Control", "Shift", "?"], () => dispatch(SetDialog(Help)))
   Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
@@ -186,9 +187,14 @@ let make = () => {
       <ImportOverlay dragging sourceAvailable onDragLeave handleDrop />
     </Content>
     <Sidebar sourceAvailable>
-      <IconButton title={"Add new language"} size=#Large onClick={onCreateTarget} icon=#plus />
-      <IconButton title={"Export to CSV"} size=#Large onClick={onExportCsv} icon=#csv />
-      <IconButton title={"Export all JSON files"} size=#Large onClick={onExportAll} icon=#json />
+      <Sidebar.Top>
+        <IconButton title={"Add new language"} size=#Large onClick={onCreateTarget} icon=#plus />
+        <IconButton title={"Export to CSV"} size=#Large onClick={onExportCsv} icon=#csv />
+        <IconButton title={"Export all JSON files"} size=#Large onClick={onExportAll} icon=#json />
+      </Sidebar.Top>
+      <Sidebar.Bottom>
+        <IconButton title={"Help"} onClick={onOpenHelp} icon=#help />
+      </Sidebar.Bottom>
     </Sidebar>
     <Dialogs dialog=state.dialog data dispatch />
   </div>
