@@ -15,3 +15,5 @@ let cancelMouseEvent = (e: ReactEvent.Mouse.t) => {
   e->ReactEvent.Mouse.stopPropagation
   e->ReactEvent.Mouse.preventDefault
 }
+
+let nbsp = `\u00A0`

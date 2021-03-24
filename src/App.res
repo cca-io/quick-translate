@@ -188,9 +188,10 @@ let make = () => {
       onMouseOver={onMouseOver}
       onDoubleClick={onDoubleClick}
       className={className->Cn.addIf(
-        cell.value->String.length === 0 &&
-        !(className->String.includes("description")) &&
-        !(className->String.includes("read-only")),
+        cell.value->String.length === 0 ||
+          (cell.value === ReactUtils.nbsp &&
+          !(className->String.includes("description")) &&
+          !(className->String.includes("read-only"))),
         "blank",
       )}>
       {children}
