@@ -11,6 +11,7 @@ module Array: {
   external setUnsafe: (array<'a>, int, 'a) => unit = "%array_unsafe_set"
   let shuffleInPlace: array<'a> => unit
   let shuffle: array<'a> => array<'a>
+  let swap: (array<'a>, int, int) => array<'a>
   let reverseInPlace: array<'a> => unit
   let reverse: array<'a> => array<'a>
   @new external makeUninitialized: int => array<Js.undefined<'a>> = "Array"
@@ -102,6 +103,7 @@ module RegExp: {
   @get external ignoreCase: t => bool = "ignoreCase"
   @get external lastIndex: t => int = "lastIndex"
   @set external setLastIndex: (t, int) => unit = "lastIndex"
+
   @get external multiline: t => bool = "multiline"
   @get external source: t => string = "source"
   @get external sticky: t => bool = "sticky"

@@ -1,6 +1,5 @@
 module CSV: {
-  let fromData: array<array<DataSheet.Cell.t>> => string
-  let toArray: string => array<array<Js.String2.t>>
+  let fromData: (~delimiter: string, array<array<DataSheet.Cell.t>>) => string
 }
 
 module Json: {

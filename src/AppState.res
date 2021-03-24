@@ -1,4 +1,4 @@
-type mode = Json | Other
+type mode = Json | Csv({commentIndex: option<int>, delimiter: string}) | Other
 
 type dialog =
   | Closed

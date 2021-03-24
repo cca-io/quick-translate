@@ -1,13 +1,24 @@
 open Stdlib
 open ReactUtils
 
+%%private(
+  let swapIndex = (data, index) =>
+    data->Array.map(row => {
+      if index !== 1 {
+        row->Array.swap(index, 1)
+      } else {
+        row
+      }
+    })
+)
+
 @react.component
 let make = () => {
   let (state, dispatch) = React.useReducer(AppState.reducer, AppState.initialState)
   let (dragging, setDragging, onDragOver, onDragLeave) = Hooks.useDrag()
   let {data, useDescription} = state
 
-  let canToggleDescription = state.mode === Json
+  let canToggleDescription = state.mode !== Other
   let showDescriptionCol = state.useDescription && canToggleDescription
   let sourceAvailable = data->Array.length > 0
   let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
@@ -48,9 +59,28 @@ let make = () => {
 
       | (Some(file), Some(Csv)) =>
         File.read(file, result => {
-          let source = result->File.FileResult.toString->Convert.CSV.toArray
+          switch result->File.FileResult.toString->Papa.parse {
+          | Success(parseResult, delimiter) =>
+            let commentIndex =
+              parseResult
+              ->Array.getUnsafe(0)
+              ->Array.getIndexBy(text =>
+                ["comments", "comment", "description"]->Array.some(str =>
+                  text->String.toLowerCase->String.includes(str)
+                )
+              )
 
-          dispatch(SetData(source->Source.fromCsv))
+            dispatch(SetMode(Csv({commentIndex: commentIndex, delimiter: delimiter})))
+
+            let source = switch commentIndex {
+            | Some(commentIndex) => parseResult->swapIndex(commentIndex)
+            | None => parseResult
+            }
+
+            dispatch(SetData(source->Source.fromCsv))
+
+          | Error => ()
+          }
         })
 
       | (Some(file), Some(Xml)) =>
@@ -149,10 +179,17 @@ let make = () => {
     )
   }
 
-  let onExportCsv = _evt =>
-    data
-    ->Convert.CSV.fromData
+  let onExportCsv = _evt => {
+    let (newData, delimiter) = switch state.mode {
+    | Csv({commentIndex: Some(index), delimiter}) => (data->swapIndex(index), delimiter)
+    | Csv({delimiter}) => (data, delimiter)
+    | _ => (data, ";")
+    }
+
+    newData
+    ->Convert.CSV.fromData(~delimiter)
     ->FileUtils.download(~download={FileUtils.timestampFilename("export.csv")})
+  }
 
   let sheetRenderer = (props: DataSheet.SheetProps.t) =>
     <table className={props.className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>

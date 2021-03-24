@@ -1,6 +1,14 @@
 module Array = {
   module Unsafe = Js.Array2
   include Belt.Array
+
+  let swap = (arr, indexA, indexB) => {
+    let copy = Belt.Array.copy(arr)
+    let temp = copy[indexA]
+    copy[indexA] = copy[indexB]
+    copy[indexB] = temp
+    copy
+  }
 }
 
 module Map = {

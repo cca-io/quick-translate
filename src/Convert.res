@@ -27,66 +27,11 @@ let toArrayHelper = (~regex, str) => {
 }
 
 module CSV = {
-  let separator = ";"
-
-  let fromData = (data: array<array<DataSheet.Cell.t>>) => {
+  let fromData = (~delimiter: string, data: array<array<DataSheet.Cell.t>>) => {
     let csvData =
-      data
-      ->Array.map(row =>
-        row->Array.map(cell => `"${cell.value}"`)->Array.Unsafe.joinWith(separator)
-      )
-      ->Array.Unsafe.joinWith("\n")
+      data->Array.map(row => row->Array.map(cell => cell.value))->Papa.unparse(~delimiter)
 
-    `data:text/csv;charset=utf-8,\uFEFF${Js.Global.encodeURI(csvData)}`
-  }
-
-  let regex =
-    // Delimiters:
-    "(" ++
-    separator ++
-    "|\r?\n|\r|^)" ++
-    // Quoted fields:
-    "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" ++
-    // Standard fields:
-    "([^" ++
-    separator ++ "\r\n]*))"
-
-  let toArray = str => {
-    let rows = [[]]
-    let pattern = RegExp.make(regex, "gi")
-
-    let rec loop = () => {
-      switch pattern->RegExp.exec_(str) {
-      | Some(re) =>
-        switch re->RegExp.captures->Array.get(1) {
-        | Some(matchedDelimiter) if matchedDelimiter->Nullable.toOption !== Some(separator) =>
-          rows->Array.Unsafe.push([])->ignore
-        | _ => ()
-        }
-
-        let matchedValue = switch re->RegExp.captures->Array.get(2) {
-        | Some(matchedValue) =>
-          matchedValue
-          ->Nullable.toOption
-          ->Option.flatMap(str => Some(str->String.replaceByRe(%re("/[\"\"]+/g"), "\"")))
-
-        | _ => re->RegExp.captures->Array.get(3)->Option.flatMap(Nullable.toOption)
-        }
-
-        rows[rows->Array.length - 1]
-        ->Option.getWithDefault([])
-        ->Array.Unsafe.push(matchedValue->Option.getWithDefault(""))
-        ->ignore
-
-        loop()
-
-      | None => ()
-      }
-    }
-
-    loop()
-
-    rows
+    `data:text/csv;charset=utf-8,\uFEFF${Js.Global.encodeURIComponent(csvData)}`
   }
 }
 
