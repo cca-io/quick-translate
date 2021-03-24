@@ -38,12 +38,24 @@ module SheetProps = {
   type t = {data: data, className: string, children: React.element}
 }
 
+module CellProps = {
+  type t = {
+    cell: Cell.t,
+    className: string,
+    onMouseDown: ReactEvent.Mouse.t => unit,
+    onMouseOver: ReactEvent.Mouse.t => unit,
+    onDoubleClick: ReactEvent.Mouse.t => unit,
+    children: React.element,
+  }
+}
+
 let update = (grid, {Change.row: row, col, value, _}) =>
   grid[row][col] = {...grid[row][col], Cell.value: value}
 
 @react.component @module("react-datasheet")
 external make: (
   ~data: data,
+  ~cellRenderer: CellProps.t => React.element=?,
   ~valueRenderer: Cell.t => string,
   ~sheetRenderer: SheetProps.t => React.element=?,
   ~onCellsChanged: array<Change.t> => unit,
