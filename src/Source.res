@@ -96,7 +96,7 @@ let getColData = (data: t, column: string) => {
       switch (row[0], row[1], row[index]) {
       | (Some(key), Some(desc), Some(source)) =>
         Message.make(
-          ~description=desc.value->String.length > 0 ? Some(desc.value) : None,
+          ~description=?desc.value->String.length > 0 ? Some(desc.value) : None,
           key.value,
           source.value,
         )->Some

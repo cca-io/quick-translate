@@ -12,6 +12,25 @@ open ReactUtils
     })
 )
 
+%%private(
+  let cellRenderer = (
+    {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
+  ) =>
+    <td
+      onMouseDown={onMouseDown}
+      onMouseOver={onMouseOver}
+      onDoubleClick={onDoubleClick}
+      className={className->Cn.addIf(
+        cell.value->String.length === 0 ||
+          (cell.value === ReactUtils.nbsp &&
+          !(className->String.includes("description")) &&
+          !(className->String.includes("read-only"))),
+        "blank",
+      )}>
+      {children}
+    </td>
+)
+
 @react.component
 let make = () => {
   let (state, dispatch) = React.useReducer(AppState.reducer, AppState.initialState)
@@ -147,15 +166,15 @@ let make = () => {
     setDragging(_ => false)
   }
 
-  let onCellsChanged = changes => {
+  let onCellsChanged = React.useCallback1(changes => {
     let dataSheet = data->Array.copy
 
     changes->Array.forEach(change => dataSheet->Source.update(change))
 
     dispatch(SetData(dataSheet))
-  }
+  }, [data])
 
-  let onExport = (col, fileType) => {
+  let onExport = React.useCallback1((col, fileType) => {
     let download = col ++ fileType->File.FileType.toExtension
 
     switch fileType {
@@ -165,9 +184,9 @@ let make = () => {
     | Xml => data->Convert.Xml.fromData(col)->FileUtils.download(~download)
     | _ => ()
     }
-  }
+  }, [data])
 
-  let onExportAll = _evt => {
+  let onExportAll = React.useCallback1(_evt => {
     data[0]
     ->Option.getWithDefault([])
     ->Array.forEachWithIndex((i, cell) =>
@@ -177,9 +196,9 @@ let make = () => {
         ->FileUtils.download(~download={cell.value ++ ".json"})
       }
     )
-  }
+  }, [data])
 
-  let onExportCsv = _evt => {
+  let onExportCsv = React.useCallback2(_evt => {
     let (newData, delimiter) = switch state.mode {
     | Csv({commentIndex: Some(index), delimiter}) => (data->swapIndex(index), delimiter)
     | Csv({delimiter}) => (data, delimiter)
@@ -189,7 +208,7 @@ let make = () => {
     newData
     ->Convert.CSV.fromData(~delimiter)
     ->FileUtils.download(~download={FileUtils.timestampFilename("export.csv")})
-  }
+  }, (state.mode, data))
 
   let sheetRenderer = (props: DataSheet.SheetProps.t) =>
     <table className={props.className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
@@ -216,23 +235,6 @@ let make = () => {
       </thead>
       <tbody> {props.children} </tbody>
     </table>
-
-  let cellRenderer = (
-    {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
-  ) =>
-    <td
-      onMouseDown={onMouseDown}
-      onMouseOver={onMouseOver}
-      onDoubleClick={onDoubleClick}
-      className={className->Cn.addIf(
-        cell.value->String.length === 0 ||
-          (cell.value === ReactUtils.nbsp &&
-          !(className->String.includes("description")) &&
-          !(className->String.includes("read-only"))),
-        "blank",
-      )}>
-      {children}
-    </td>
 
   <div className="App" onDragOver>
     <Content sourceAvailable>

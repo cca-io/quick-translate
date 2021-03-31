@@ -49,7 +49,7 @@ module CellProps = {
   }
 }
 
-let update = (grid, {Change.row: row, col, value, _}) =>
+let update = (grid, {Change.row: row, col, value}) =>
   grid[row][col] = {...grid[row][col], Cell.value: value}
 
 @react.component @module("react-datasheet")

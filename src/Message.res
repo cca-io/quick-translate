@@ -6,7 +6,7 @@ type t = {
   description: option<string>,
 }
 
-let make = (id, ~description=None, defaultMessage) => {
+let make = (id, ~description=?, defaultMessage) => {
   id: id,
   defaultMessage: defaultMessage,
   description: description,
