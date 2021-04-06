@@ -1,14 +1,21 @@
 open ReactUtils
 
+type shortcut = Simple | Ctrl | CtrlShift
+
 module Shortcut = {
+  let add = (a, b) => <> a {" + "->s} b </>
+  let \"+" = add
+  let kc = text => <kbd> {text->s} </kbd>
+
   @react.component
-  let make = (~title, ~single=false, ~keycap) =>
+  let make = (~title, ~type_=Simple, ~keycap) =>
     <div className="Shortcut">
       <div className="ShortcutKeycaps">
-        {single
-          ? React.null
-          : <> <kbd> {"Ctrl"->s} </kbd> {" + "->s} <kbd> {"Shift"->s} </kbd> {" + "->s} </>}
-        <kbd> {keycap->s} </kbd>
+        {switch type_ {
+        | Simple => kc(keycap)
+        | Ctrl => kc("Ctrl") + kc(keycap)
+        | CtrlShift => kc("Ctrl") + kc("Shift") + kc(keycap)
+        }}
       </div>
       <div> {title->s} </div>
     </div>
@@ -52,13 +59,15 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
     <Dialog.Info open_=true title={"Help"} onClose>
       <h3> {"Keyboard shortcuts"->s} </h3>
       <h4> {"Main view"->s} </h4>
-      <Shortcut keycap={"?"} title="Help dialog" />
-      <Shortcut keycap={"N"} title="Create a new target" />
-      <Shortcut keycap={"R"} title="Remove source" />
-      <Shortcut keycap={"D"} title="Toggle Description column" />
+      <Shortcut type_=Ctrl keycap={"Z"} title="Undo" />
+      <Shortcut type_=CtrlShift keycap={"Z"} title="Redo" />
+      <Shortcut type_=CtrlShift keycap={"D"} title="Toggle Description column" />
+      <Shortcut type_=CtrlShift keycap={"N"} title="Create a new target" />
+      <Shortcut type_=CtrlShift keycap={"R"} title="Remove source" />
+      <Shortcut type_=CtrlShift keycap={"?"} title="Help dialog" />
       <h4> {"Dialogs"->s} </h4>
-      <Shortcut single=true keycap={"Esc"} title="Close dialog" />
-      <Shortcut single=true keycap={"Enter"} title="Confirm dialog" />
+      <Shortcut keycap={"Esc"} title="Close dialog" />
+      <Shortcut keycap={"Enter"} title="Confirm dialog" />
     </Dialog.Info>
   }
 }

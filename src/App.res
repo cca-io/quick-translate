@@ -13,7 +13,7 @@ open ReactUtils
     let className =
       className->Cn.addIf(
         cell.value->String.length === 0 ||
-          (cell.value === ReactUtils.nbsp &&
+          (cell.value === nbsp &&
           !(className->String.includes("description")) &&
           !(className->String.includes("read-only"))),
         "blank",
@@ -39,6 +39,9 @@ let make = () => {
   Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
   Hooks.useMultiKeyPress(["Control", "Shift", "R"], () => dispatch(SetDialog(RemoveSource)))
   Hooks.useMultiKeyPress(["Control", "Shift", "D"], () => dispatch(ToggleUseDescription))
+
+  Hooks.useMultiKeyPress(["Control", "z"], () => dispatch(Undo))
+  Hooks.useMultiKeyPress(["Control", "Shift", "Z"], () => dispatch(Redo))
 
   let handleDrop = (e, sourceOrTarget: FileUtils.file) => {
     e->cancelMouseEvent
@@ -159,11 +162,9 @@ let make = () => {
   }
 
   let onCellsChanged = React.useCallback1(changes => {
-    let dataSheet = data->Array.copy
+    let changedData = data->Source.update(changes)
 
-    changes->Array.forEach(change => dataSheet->Source.update(change))
-
-    dispatch(SetData(dataSheet))
+    dispatch(SetData(changedData))
   }, [data])
 
   let onExport = React.useCallback1((col, fileType) => {
@@ -202,8 +203,8 @@ let make = () => {
     ->FileUtils.download(~download=FileUtils.timestampFilename("export.csv"))
   }, (state.mode, data))
 
-  let sheetRenderer = (props: DataSheet.SheetProps.t) =>
-    <table className={props.className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
+  let sheetRenderer = ({data, className, children}: DataSheet.SheetProps.t) =>
+    <table className={className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
       <thead>
         {sourceAvailable
           ? <tr> <th> {"Source"->s} </th> <th /> <th /> <th> {"Targets"->s} </th> </tr>
@@ -225,7 +226,7 @@ let make = () => {
           ->React.array}
         </tr>
       </thead>
-      <tbody> {props.children} </tbody>
+      <tbody> {children} </tbody>
     </table>
 
   <div className="App" onDragOver>

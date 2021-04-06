@@ -1,7 +1,7 @@
 open Stdlib
 open DataSheet
 
-type t = array<array<Cell.t>>
+type t = DataSheet.data
 
 let make = (data: array<Message.t>, fileName): t => {
   data
@@ -82,7 +82,13 @@ let remove = (data: t, column: string) => {
   }
 }
 
-let update = (data, changes) => data->DataSheet.update(changes)
+let update = (data: t, changes: array<Change.t>): t => {
+  // Needed in order to not mutate the state.
+  let copy = data->Array.map(inner => inner->Array.copy)
+
+  changes->Array.forEach(change => copy->DataSheet.update(change))
+  copy
+}
 
 let empty = () => []
 
