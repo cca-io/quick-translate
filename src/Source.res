@@ -22,7 +22,7 @@ let make = (data: array<Message.t>, fileName): t => {
   )
 }
 
-let add = (target: array<Message.t>, data: t, fileName) => {
+let add = (data: t, target: array<Message.t>, fileName) => {
   let targetMap =
     target
     ->Array.map(({Message.id: id, defaultMessage}) => (id, defaultMessage))
@@ -48,9 +48,9 @@ let add = (target: array<Message.t>, data: t, fileName) => {
   [header]->Array.concat(body)
 }
 
-let addMultiple = (targets: array<(string, array<Json.t>)>, data: t) => {
+let addMultiple = (data: t, targets: array<(string, array<Json.t>)>) => {
   targets->Array.reduce(data, (newData, (fileName, target)) =>
-    target->Message.fromJson->add(newData, fileName)
+    newData->add(target->Message.fromJson, fileName)
   )
 }
 

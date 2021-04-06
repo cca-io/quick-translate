@@ -27,7 +27,7 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       title={"Create new target"}
       label={"Enter file name for target"->s}
       onClose
-      onSubmit={value => dispatch(SetData([]->Source.add(data, value)))}
+      onSubmit={value => dispatch(SetData(data->Source.add([], value)))}
     />
 
   | RemoveTarget(column) =>

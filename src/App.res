@@ -3,32 +3,24 @@ open ReactUtils
 
 %%private(
   let swapIndex = (data, index) =>
-    data->Array.map(row => {
-      if index !== 1 {
-        row->Array.swap(index, 1)
-      } else {
-        row
-      }
-    })
+    data->Array.map(row => index !== 1 ? row->Array.swap(index, 1) : row)
 )
 
 %%private(
   let cellRenderer = (
     {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
-  ) =>
-    <td
-      onMouseDown={onMouseDown}
-      onMouseOver={onMouseOver}
-      onDoubleClick={onDoubleClick}
-      className={className->Cn.addIf(
+  ) => {
+    let className =
+      className->Cn.addIf(
         cell.value->String.length === 0 ||
           (cell.value === ReactUtils.nbsp &&
           !(className->String.includes("description")) &&
           !(className->String.includes("read-only"))),
         "blank",
-      )}>
-      {children}
-    </td>
+      )
+
+    <td onMouseDown onMouseOver onDoubleClick className> {children} </td>
+  }
 )
 
 @react.component
@@ -69,7 +61,7 @@ let make = () => {
                   dispatch(SetMode(Json))
 
                   result->Message.fromJson->Source.make(file.name)
-                | Target => result->Message.fromJson->Source.add(data, file.name)
+                | Target => data->Source.add(result->Message.fromJson, file.name)
                 }
               ),
             ),
@@ -110,7 +102,7 @@ let make = () => {
             SetData(
               switch sourceOrTarget {
               | Source => source->Source.make(file.name)
-              | Target => source->Source.add(data, file.name)
+              | Target => data->Source.add(source, file.name)
               },
             ),
           )
@@ -124,7 +116,7 @@ let make = () => {
             SetData(
               switch sourceOrTarget {
               | Source => source->Source.make(file.name)
-              | Target => source->Source.add(data, file.name)
+              | Target => data->Source.add(source, file.name)
               },
             ),
           )
@@ -138,7 +130,7 @@ let make = () => {
             SetData(
               switch sourceOrTarget {
               | Source => source->Source.make(file.name)
-              | Target => source->Source.add(data, file.name)
+              | Target => data->Source.add(source, file.name)
               },
             ),
           )
@@ -159,7 +151,7 @@ let make = () => {
       )
       ->Promise.allArray
       ->Promise.get(results =>
-        dispatch(SetData(results->Array.keepMap(a => a)->Source.addMultiple(data)))
+        dispatch(SetData(data->Source.addMultiple(results->Array.keepMap(a => a))))
       )
     }
 
@@ -207,7 +199,7 @@ let make = () => {
 
     newData
     ->Convert.CSV.fromData(~delimiter)
-    ->FileUtils.download(~download={FileUtils.timestampFilename("export.csv")})
+    ->FileUtils.download(~download=FileUtils.timestampFilename("export.csv"))
   }, (state.mode, data))
 
   let sheetRenderer = (props: DataSheet.SheetProps.t) =>
