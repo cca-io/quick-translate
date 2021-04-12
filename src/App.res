@@ -32,6 +32,7 @@ let make = () => {
   let canToggleDescription = state.mode !== Other
   let showDescriptionCol = state.useDescription && canToggleDescription
   let sourceAvailable = data->Array.length > 0
+
   let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
   let onOpenHelp = _evt => dispatch(SetDialog(Help))
 
@@ -207,7 +208,16 @@ let make = () => {
     <table className={className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
       <thead>
         {sourceAvailable
-          ? <tr> <th> {"Source"->s} </th> <th /> <th /> <th> {"Targets"->s} </th> </tr>
+          ? <tr>
+              <th> {"Source"->s} </th>
+              <th />
+              <th />
+              <th> {"Targets"->s} </th>
+              {data[0]
+              ->Option.getWithDefault([])
+              ->Array.mapWithIndex((i, _) => i > 3 ? <th /> : React.null)
+              ->React.array}
+            </tr>
           : React.null}
         <tr>
           {data[0]
