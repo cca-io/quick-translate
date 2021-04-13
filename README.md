@@ -92,3 +92,23 @@ The app allows to
 
 > **NOTE**: Currently the app state is not stored anywhere, which means a refresh deletes all your data.
 > To save your data, use the export/import CSV functionality for now.
+
+## Development
+
+Setup:
+
+```sh
+npm install
+```
+
+Run ReScript build and vitejs dev server:
+
+```sh
+npm run dev
+```
+
+Production build:
+
+```sh
+npm run build
+```
