@@ -2,7 +2,7 @@
 
 Translate multiple languages at once in a spreadsheet.
 
-![quick-translate screenshot](https://user-images.githubusercontent.com/18074327/111455239-d4d93600-8715-11eb-8c87-575da0f3cdcb.png)
+![quick-translate screenshot](https://user-images.githubusercontent.com/18074327/114715932-d9543700-9d33-11eb-95d0-b56a3ee79bd4.png)
 
 ### Demo
 
