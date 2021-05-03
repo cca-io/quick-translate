@@ -16,7 +16,7 @@
     "re:clean": "rescript clean"
   },
   "dependencies": {
-    "@rescript/react": "^0.10.1",
+    "@rescript/react": "^0.10.2",
     "papaparse": "^5.3.0",
     "preact": "^10.5.13",
     "prop-types": "15",
