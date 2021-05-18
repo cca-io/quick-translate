@@ -6,7 +6,7 @@ Translate multiple languages at once in a spreadsheet.
 
 ### Demo
 
-[https://fhammerschmidt.github.io/quick-translate/](https://fhammerschmidt.github.io/quick-translate/)
+[https://cca-io.github.io/quick-translate//](https://cca-io.github.io/quick-translate//)
 
 ## Documentation
 
