@@ -62,7 +62,7 @@ Some.Message.id=Some message
 ]
 ```
 
-which is exactly what [bs-react-intl-extractor](https://github.com/cknitt/bs-react-intl-extractor) yields, for instance.
+which is exactly what [rescript-react-intl-extractor](https://github.com/cca-io/rescript-react-intl-extractor) yields, for instance.
 
 #### CSV
 
