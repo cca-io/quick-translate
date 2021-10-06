@@ -1,0 +1,12 @@
+﻿ID;Description;example_en;example_de;example_it
+Support.appVersion;;App version;App-Version;Versione dell'app
+Support.browserInformation;;Browser Information;Browser-Information;Informazioni del browser
+Support.build;;Build: {build};Build: {build};Build: {build}
+Support.emailText;;Our support email can be reached at: {supportEmailLink};Sie erreichen unsere Support-Email unter: {supportEmailLink};Invia feedback a: {supportEmailLink}
+Support.hotline.title;;Support-Hotline;Support-Hotline;Hotline di supporto
+Support.hotlineText;;Our support hotline can be reached at: {supportTelLink};Sie erreichen unsere Support-Hotline unter: {supportTelLink};Puoi raggiungere la nostra hotline di supporto a: {supportTelLink}
+Support.permissions;;Permissions;Berechtigungen;Autorizzazioni
+Support.roles;;Roles;Rollen;Ruoli
+Support.title;;Support;Support;Supporto
+Support.userGroups;;AD Groups;AD-Gruppen;Gruppi AD
+Support.version;;Version: {version};Version: {version};Versione: {version}

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "Support.appVersion",
+    "defaultMessage": "Versione dell'app"
+  },
+  {
+    "id": "Support.browserInformation",
+    "defaultMessage": "Informazioni del browser"
+  },
+  {
+    "id": "Support.build",
+    "defaultMessage": "Build: {build}"
+  },
+  {
+    "id": "Support.emailText",
+    "defaultMessage": "Invia feedback a: {supportEmailLink}"
+  },
+  {
+    "id": "Support.hotline.title",
+    "defaultMessage": "Hotline di supporto"
+  },
+  {
+    "id": "Support.hotlineText",
+    "defaultMessage": "Puoi raggiungere la nostra hotline di supporto a: {supportTelLink}"
+  },
+  {
+    "id": "Support.permissions",
+    "defaultMessage": "Autorizzazioni"
+  },
+  {
+    "id": "Support.roles",
+    "defaultMessage": "Ruoli"
+  },
+  {
+    "id": "Support.title",
+    "defaultMessage": "Supporto"
+  },
+  {
+    "id": "Support.userGroups",
+    "defaultMessage": "Gruppi AD"
+  },
+  {
+    "id": "Support.version",
+    "defaultMessage": "Versione: {version}"
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "Support.appVersion",
+    "defaultMessage": "App version"
+  },
+  {
+    "id": "Support.browserInformation",
+    "defaultMessage": "Browser Information"
+  },
+  {
+    "id": "Support.build",
+    "defaultMessage": "Build: {build}"
+  },
+  {
+    "id": "Support.emailText",
+    "defaultMessage": "Our support email can be reached at: {supportEmailLink}"
+  },
+  {
+    "id": "Support.hotline.title",
+    "defaultMessage": "Support-Hotline"
+  },
+  {
+    "id": "Support.hotlineText",
+    "defaultMessage": "Our support hotline can be reached at: {supportTelLink}"
+  },
+  {
+    "id": "Support.permissions",
+    "defaultMessage": "Permissions"
+  },
+  {
+    "id": "Support.roles",
+    "defaultMessage": "Roles"
+  },
+  {
+    "id": "Support.title",
+    "defaultMessage": "Support"
+  },
+  {
+    "id": "Support.userGroups",
+    "defaultMessage": "AD Groups"
+  },
+  {
+    "id": "Support.version",
+    "defaultMessage": "Version: {version}"
+  }
+]
