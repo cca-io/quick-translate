@@ -7,7 +7,6 @@
     "dev": "run-p re:watch vite:serve",
     "build": "run-s re:build vite:build",
     "buildCI": "run-s re:build vite:buildCI",
-    "intf": "./scripts/createInterface.sh",
     "vite:serve": "vite --port 8083",
     "vite:build": "vite build",
     "vite:buildCI": "vite build --base=/quick-translate/",
