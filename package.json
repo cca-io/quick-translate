@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "run-p re:watch vite:serve",
-    "build": "run-s re:build vite:build",
+    "build": "run-s re:build vite:build vite:preview",
     "buildCI": "run-s re:build vite:buildCI",
+    "vite:preview": "vite preview --port 8083",
     "vite:serve": "vite --port 8083",
     "vite:build": "vite build",
     "vite:buildCI": "vite build --base=/quick-translate/",
@@ -25,6 +26,7 @@
     "@vitejs/plugin-react": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "rescript": "^10.0.0-rc.1",
-    "vite": "^3.0.4"
+    "vite": "^3.0.4",
+    "vite-plugin-pwa": "^0.12.3"
   }
 }
