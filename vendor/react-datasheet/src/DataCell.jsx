@@ -1,5 +1,4 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from "react";
 
 import {
   ENTER_KEY,
@@ -9,13 +8,12 @@ import {
   LEFT_KEY,
   UP_KEY,
   DOWN_KEY,
-} from './keys';
+} from "./keys";
 
-import Cell from './Cell';
-import CellShape from './CellShape';
-import DataEditor from './DataEditor';
-import ValueViewer from './ValueViewer';
-import { renderValue, renderData } from './renderHelpers';
+import Cell from "./Cell";
+import DataEditor from "./DataEditor";
+import ValueViewer from "./ValueViewer";
+import { renderValue, renderData } from "./renderHelpers";
 
 function initialData({ cell, row, col, valueRenderer, dataRenderer }) {
   return renderData(cell, row, col, valueRenderer, dataRenderer);
@@ -26,7 +24,7 @@ function initialValue({ cell, row, col, valueRenderer }) {
 }
 
 function widthStyle(cell) {
-  const width = typeof cell.width === 'number' ? cell.width + 'px' : cell.width;
+  const width = typeof cell.width === "number" ? cell.width + "px" : cell.width;
   return width ? { width } : null;
 }
 
@@ -47,7 +45,7 @@ export default class DataCell extends PureComponent {
       updated: false,
       reverting: false,
       committing: false,
-      value: '',
+      value: "",
     };
   }
 
@@ -60,7 +58,7 @@ export default class DataCell extends PureComponent {
       this.timeout = setTimeout(() => this.setState({ updated: false }), 700);
     }
     if (this.props.editing === true && prevProps.editing === false) {
-      const value = this.props.clearing ? '' : initialData(this.props);
+      const value = this.props.clearing ? "" : initialData(this.props);
       this.setState({ value, reverting: false });
     }
 
@@ -204,15 +202,15 @@ export default class DataCell extends PureComponent {
 
     const className = [
       cell.className,
-      'cell',
+      "cell",
       cell.overflow,
-      selected && 'selected',
-      editing && 'editing',
-      cell.readOnly && 'read-only',
-      updated && 'updated',
+      selected && "selected",
+      editing && "editing",
+      cell.readOnly && "read-only",
+      updated && "updated",
     ]
-      .filter(a => a)
-      .join(' ');
+      .filter((a) => a)
+      .join(" ");
 
     return (
       <CellRenderer
@@ -236,31 +234,6 @@ export default class DataCell extends PureComponent {
     );
   }
 }
-
-DataCell.propTypes = {
-  row: PropTypes.number.isRequired,
-  col: PropTypes.number.isRequired,
-  cell: PropTypes.shape(CellShape).isRequired,
-  forceEdit: PropTypes.bool,
-  selected: PropTypes.bool,
-  editing: PropTypes.bool,
-  editValue: PropTypes.any,
-  clearing: PropTypes.bool,
-  cellRenderer: PropTypes.func,
-  valueRenderer: PropTypes.func.isRequired,
-  dataRenderer: PropTypes.func,
-  valueViewer: PropTypes.func,
-  dataEditor: PropTypes.func,
-  attributesRenderer: PropTypes.func,
-  onNavigate: PropTypes.func.isRequired,
-  onMouseDown: PropTypes.func.isRequired,
-  onMouseOver: PropTypes.func.isRequired,
-  onDoubleClick: PropTypes.func.isRequired,
-  onContextMenu: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onRevert: PropTypes.func.isRequired,
-  onEdit: PropTypes.func,
-};
 
 DataCell.defaultProps = {
   forceEdit: false,

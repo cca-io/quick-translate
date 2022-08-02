@@ -1,7 +1,4 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-
-import CellShape from './CellShape';
+import React, { PureComponent } from "react";
 
 export default class DataEditor extends PureComponent {
   constructor(props) {
@@ -21,7 +18,7 @@ export default class DataEditor extends PureComponent {
     const { value, onKeyDown } = this.props;
     return (
       <input
-        ref={input => {
+        ref={(input) => {
           this._input = input;
         }}
         className="data-editor"
@@ -32,14 +29,3 @@ export default class DataEditor extends PureComponent {
     );
   }
 }
-
-DataEditor.propTypes = {
-  value: PropTypes.node.isRequired,
-  row: PropTypes.number.isRequired,
-  col: PropTypes.number.isRequired,
-  cell: PropTypes.shape(CellShape),
-  onChange: PropTypes.func.isRequired,
-  onCommit: PropTypes.func.isRequired,
-  onRevert: PropTypes.func.isRequired,
-  onKeyDown: PropTypes.func.isRequired,
-};

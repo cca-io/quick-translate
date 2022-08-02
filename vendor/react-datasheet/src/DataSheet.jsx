@@ -1,11 +1,10 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import Sheet from './Sheet';
-import Row from './Row';
-import Cell from './Cell';
-import DataCell from './DataCell';
-import DataEditor from './DataEditor';
-import ValueViewer from './ValueViewer';
+import React, { PureComponent } from "react";
+import Sheet from "./Sheet";
+import Row from "./Row";
+import Cell from "./Cell";
+import DataCell from "./DataCell";
+import DataEditor from "./DataEditor";
+import ValueViewer from "./ValueViewer";
 import {
   TAB_KEY,
   ENTER_KEY,
@@ -16,9 +15,9 @@ import {
   UP_KEY,
   DOWN_KEY,
   RIGHT_KEY,
-} from './keys';
+} from "./keys";
 
-const isEmpty = obj => Object.keys(obj).length === 0;
+const isEmpty = (obj) => Object.keys(obj).length === 0;
 
 const range = (start, end) => {
   const array = [];
@@ -29,8 +28,8 @@ const range = (start, end) => {
   return array;
 };
 
-const defaultParsePaste = str => {
-  return str.split(/\r\n|\n|\r/).map(row => row.split('\t'));
+const defaultParsePaste = (str) => {
+  return str.split(/\r\n|\n|\r/).map((row) => row.split("\t"));
 };
 
 export default class DataSheet extends PureComponent {
@@ -72,29 +71,29 @@ export default class DataSheet extends PureComponent {
   }
 
   removeAllListeners() {
-    document.removeEventListener('mousedown', this.pageClick);
-    document.removeEventListener('mouseup', this.onMouseUp);
-    document.removeEventListener('cut', this.handleCut);
-    document.removeEventListener('copy', this.handleCopy);
-    document.removeEventListener('paste', this.handlePaste);
-    document.removeEventListener('keydown', this.handleIEClipboardEvents);
+    document.removeEventListener("mousedown", this.pageClick);
+    document.removeEventListener("mouseup", this.onMouseUp);
+    document.removeEventListener("cut", this.handleCut);
+    document.removeEventListener("copy", this.handleCopy);
+    document.removeEventListener("paste", this.handlePaste);
+    document.removeEventListener("keydown", this.handleIEClipboardEvents);
   }
 
   componentDidMount() {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     this.dgDom &&
-      this.dgDom.addEventListener('keydown', this.handleComponentKey);
+      this.dgDom.addEventListener("keydown", this.handleComponentKey);
   }
 
   componentWillUnmount() {
     this.dgDom &&
-      this.dgDom.removeEventListener('keydown', this.handleComponentKey);
+      this.dgDom.removeEventListener("keydown", this.handleComponentKey);
     this.removeAllListeners();
   }
 
   isSelectionControlled() {
-    return 'selected' in this.props;
+    return "selected" in this.props;
   }
 
   getState() {
@@ -117,15 +116,15 @@ export default class DataSheet extends PureComponent {
         editModeChanged(wilBeEditing);
       }
     }
-    if (this.isSelectionControlled() && ('start' in state || 'end' in state)) {
+    if (this.isSelectionControlled() && ("start" in state || "end" in state)) {
       let { start, end, ...rest } = state;
       let { selected, onSelect } = this.props;
       selected = selected || {};
       if (!start) {
-        start = 'start' in selected ? selected.start : this.defaultState.start;
+        start = "start" in selected ? selected.start : this.defaultState.start;
       }
       if (!end) {
-        end = 'end' in selected ? selected.end : this.defaultState.end;
+        end = "end" in selected ? selected.end : this.defaultState.end;
       }
       onSelect && onSelect({ start, end });
       this.setState(rest);
@@ -185,27 +184,27 @@ export default class DataSheet extends PureComponent {
         });
       } else {
         const text = range(start.i, end.i)
-          .map(i =>
+          .map((i) =>
             range(start.j, end.j)
-              .map(j => {
+              .map((j) => {
                 const cell = data[i][j];
                 const value = dataRenderer ? dataRenderer(cell, i, j) : null;
                 if (
-                  value === '' ||
+                  value === "" ||
                   value === null ||
-                  typeof value === 'undefined'
+                  typeof value === "undefined"
                 ) {
                   return valueRenderer(cell, i, j);
                 }
                 return value;
               })
-              .join('\t'),
+              .join("\t")
           )
-          .join('\n');
+          .join("\n");
         if (window.clipboardData && window.clipboardData.setData) {
-          window.clipboardData.setData('Text', text);
+          window.clipboardData.setData("Text", text);
         } else {
-          e.clipboardData.setData('text/plain', text);
+          e.clipboardData.setData("text/plain", text);
         }
       }
     }
@@ -223,9 +222,9 @@ export default class DataSheet extends PureComponent {
       let pasteData = [];
       if (window.clipboardData && window.clipboardData.getData) {
         // IE
-        pasteData = parse(window.clipboardData.getData('Text'));
+        pasteData = parse(window.clipboardData.getData("Text"));
       } else if (e.clipboardData && e.clipboardData.getData) {
-        pasteData = parse(e.clipboardData.getData('text/plain'));
+        pasteData = parse(e.clipboardData.getData("text/plain"));
       }
 
       // in order of preference
@@ -359,8 +358,8 @@ export default class DataSheet extends PureComponent {
 
   getSelectedCells(data, start, end) {
     let selected = [];
-    range(start.i, end.i).map(row => {
-      range(start.j, end.j).map(col => {
+    range(start.i, end.i).map((row) => {
+      range(start.j, end.j).map((col) => {
         if (data[row] && data[row][col]) {
           selected.push({ cell: data[row][col], row, col });
         }
@@ -372,8 +371,8 @@ export default class DataSheet extends PureComponent {
   clearSelectedCells(start, end) {
     const { data, onCellsChanged, onChange } = this.props;
     const cells = this.getSelectedCells(data, start, end)
-      .filter(cell => !cell.cell.readOnly)
-      .map(cell => ({ ...cell, value: '' }));
+      .filter((cell) => !cell.cell.readOnly)
+      .map((cell) => ({ ...cell, value: "" }));
     if (onCellsChanged) {
       onCellsChanged(cells);
       this.onRevert();
@@ -413,17 +412,17 @@ export default class DataSheet extends PureComponent {
   }
 
   searchForNextSelectablePos(isCellNavigable, data, start, offsets, jumpRow) {
-    const previousRow = location => ({
+    const previousRow = (location) => ({
       i: location.i - 1,
       j: data[0].length - 1,
     });
-    const nextRow = location => ({ i: location.i + 1, j: 0 });
-    const advanceOffset = location => ({
+    const nextRow = (location) => ({ i: location.i + 1, j: 0 });
+    const advanceOffset = (location) => ({
       i: location.i + offsets.i,
       j: location.j + offsets.j,
     });
     const isCellDefined = ({ i, j }) =>
-      data[i] && typeof data[i][j] !== 'undefined';
+      data[i] && typeof data[i][j] !== "undefined";
 
     let newLocation = advanceOffset(start);
 
@@ -432,7 +431,7 @@ export default class DataSheet extends PureComponent {
       !isCellNavigable(
         data[newLocation.i][newLocation.j],
         newLocation.i,
-        newLocation.j,
+        newLocation.j
       )
     ) {
       newLocation = advanceOffset(newLocation);
@@ -454,7 +453,7 @@ export default class DataSheet extends PureComponent {
       !isCellNavigable(
         data[newLocation.i][newLocation.j],
         newLocation.i,
-        newLocation.j,
+        newLocation.j
       )
     ) {
       return this.searchForNextSelectablePos(
@@ -462,7 +461,7 @@ export default class DataSheet extends PureComponent {
         data,
         newLocation,
         offsets,
-        jumpRow,
+        jumpRow
       );
     } else if (isCellDefined(newLocation)) {
       return newLocation;
@@ -489,7 +488,7 @@ export default class DataSheet extends PureComponent {
           data,
           start,
           offsets,
-          jumpRow,
+          jumpRow
         );
         if (newLocation) {
           this.updateLocationSingleCell(newLocation);
@@ -566,18 +565,18 @@ export default class DataSheet extends PureComponent {
     var isIE = /MSIE|Trident/.test(ua);
     // Listen for Ctrl + V in case of IE
     if (isIE) {
-      document.addEventListener('keydown', this.handleIEClipboardEvents);
+      document.addEventListener("keydown", this.handleIEClipboardEvents);
     }
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
-    document.addEventListener('mouseup', this.onMouseUp);
+    document.addEventListener("mouseup", this.onMouseUp);
     // Listen for any outside mouse clicks
-    document.addEventListener('mousedown', this.pageClick);
+    document.addEventListener("mousedown", this.pageClick);
 
     // Cut, copy and paste event handlers
-    document.addEventListener('cut', this.handleCut);
-    document.addEventListener('copy', this.handleCopy);
-    document.addEventListener('paste', this.handlePaste);
+    document.addEventListener("cut", this.handleCut);
+    document.addEventListener("copy", this.handleCopy);
+    document.addEventListener("paste", this.handlePaste);
   }
 
   onMouseOver(i, j) {
@@ -588,7 +587,7 @@ export default class DataSheet extends PureComponent {
 
   onMouseUp() {
     this._setState({ selecting: false });
-    document.removeEventListener('mouseup', this.onMouseUp);
+    document.removeEventListener("mouseup", this.onMouseUp);
   }
 
   onChange(row, col, value) {
@@ -668,7 +667,7 @@ export default class DataSheet extends PureComponent {
     const { forceEdit } = this.state;
     return (
       <span
-        ref={r => {
+        ref={(r) => {
           this.dgDom = r;
         }}
         tabIndex="0"
@@ -677,9 +676,9 @@ export default class DataSheet extends PureComponent {
       >
         <SheetRenderer
           data={data}
-          className={['data-grid', className, overflow]
-            .filter(a => a)
-            .join(' ')}
+          className={["data-grid", className, overflow]
+            .filter((a) => a)
+            .join(" ")}
         >
           {data.map((row, i) => (
             <RowRenderer
@@ -729,40 +728,6 @@ export default class DataSheet extends PureComponent {
     );
   }
 }
-
-DataSheet.propTypes = {
-  data: PropTypes.array.isRequired,
-  className: PropTypes.string,
-  disablePageClick: PropTypes.bool,
-  overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
-  onChange: PropTypes.func,
-  onCellsChanged: PropTypes.func,
-  onContextMenu: PropTypes.func,
-  onSelect: PropTypes.func,
-  isCellNavigable: PropTypes.func,
-  selected: PropTypes.shape({
-    start: PropTypes.shape({
-      i: PropTypes.number,
-      j: PropTypes.number,
-    }),
-    end: PropTypes.shape({
-      i: PropTypes.number,
-      j: PropTypes.number,
-    }),
-  }),
-  valueRenderer: PropTypes.func.isRequired,
-  dataRenderer: PropTypes.func,
-  sheetRenderer: PropTypes.func.isRequired,
-  rowRenderer: PropTypes.func.isRequired,
-  cellRenderer: PropTypes.func.isRequired,
-  valueViewer: PropTypes.func,
-  dataEditor: PropTypes.func,
-  parsePaste: PropTypes.func,
-  attributesRenderer: PropTypes.func,
-  keyFn: PropTypes.func,
-  handleCopy: PropTypes.func,
-  editModeChanged: PropTypes.func,
-};
 
 DataSheet.defaultProps = {
   sheetRenderer: Sheet,

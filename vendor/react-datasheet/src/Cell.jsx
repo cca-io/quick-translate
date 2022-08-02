@@ -1,6 +1,4 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import CellShape from './CellShape';
+import React, { PureComponent } from "react";
 
 export default class Cell extends PureComponent {
   render() {
@@ -40,22 +38,6 @@ export default class Cell extends PureComponent {
     );
   }
 }
-
-Cell.propTypes = {
-  row: PropTypes.number.isRequired,
-  col: PropTypes.number.isRequired,
-  cell: PropTypes.shape(CellShape).isRequired,
-  selected: PropTypes.bool,
-  editing: PropTypes.bool,
-  updated: PropTypes.bool,
-  attributesRenderer: PropTypes.func,
-  onMouseDown: PropTypes.func.isRequired,
-  onMouseOver: PropTypes.func.isRequired,
-  onDoubleClick: PropTypes.func.isRequired,
-  onContextMenu: PropTypes.func.isRequired,
-  className: PropTypes.string,
-  style: PropTypes.object,
-};
 
 Cell.defaultProps = {
   selected: false,
