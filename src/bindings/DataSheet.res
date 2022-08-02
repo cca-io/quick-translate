@@ -8,11 +8,11 @@ module Cell = {
   }
 
   let make = (~expr=None, ~readOnly=false, ~className="", value) => {
-    value: value,
-    expr: expr,
-    readOnly: readOnly,
+    value,
+    expr,
+    readOnly,
     width: None,
-    className: className,
+    className,
   }
 
   let makeRO = value => {...make(value), readOnly: true}
@@ -52,7 +52,7 @@ module CellProps = {
 let update = (grid, {Change.row: row, col, value}) =>
   grid[row][col] = {...grid[row][col], Cell.value: value->Js.String2.trim}
 
-@react.component @module("react-datasheet")
+@react.component @module("../../vendor/react-datasheet/src")
 external make: (
   ~data: data,
   ~cellRenderer: CellProps.t => React.element=?,
