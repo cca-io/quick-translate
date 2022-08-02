@@ -15,18 +15,17 @@
     "re:clean": "rescript clean"
   },
   "dependencies": {
-    "@rescript/react": "^0.10.2",
-    "papaparse": "^5.3.0",
-    "prop-types": "15",
-    "react": "^17.0.2",
-    "react-datasheet": "^1.4.9",
-    "react-dom": "^17.0.2",
-    "reason-promise": "^1.1.3"
+    "@rescript/react": "^0.10.3",
+    "papaparse": "^5.3.2",
+    "react": "^18.2.0",
+    "react-datasheet": "^1.4.12",
+    "react-dom": "^18.2.0",
+    "reason-promise": "^1.1.5"
   },
   "devDependencies": {
-    "@vitejs/plugin-react-refresh": "^1.1.0",
+    "@vitejs/plugin-react": "^2.0.0",
     "npm-run-all": "^4.1.5",
-    "rescript": "^9.1.4",
-    "vite": "^2.0.0"
+    "rescript": "^10.0.0-rc.1",
+    "vite": "^3.0.4"
   }
 }
