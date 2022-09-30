@@ -1,28 +1,6 @@
 open Stdlib
 open ReactUtils
 
-%%private(
-  let swapIndex = (data, index) =>
-    data->Array.map(row => index !== 1 ? row->Array.swap(index, 1) : row)
-)
-
-%%private(
-  let cellRenderer = (
-    {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
-  ) => {
-    let className =
-      className->Cn.addIf(
-        cell.value->String.length === 0 ||
-          (cell.value === nbsp &&
-          !(className->String.includes("description")) &&
-          !(className->String.includes("read-only"))),
-        "blank",
-      )
-
-    <td onMouseDown onMouseOver onDoubleClick className> {children} </td>
-  }
-)
-
 @react.component
 let make = () => {
   let (state, dispatch) = React.useReducer(AppState.reducer, AppState.initialState)
@@ -76,16 +54,12 @@ let make = () => {
             let commentIndex =
               parseResult
               ->Array.getUnsafe(0)
-              ->Array.getIndexBy(text =>
-                ["comments", "comment", "description"]->Array.some(str =>
-                  text->String.toLowerCase->String.includes(str)
-                )
-              )
+              ->Array.getIndexBy(text => text->SourceUtils.isCommentColumn)
 
-            dispatch(SetMode(Csv({commentIndex: commentIndex, delimiter: delimiter})))
+            dispatch(SetMode(Csv({commentIndex, delimiter})))
 
             let source = switch commentIndex {
-            | Some(commentIndex) => parseResult->swapIndex(commentIndex)
+            | Some(commentIndex) => parseResult->SourceUtils.swapIndex(commentIndex)
             | None => parseResult
             }
 
@@ -204,7 +178,7 @@ let make = () => {
 
   let onExportCsv = React.useCallback2(_evt => {
     let (newData, delimiter) = switch state.mode {
-    | Csv({commentIndex: Some(index), delimiter}) => (data->swapIndex(index), delimiter)
+    | Csv({commentIndex: Some(index), delimiter}) => (data->SourceUtils.swapIndex(index), delimiter)
     | Csv({delimiter}) => (data, delimiter)
     | _ => (data, ";")
     }
@@ -248,6 +222,21 @@ let make = () => {
       </thead>
       <tbody> {children} </tbody>
     </table>
+
+  let cellRenderer = (
+    {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
+  ) => {
+    let className =
+      className->Cn.addIf(
+        cell.value->String.length === 0 ||
+          (cell.value === nbsp &&
+          !(className->String.includes("description")) &&
+          !(className->String.includes("read-only"))),
+        "blank",
+      )
+
+    <td onMouseDown onMouseOver onDoubleClick className> {children} </td>
+  }
 
   <div className="App" onDragOver>
     <Content sourceAvailable>
