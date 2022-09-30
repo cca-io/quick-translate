@@ -44,10 +44,7 @@ let make = () => {
   Hooks.useMultiKeyPress(["Control", "z"], () => dispatch(Undo))
   Hooks.useMultiKeyPress(["Control", "Shift", "Z"], () => dispatch(Redo))
 
-  let handleDrop = (e, sourceOrTarget: FileUtils.file) => {
-    e->cancelMouseEvent
-    let files = e->File.fromMouseEvent
-
+  let handleFiles = (files, sourceOrTarget: FileUtils.file) => {
     if files->Array.length === 1 {
       let file = files[0]
       let fileType = file->Option.flatMap(File.getFileType)
@@ -162,6 +159,19 @@ let make = () => {
     setDragging(_ => false)
   }
 
+  let handleDrop = (e, sourceOrTarget: FileUtils.file) => {
+    e->cancelMouseEvent
+    let files = e->File.fromMouseEvent
+
+    handleFiles(files, sourceOrTarget)
+  }
+
+  let handleUploadClicked = (e, sourceOrTarget: FileUtils.file) => {
+    let files = e->File.fromFormEvent
+
+    handleFiles(files, sourceOrTarget)
+  }
+
   let onCellsChanged = React.useCallback1(changes => {
     let changedData = data->Source.update(changes)
 
@@ -244,7 +254,7 @@ let make = () => {
       <DataSheet
         data onCellsChanged sheetRenderer cellRenderer valueRenderer={cell => cell.value}
       />
-      <NoDataView dragging sourceAvailable />
+      <NoDataView dragging sourceAvailable handleUploadClicked />
       <ImportOverlay dragging sourceAvailable onDragLeave handleDrop />
     </Content>
     <Sidebar sourceAvailable>

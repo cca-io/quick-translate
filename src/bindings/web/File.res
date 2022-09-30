@@ -60,6 +60,10 @@ let fromMouseEvent: ReactEvent.Mouse.t => array<t> = e => {
   (e->ReactEvent.Mouse.nativeEvent)["dataTransfer"]["files"]
 }
 
+let fromFormEvent: ReactEvent.Form.t => array<t> = e => {
+  (e->ReactEvent.Form.target)["files"]
+}
+
 let getExtension = fileName =>
   fileName->String.split(".")->Array.copy->Array.Unsafe.pop->Option.map(ext => "." ++ ext)
 

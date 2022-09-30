@@ -10,7 +10,7 @@ let fileTypes = [
 ]
 
 @react.component
-let make = (~sourceAvailable, ~dragging) =>
+let make = (~sourceAvailable, ~dragging, ~handleUploadClicked) =>
   sourceAvailable || dragging
     ? React.null
     : <div className="NoDataView">
@@ -20,8 +20,14 @@ let make = (~sourceAvailable, ~dragging) =>
           {"Supported file types:"->s}
           <ul>
             {fileTypes
-            ->Array.map(((ft, desc)) => <li key=ft> <b> {ft->s} </b> {desc->s} </li>)
+            ->Array.map(((ft, desc)) =>
+              <li key=ft>
+                <b> {ft->s} </b>
+                {desc->s}
+              </li>
+            )
             ->React.array}
           </ul>
         </div>
+        <input type_="file" onChange={event => handleUploadClicked(event, FileUtils.Source)} />
       </div>
