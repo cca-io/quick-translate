@@ -53,7 +53,9 @@ module Properties = {
       ->Array.map(({id, defaultMessage}) => `${id}=${defaultMessage}`)
       ->Array.Unsafe.joinWith("\n")
 
-    "data:text/plain;charset=ISO-8859-1," ++ Js.Global.encodeURIComponent(propsData)
+    let enc = TextEncoder.makeIso8859_1()
+    let encoded = enc->TextEncoder.encode(propsData)
+    [encoded]->TextEncoder.makeBlob->TextEncoder.toUrl
   }
 
   let toArray = str => toArrayHelper(~regex, str)
