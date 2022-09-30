@@ -10,13 +10,3 @@ external makeIso8859_1: (
 ) => t = "TextEncoder"
 
 @send external encode: (t, string) => Js.TypedArray2.Uint8Array.t = "encode"
-
-type blob
-@new
-external makeBlob: (
-  array<Js.TypedArray2.Uint8Array.t>,
-  @as(json`{"type": "text/plain"}`) _,
-) => blob = "Blob"
-
-@scope("URL")
-external toUrl: blob => string = "createObjectURL"
