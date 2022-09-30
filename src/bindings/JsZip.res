@@ -1,6 +1,6 @@
 type t
 
-@module("JSZip") @new external make: unit => t = "default"
+@module("jszip") @new external make: unit => t = "default"
 
 @send external file: (t, string, Blob.t) => unit = "file"
 
