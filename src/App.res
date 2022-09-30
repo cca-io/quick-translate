@@ -165,15 +165,20 @@ let make = () => {
   }, [data])
 
   let onExportAll = React.useCallback1(_evt => {
+    let zip = JsZip.make()
+
     data[0]
     ->Option.getWithDefault([])
     ->Array.forEachWithIndex((i, cell) =>
       if i > 0 {
-        data
-        ->Convert.Json.fromData(cell.value)
-        ->FileUtils.download(~download={cell.value ++ ".json"})
+        zip->JsZip.file(cell.value ++ ".json", data->Convert.Json.fromDataAsBlob(cell.value))
       }
     )
+
+    zip
+    ->JsZip.generateAsync({\"type": #blob})
+    ->Promise.Js.fromBsPromise
+    ->Promise.Js.get(blob => blob->Blob.toUrl->FileUtils.download(~download="all.zip"))
   }, [data])
 
   let onExportCsv = React.useCallback2(_evt => {
@@ -199,7 +204,7 @@ let make = () => {
               <th> {"Targets"->s} </th>
               {data[0]
               ->Option.getWithDefault([])
-              ->Array.mapWithIndex((i, _) => i > 3 ? <th /> : React.null)
+              ->Array.mapWithIndex((i, _) => i > 3 ? <th key={i->Int.toString} /> : React.null)
               ->React.array}
             </tr>
           : React.null}

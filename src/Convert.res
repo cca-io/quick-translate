@@ -41,6 +41,12 @@ module Json = {
 
     "data:text/json;charset=utf-8," ++ Js.Global.encodeURIComponent(colData)
   }
+
+  let fromDataAsBlob = (data, col) => {
+    let colData = data->Source.getColData(col)->Message.toJson->Json.stringifyWithSpace(2)
+
+    Blob.fromString([colData])
+  }
 }
 
 module Properties = {
@@ -55,7 +61,7 @@ module Properties = {
 
     let enc = TextEncoder.makeIso8859_1()
     let encoded = enc->TextEncoder.encode(propsData)
-    [encoded]->TextEncoder.makeBlob->TextEncoder.toUrl
+    [encoded]->Blob.fromTypedArray->Blob.toUrl
   }
 
   let toArray = str => toArrayHelper(~regex, str)

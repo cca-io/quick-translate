@@ -4,6 +4,7 @@ module CSV: {
 
 module Json: {
   let fromData: (array<array<DataSheet.Cell.t>>, string) => string
+  let fromDataAsBlob: (Source.t, string) => Blob.t
 }
 
 module Properties: {
