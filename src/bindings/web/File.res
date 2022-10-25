@@ -54,6 +54,9 @@ module Reader = {
   @new external make: unit => reader = "FileReader"
   @send external readAsText: (reader, t, encoding) => unit = "readAsText"
   @set external setOnload: (reader, event => unit) => unit = "onload"
+  @set external setOnError: (reader, event => unit) => unit = "onerror"
+
+  exception FileReadError
 }
 
 let fromMouseEvent: ReactEvent.Mouse.t => array<t> = e => {
@@ -77,11 +80,13 @@ let getFileType = (file: t) => {
 
 let isJson = (file: t) => file.\"type" === "application/json"
 
-let read = (file: t, ~encoding=#"UTF-8", cb) => {
-  let fileReader = Reader.make()
-  fileReader->Reader.readAsText(file, encoding)
-  fileReader->Reader.setOnload(e => cb(e.target.result))
-}
+let read = (~encoding=#"UTF-8", file: t) =>
+  Js.Promise.make((~resolve, ~reject) => {
+    let fileReader = Reader.make()
+    fileReader->Reader.readAsText(file, encoding)
+    fileReader->Reader.setOnload(e => resolve(. e.target.result))
+    fileReader->Reader.setOnError(_ => reject(. Reader.FileReadError))
+  })
 
 let resultToJson = (result: FileResult.t) =>
   result->FileResult.toString->Json.parseExn->Json.decodeArray
