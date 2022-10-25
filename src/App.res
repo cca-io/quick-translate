@@ -29,26 +29,31 @@ let make = () => {
 
       switch (file, fileType) {
       | (Some(file), Some(Json)) =>
-        File.read(file, result =>
-          dispatch(
-            SetData(
-              result
-              ->File.resultToJson
-              ->Option.mapWithDefault(data, result =>
-                switch sourceOrTarget {
-                | Source =>
-                  dispatch(SetMode(Json))
+        let readFile = async () => {
+          let result = await File.read(file)
 
-                  result->Message.fromJson->Source.make(file.name)
-                | Target => data->Source.add(result->Message.fromJson, file.name)
-                }
-              ),
-            ),
-          )
-        )
+          let data =
+            result
+            ->File.resultToJson
+            ->Option.mapWithDefault(data, result =>
+              switch sourceOrTarget {
+              | Source =>
+                dispatch(SetMode(Json))
+
+                result->Message.fromJson->Source.make(file.name)
+              | Target => data->Source.add(result->Message.fromJson, file.name)
+              }
+            )
+
+          dispatch(SetData(data))
+        }
+
+        let _ = readFile()
 
       | (Some(file), Some(Csv)) =>
-        File.read(file, result => {
+        let readFile = async () => {
+          let result = await File.read(file)
+
           switch result->File.FileResult.toString->Papa.parse {
           | Success(parseResult, delimiter) =>
             let commentIndex =
@@ -67,10 +72,13 @@ let make = () => {
 
           | Error => ()
           }
-        })
+        }
+
+        let _ = readFile()
 
       | (Some(file), Some(Xml)) =>
-        file->File.read(result => {
+        let readFile = async () => {
+          let result = await File.read(file)
           let source = result->File.FileResult.toString->Convert.Xml.toArray
 
           dispatch(
@@ -81,10 +89,13 @@ let make = () => {
               },
             ),
           )
-        })
+        }
+
+        let _ = readFile()
 
       | (Some(file), Some(Strings)) =>
-        file->File.read(result => {
+        let readFile = async () => {
+          let result = await File.read(file)
           let source = result->File.FileResult.toString->Convert.Strings.toArray
 
           dispatch(
@@ -95,10 +106,13 @@ let make = () => {
               },
             ),
           )
-        })
+        }
+
+        let _ = readFile()
 
       | (Some(file), Some(Properties)) =>
-        file->File.read(~encoding=#"ISO-8859-1", result => {
+        let readFile = async () => {
+          let result = await File.read(file, ~encoding=#"ISO-8859-1")
           let source = result->File.FileResult.toString->Convert.Properties.toArray
 
           dispatch(
@@ -109,25 +123,34 @@ let make = () => {
               },
             ),
           )
-        })
+        }
+
+        let _ = readFile()
 
       | _ => ()
       }
     } else {
-      files
-      ->Array.map(file =>
-        Promise.exec(resolve =>
-          if sourceOrTarget === Target && file->File.isJson {
-            File.read(file, resolve)
+      let readFiles = async () => {
+        let results = []
+
+        for i in 0 to files->Array.length - 1 {
+          switch files[i] {
+          | None => ()
+          | Some(file) =>
+            if sourceOrTarget === Target && file->File.isJson {
+              let result = await File.read(file)
+              let _ =
+                results->Js.Array2.push(
+                  result->File.resultToJson->Option.flatMap(result => Some(file.name, result)),
+                )
+            }
           }
-        )->Promise.map(res =>
-          res->File.resultToJson->Option.flatMap(result => Some(file.name, result))
-        )
-      )
-      ->Promise.allArray
-      ->Promise.get(results =>
+        }
+
         dispatch(SetData(data->Source.addMultiple(results->Array.keepMap(a => a))))
-      )
+      }
+
+      let _ = readFiles()
     }
 
     setDragging(_ => false)
@@ -175,10 +198,12 @@ let make = () => {
       }
     )
 
-    zip
-    ->JsZip.generateAsync({\"type": #blob})
-    ->Promise.Js.fromBsPromise
-    ->Promise.Js.get(blob => blob->Blob.toUrl->FileUtils.download(~download="all.zip"))
+    let performDownload = async () => {
+      let blob = await (zip->JsZip.generateAsync({\"type": #blob}))
+      blob->Blob.toUrl->FileUtils.download(~download="all.zip")
+    }
+
+    let _ = performDownload()
   }, [data])
 
   let onExportCsv = React.useCallback2(_evt => {
