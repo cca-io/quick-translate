@@ -1,5 +1,3 @@
-open Stdlib
-
 let useDragOver = () => {
   let (dragging, setDragging) = React.useState(() => false)
 
@@ -90,13 +88,13 @@ type action =
 
 let reducer = (state, action) =>
   switch action {
-  | SetKey(key) => state->Set.String.add(key)
-  | RemoveKey(key) => state->Set.String.remove(key)
-  | Reset => Set.String.empty
+  | SetKey(key) => state->Belt.Set.String.add(key)
+  | RemoveKey(key) => state->Belt.Set.String.remove(key)
+  | Reset => Belt.Set.String.empty
   }
 
 let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit => unit) => {
-  let (keysPressed, dispatch) = React.useReducer(reducer, Set.String.empty)
+  let (keysPressed, dispatch) = React.useReducer(reducer, Belt.Set.String.empty)
 
   let downHandler = React.Uncurried.useCallback1((key, evt) => {
     let eventKey = evt->KeyboardEvent.key
@@ -113,7 +111,7 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
   }, [keysPressed])
 
   React.useEffect2(() => {
-    if keys->Set.String.fromArray->Set.String.eq(keysPressed) {
+    if keys->Belt.Set.String.fromArray->Belt.Set.String.eq(keysPressed) {
       callback()
       dispatch(Reset)
     }

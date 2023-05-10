@@ -1,4 +1,3 @@
-open Stdlib
 open ReactUtils
 
 @react.component
@@ -59,7 +58,7 @@ let make = () => {
             let commentIndex =
               parseResult
               ->Array.getUnsafe(0)
-              ->Array.getIndexBy(text => text->SourceUtils.isCommentColumn)
+              ->Belt.Array.getIndexBy(text => text->SourceUtils.isCommentColumn)
 
             dispatch(SetMode(Csv({commentIndex, delimiter})))
 

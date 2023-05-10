@@ -1,5 +1,3 @@
-open Stdlib
-
 type file = Source | Target
 
 let fileNameWithoutExt = fileName => {

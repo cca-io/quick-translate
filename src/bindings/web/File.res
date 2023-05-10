@@ -1,5 +1,3 @@
-open Stdlib
-
 type t = {
   lastModified: int,
   lastModifiedDate: Date.t,

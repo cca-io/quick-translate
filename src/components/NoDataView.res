@@ -1,4 +1,3 @@
-open Stdlib
 open ReactUtils
 
 let fileTypes = [

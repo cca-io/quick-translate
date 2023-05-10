@@ -1,5 +1,3 @@
-open Stdlib
-
 @react.component
 let make = (~size, ~fill="tomato", ~text, ~children) =>
   <svg

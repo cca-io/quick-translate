@@ -1,5 +1,3 @@
-open Stdlib
-
 type t = {
   id: string,
   defaultMessage: string,
@@ -7,9 +5,9 @@ type t = {
 }
 
 let make = (id, ~description=?, defaultMessage) => {
-  id: id,
-  defaultMessage: defaultMessage,
-  description: description,
+  id,
+  defaultMessage,
+  description,
 }
 
 external toJson: array<t> => Json.t = "%identity"

@@ -1,5 +1,3 @@
-open Stdlib
-
 @react.component
 let make = React.memo((~size) =>
   <svg

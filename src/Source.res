@@ -26,7 +26,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
   let targetMap =
     target
     ->Array.map(({Message.id: id, defaultMessage}) => (id, defaultMessage))
-    ->Map.String.fromArray
+    ->Belt.Map.String.fromArray
 
   let header =
     data[0]->Option.mapWithDefault([], header =>
@@ -39,7 +39,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
     ->Array.map(b => {
       let value =
         b[0]
-        ->Option.flatMap(key => targetMap->Map.String.get(key.value))
+        ->Option.flatMap(key => targetMap->Belt.Map.String.get(key.value))
         ->Option.mapWithDefault(Cell.empty(), value => Cell.make(value))
 
       b->Array.concat([value])
@@ -68,7 +68,7 @@ let fromCsv = rows => {
 }
 
 let getColIndex = (data: t, column) =>
-  data[0]->Option.getWithDefault([])->Array.getIndexBy(col => col.value === column)
+  data[0]->Option.getWithDefault([])->Belt.Array.getIndexBy(col => col.value === column)
 
 let remove = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)

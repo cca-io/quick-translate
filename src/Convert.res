@@ -1,4 +1,4 @@
-open Stdlib
+@new external makeRegExp: (string, string) => Js.Re.t = "RegExp"
 
 let toArrayHelper = (~regex, str) => {
   let rows = []

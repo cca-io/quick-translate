@@ -1,7 +1,5 @@
-open Stdlib
-
-let swapIndex = (data, index) =>
-  data->Array.map(row => index !== 1 ? row->Array.swap(index, 1) : row)
+let swapIndex = (data: array<array<'a>>, index) =>
+  data->Array.map(row => index !== 1 ? row->ArrayUtils.swap(index, 1) : row)
 
 let isCommentColumn = text =>
   ["comments", "comment", "description"]->Array.some(str =>
