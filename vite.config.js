@@ -7,7 +7,9 @@ import { VitePWA } from "vite-plugin-pwa";
  */
 export default {
   plugins: [
-    react(),
+    react({
+      include: ["**/*.bs.mjs"],
+    }),
     VitePWA({
       includeAssets: [
         "icon.svg",

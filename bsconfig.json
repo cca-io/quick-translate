@@ -1,9 +1,6 @@
 {
   "name": "quick-translate",
   "version": "0.1.0",
-  "reason": {
-    "react-jsx": 3
-  },
   "sources": {
     "dir": "src",
     "subdirs": true
@@ -14,9 +11,18 @@
       "in-source": true
     }
   ],
-  "suffix": ".bs.js",
-  "bs-dependencies": ["@rescript/react"],
+  "suffix": ".bs.mjs",
+  "bs-dependencies": [
+    "@rescript/core",
+    "@rescript/react"
+  ],
+  "bsc-flags": ["-open RescriptCore"],
   "warnings": {
     "error": "+101"
+  },
+  "uncurried": true,
+  "jsx": {
+    "version": 4,
+    "mode": "automatic"
   }
 }
