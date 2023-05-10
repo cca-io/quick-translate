@@ -13,18 +13,18 @@ module ExportButtonRow = {
   let make = (~value, ~onExport) =>
     <div className="ExportButtonRow">
       <IconButton
-        title={"Export JSON file"} onClick={evt => onExport(value, File.FileType.Json)} icon=#json
+        title={"Export JSON file"} onClick={_evt => onExport(value, File.FileType.Json)} icon=#json
       />
       <IconButton
         title={"Export Properties file"}
-        onClick={evt => onExport(value, Properties)}
+        onClick={_evt => onExport(value, Properties)}
         icon=#properties
       />
       <IconButton
-        title={"Export Strings file"} onClick={evt => onExport(value, Strings)} icon=#strings
+        title={"Export Strings file"} onClick={_evt => onExport(value, Strings)} icon=#strings
       />
       <IconButton
-        title={"Export Android XML resources file"} onClick={evt => onExport(value, Xml)} icon=#xml
+        title={"Export Android XML resources file"} onClick={_evt => onExport(value, Xml)} icon=#xml
       />
     </div>
 }
@@ -33,7 +33,7 @@ module ActionButtonRow = {
   @react.component
   let make = (~value, ~onRemoveTarget) =>
     <div className="ActionButtonRow">
-      <IconButton title={"Remove column"} onClick={evt => onRemoveTarget(value)} icon=#trash />
+      <IconButton title={"Remove column"} onClick={_evt => onRemoveTarget(value)} icon=#trash />
     </div>
 }
 
@@ -65,7 +65,11 @@ let make = (~index, ~useDescription, ~canToggleDescription, ~value, ~onExport, ~
         <IdButtonRow useDescription canToggleDescription onRemoveSource onToggleDescriptions />
       | Description => React.null
       | Source => <ExportButtonRow value onExport />
-      | Target => <> <ExportButtonRow value onExport /> <ActionButtonRow value onRemoveTarget /> </>
+      | Target =>
+        <>
+          <ExportButtonRow value onExport />
+          <ActionButtonRow value onRemoveTarget />
+        </>
       }}
     </div>
   </th>

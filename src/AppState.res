@@ -32,14 +32,14 @@ type action =
 
 let reducer = (state, action) =>
   switch action {
-  | SetMode(mode) => {...state, mode: mode}
+  | SetMode(mode) => {...state, mode}
   | SetData(data) => {
       ...state,
       history: {
         past: state.history.past->Array.concat([state.data]),
         future: [],
       },
-      data: data,
+      data,
       dialog: Closed,
     }
   | Redo =>
@@ -75,7 +75,7 @@ let reducer = (state, action) =>
     | _ => state
     }
   | ToggleUseDescription => {...state, useDescription: !state.useDescription}
-  | SetDialog(dialog) => {...state, dialog: dialog}
+  | SetDialog(dialog) => {...state, dialog}
   }
 
 let initialState = {

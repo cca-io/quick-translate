@@ -82,8 +82,8 @@ let read = (~encoding=#"UTF-8", file: t) =>
   Js.Promise.make((~resolve, ~reject) => {
     let fileReader = Reader.make()
     fileReader->Reader.readAsText(file, encoding)
-    fileReader->Reader.setOnload(e => resolve(. e.target.result))
-    fileReader->Reader.setOnError(_ => reject(. Reader.FileReadError))
+    fileReader->Reader.setOnload(e => resolve(e.target.result))
+    fileReader->Reader.setOnError(_ => reject(Reader.FileReadError))
   })
 
 let resultToJson = (result: FileResult.t) =>

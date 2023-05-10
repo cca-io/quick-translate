@@ -96,14 +96,14 @@ let reducer = (state, action) =>
 let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit => unit) => {
   let (keysPressed, dispatch) = React.useReducer(reducer, Belt.Set.String.empty)
 
-  let downHandler = React.Uncurried.useCallback1((key, evt) => {
+  let downHandler = React.useCallback1((key, evt) => {
     let eventKey = evt->KeyboardEvent.key
     if !(evt->KeyboardEvent.repeat) && isTargetOk(~omiTextfields, evt) && eventKey === key {
       dispatch(SetKey(key))
     }
   }, [keysPressed])
 
-  let upHandler = React.Uncurried.useCallback1((key, evt) => {
+  let upHandler = React.useCallback1((key, evt) => {
     let eventKey = evt->KeyboardEvent.key
     if isTargetOk(~omiTextfields, evt) && eventKey === key {
       dispatch(RemoveKey(key))
@@ -119,13 +119,15 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
   }, (callback, keysPressed))
 
   React.useEffect0(() => {
-    keys->Array.forEach(key => window.addEventListener("keydown", downHandler(. key)))
-    keys->Array.forEach(key => window.addEventListener("keyup", upHandler(. key)))
+    keys->Array.forEach(key => window.addEventListener("keydown", evt => downHandler(key, evt)))
+    keys->Array.forEach(key => window.addEventListener("keyup", evt => upHandler(key, evt)))
 
     Some(
       () => {
-        keys->Array.forEach(key => window.removeEventListener("keydown", downHandler(. key)))
-        keys->Array.forEach(key => window.removeEventListener("keyup", upHandler(. key)))
+        keys->Array.forEach(key =>
+          window.removeEventListener("keydown", evt => downHandler(key, evt))
+        )
+        keys->Array.forEach(key => window.removeEventListener("keyup", evt => upHandler(key, evt)))
       },
     )
   })
