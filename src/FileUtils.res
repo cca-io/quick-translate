@@ -5,9 +5,7 @@ let fileNameWithoutExt = fileName => {
 
   fileNameArray->Array.length === 1
     ? fileName
-    : fileNameArray
-      ->Array.slice(~offset=0, ~len=fileNameArray->Array.length - 1)
-      ->Array.Unsafe.joinWith("")
+    : fileNameArray->Array.slice(~start=0, ~end=fileNameArray->Array.length - 1)->Array.joinWith("")
 }
 
 let download = (~download, ~blankTarget=true, url) => {
@@ -29,7 +27,7 @@ let download = (~download, ~blankTarget=true, url) => {
 let timestampFilename = filename => {
   let timestamp = Date.make()->Date.toISOString->String.split(".")
   let formatted =
-    timestamp->Array.getUnsafe(0)->String.replace("T", "_")->String.replaceByRe(%re("/:/g"), "-")
+    timestamp->Array.getUnsafe(0)->String.replace("T", "_")->String.replaceRegExp(%re("/:/g"), "-")
 
   formatted ++ "-" ++ filename
 }

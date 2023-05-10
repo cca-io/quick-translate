@@ -49,8 +49,15 @@ module CellProps = {
   }
 }
 
-let update = (grid, {Change.row: row, col, value}) =>
-  grid[row][col] = {...grid[row][col], Cell.value: value->Js.String2.trim}
+let update = (grid, {Change.row: _row as rowIndex, col, value}) => {
+  let row = grid->Array.getUnsafe(rowIndex)
+  let cell = row->Array.getUnsafe(col)
+
+  let newCell = {...cell, Cell.value: value->String.trim}
+  row->Array.setUnsafe(col, newCell)
+
+  grid->Array.setUnsafe(rowIndex, row)
+}
 
 @react.component @module("../../vendor/react-datasheet/src")
 external make: (

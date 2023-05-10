@@ -66,7 +66,7 @@ let fromFormEvent: ReactEvent.Form.t => array<t> = e => {
 }
 
 let getExtension = fileName =>
-  fileName->String.split(".")->Array.copy->Array.Unsafe.pop->Option.map(ext => "." ++ ext)
+  fileName->String.split(".")->Array.copy->Array.pop->Option.map(ext => "." ++ ext)
 
 let getFileType = (file: t) => {
   let type_ = file.\"type"
@@ -87,4 +87,4 @@ let read = (~encoding=#"UTF-8", file: t) =>
   })
 
 let resultToJson = (result: FileResult.t) =>
-  result->FileResult.toString->Json.parseExn->Json.decodeArray
+  result->FileResult.toString->JSON.parseExn->JSON.Decode.array

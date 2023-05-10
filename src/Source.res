@@ -1,4 +1,3 @@
-open Stdlib
 open DataSheet
 
 type t = DataSheet.data
@@ -10,16 +9,13 @@ let make = (data: array<Message.t>, fileName): t => {
     Cell.make(~className="description", description->Option.getWithDefault("")),
     Cell.make(defaultMessage),
   ])
-  ->Array.concat(
+  ->Array.concat([
     [
-      [
-        Cell.makeRO("ID"),
-        Cell.makeRO("Description"),
-        Cell.makeRO(fileName->FileUtils.fileNameWithoutExt),
-      ],
+      Cell.makeRO("ID"),
+      Cell.makeRO("Description"),
+      Cell.makeRO(fileName->FileUtils.fileNameWithoutExt),
     ],
-    _,
-  )
+  ])
 }
 
 let add = (data: t, target: array<Message.t>, fileName) => {
@@ -35,7 +31,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
 
   let body =
     data
-    ->Array.sliceToEnd(1)
+    ->Array.sliceToEnd(~start=1)
     ->Array.map(b => {
       let value =
         b[0]
@@ -48,7 +44,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
   [header]->Array.concat(body)
 }
 
-let addMultiple = (data: t, targets: array<(string, array<Json.t>)>) => {
+let addMultiple = (data: t, targets: array<(string, array<JSON.t>)>) => {
   targets->Array.reduce(data, (newData, (fileName, target)) =>
     newData->add(target->Message.fromJson, fileName)
   )
@@ -59,9 +55,9 @@ let fromCsv = rows => {
 
   let body =
     rows
-    ->Array.sliceToEnd(1)
+    ->Array.sliceToEnd(~start=1)
     ->Array.map(row =>
-      row->Array.mapWithIndex((i, text) => i > 0 ? text->Cell.make : text->Cell.makeRO)
+      row->Array.mapWithIndex((text, i) => i > 0 ? text->Cell.make : text->Cell.makeRO)
     )
 
   [header]->Array.concat(body)
@@ -76,7 +72,9 @@ let remove = (data: t, column: string) => {
   switch colIndex {
   | Some(index) =>
     data->Array.map(row =>
-      row->Array.mapWithIndex((i, col) => index === i ? None : Some(col))->Array.keepMap(col => col)
+      row
+      ->Array.mapWithIndex((col, i) => index === i ? None : Some(col))
+      ->Array.filterMap(col => col)
     )
   | None => data
   }
@@ -94,11 +92,11 @@ let empty = () => []
 
 let getColData = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)
-  let body = data->Array.sliceToEnd(1)
+  let body = data->Array.sliceToEnd(~start=1)
 
   switch colIndex {
   | Some(index) =>
-    body->Array.keepMap(row =>
+    body->Array.filterMap(row =>
       switch (row[0], row[1], row[index]) {
       | (Some(key), Some(desc), Some(source)) =>
         Message.make(

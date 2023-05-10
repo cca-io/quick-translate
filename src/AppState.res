@@ -1,5 +1,3 @@
-open Stdlib
-
 type mode = Json | Csv({commentIndex: option<int>, delimiter: string}) | Other
 
 type dialog =
@@ -52,7 +50,7 @@ let reducer = (state, action) =>
         data: nextData,
         history: {
           past: past->Array.concat([state.data]),
-          future: future->Array.sliceToEnd(1),
+          future: future->Array.sliceToEnd(~start=1),
         },
       }
     | None => state
@@ -61,7 +59,7 @@ let reducer = (state, action) =>
     let {past, future} = state.history
     let lastIndex = past->Array.length - 1
     let previous = past[lastIndex]
-    let newPast = past->Array.slice(~offset=0, ~len=lastIndex)
+    let newPast = past->Array.slice(~start=0, ~end=lastIndex)
 
     switch previous {
     | Some(previous) if lastIndex > 0 => {

@@ -2,18 +2,18 @@
 
 let toArrayHelper = (~regex, str) => {
   let rows = []
-  let pattern = RegExp.make(regex, "gi")
+  let pattern = makeRegExp(regex, "gi")
 
   let rec loop = () => {
-    switch pattern->RegExp.exec_(str) {
+    switch pattern->RegExp.exec(str) {
     | None => ()
     | Some(re) =>
-      let arr = re->RegExp.captures
-      let key = arr[1]->Option.flatMap(key => key->Nullable.toOption)
-      let value = arr[2]->Option.flatMap(value => value->Nullable.toOption)
+      let arr = re->RegExp.Result.matches
+      let key = arr[1]
+      let value = arr[2]
 
       switch (key, value) {
-      | (Some(key), Some(value)) => rows->Array.Unsafe.push(Message.make(key, value))->ignore
+      | (Some(key), Some(value)) => rows->Array.push(Message.make(key, value))
       | _ => ()
       }
 
@@ -37,13 +37,13 @@ module CSV = {
 
 module Json = {
   let fromData = (data, col) => {
-    let colData = data->Source.getColData(col)->Message.toJson->Json.stringifyWithSpace(2)
+    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringifyWithIndent(2)
 
     "data:text/json;charset=utf-8," ++ Js.Global.encodeURIComponent(colData)
   }
 
   let fromDataAsBlob = (data, col) => {
-    let colData = data->Source.getColData(col)->Message.toJson->Json.stringifyWithSpace(2)
+    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringifyWithIndent(2)
 
     Blob.fromString([colData])
   }
@@ -57,7 +57,7 @@ module Properties = {
       data
       ->Source.getColData(col)
       ->Array.map(({id, defaultMessage}) => `${id}=${defaultMessage}`)
-      ->Array.Unsafe.joinWith("\n")
+      ->Array.joinWith("\n")
 
     let enc = TextEncoder.makeIso8859_1()
     let encoded = enc->TextEncoder.encode(propsData)
@@ -75,7 +75,7 @@ module Strings = {
       data
       ->Source.getColData(col)
       ->Array.map(({id, defaultMessage}) => `"${id}" = "${defaultMessage}"`)
-      ->Array.Unsafe.joinWith("\n")
+      ->Array.joinWith("\n")
 
     "data:text/plain;charset=utf-8," ++ Js.Global.encodeURIComponent(propsData)
   }
@@ -91,7 +91,7 @@ module Xml = {
       data
       ->Source.getColData(col)
       ->Array.map(({id, defaultMessage}) => `    <string name="${id}">${defaultMessage}</string>`)
-      ->Array.Unsafe.joinWith("\n")
+      ->Array.joinWith("\n")
 
     let propsData = "<resources>\n" ++ propsData ++ "\n</resources>"
 

@@ -146,7 +146,7 @@ let make = () => {
           }
         }
 
-        dispatch(SetData(data->Source.addMultiple(results->Array.keepMap(a => a))))
+        dispatch(SetData(data->Source.addMultiple(results->Array.filterMap(a => a))))
       }
 
       let _ = readFiles()
@@ -191,14 +191,14 @@ let make = () => {
 
     data[0]
     ->Option.getWithDefault([])
-    ->Array.forEachWithIndex((i, cell) =>
+    ->Array.forEachWithIndex((cell, i) =>
       if i > 0 {
         zip->JsZip.file(cell.value ++ ".json", data->Convert.Json.fromDataAsBlob(cell.value))
       }
     )
 
     let performDownload = async () => {
-      let blob = await (zip->JsZip.generateAsync({\"type": #blob}))
+      let blob = await zip->JsZip.generateAsync({\"type": #blob})
       blob->Blob.toUrl->FileUtils.download(~download="all.zip")
     }
 
@@ -228,14 +228,14 @@ let make = () => {
               <th> {"Targets"->s} </th>
               {data[0]
               ->Option.getWithDefault([])
-              ->Array.mapWithIndex((i, _) => i > 3 ? <th key={i->Int.toString} /> : React.null)
+              ->Array.mapWithIndex((_cell, i) => i > 3 ? <th key={i->Int.toString} /> : React.null)
               ->React.array}
             </tr>
           : React.null}
         <tr>
           {data[0]
           ->Option.getWithDefault([])
-          ->Array.mapWithIndex((i, {value}) =>
+          ->Array.mapWithIndex(({value}, i) =>
             <HeaderCol
               key={i->Int.toString}
               index={i}

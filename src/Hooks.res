@@ -43,8 +43,7 @@ type window = {
 let blacklistedTargets = ["INPUT", "TEXTAREA"]
 
 let isTargetOk = (~omiTextfields=true, evt) =>
-  !omiTextfields ||
-  !(blacklistedTargets->Array.Unsafe.includes((evt->KeyboardEvent.target)["tagName"]))
+  !omiTextfields || !(blacklistedTargets->Array.includes((evt->KeyboardEvent.target)["tagName"]))
 
 let useKeyPress = (~omiTextfields=true, targetKey: string, callback: unit => unit) => {
   let (keyPressed, setKeyPressed) = React.useState(() => false)

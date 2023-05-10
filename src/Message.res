@@ -10,5 +10,5 @@ let make = (id, ~description=?, defaultMessage) => {
   description,
 }
 
-external toJson: array<t> => Json.t = "%identity"
-external fromJson: array<Json.t> => array<t> = "%identity"
+external toJson: array<t> => JSON.t = "%identity"
+external fromJson: array<JSON.t> => array<t> = "%identity"
