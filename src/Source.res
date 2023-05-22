@@ -3,19 +3,22 @@ open DataSheet
 type t = DataSheet.data
 
 let make = (data: array<Message.t>, fileName): t => {
-  data
-  ->Array.map(({id, defaultMessage, description}) => [
-    Cell.makeRO(id),
-    Cell.make(~className="description", description->Option.getWithDefault("")),
-    Cell.make(defaultMessage),
-  ])
-  ->Array.concat([
+  let headerRows = [
     [
       Cell.makeRO("ID"),
       Cell.makeRO("Description"),
       Cell.makeRO(fileName->FileUtils.fileNameWithoutExt),
     ],
-  ])
+  ]
+
+  let rows =
+    data->Array.map(({id, defaultMessage, description}) => [
+      Cell.makeRO(id),
+      Cell.make(~className="description", description->Option.getWithDefault("")),
+      Cell.make(defaultMessage),
+    ])
+
+  Array.concat(headerRows, rows)
 }
 
 let add = (data: t, target: array<Message.t>, fileName) => {
