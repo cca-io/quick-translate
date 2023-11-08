@@ -1,4 +1,4 @@
-![quick-translate logo](assets/logo.svg)
+![quick-translate logo](src/icons/logo.svg)
 
 Translate multiple languages at once in a spreadsheet.
 
