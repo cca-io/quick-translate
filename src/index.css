@@ -15,6 +15,14 @@ body {
   overflow-y: hidden;
 }
 
+.AppLogo {
+  margin-bottom: 50px;
+  padding: 20px 0px;
+  background-color: #24283a;
+  border-radius: 10px;
+  opacity: 1.;
+}
+
 .ImportOverlay {
   position: absolute;
   z-index: 5;
@@ -35,9 +43,8 @@ body {
   font-size: 4rem;
   padding: 8px;
   text-align: center;
-  background-color: darkgrey;
+  background-color: #ffffff;
   color: #3c3c3c;
-  opacity: 0.5;
 }
 
 .FileTypes {

@@ -20,7 +20,6 @@
   "warnings": {
     "error": "+101"
   },
-  "uncurried": true,
   "jsx": {
     "version": 4,
     "mode": "automatic"

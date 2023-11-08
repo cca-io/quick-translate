@@ -21,7 +21,7 @@ export default {
         name: "Quick Translate",
         short_name: "QT",
         description: "Translate multiple languages at once in a spreadsheet",
-        theme_color: "#fddf19",
+        theme_color: "#93dcd0",
         icons: [
           {
             src: "icon-192.png",
