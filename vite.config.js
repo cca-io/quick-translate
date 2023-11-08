@@ -12,6 +12,7 @@ export default {
     }),
     VitePWA({
       includeAssets: [
+        "logo.svg",
         "icon.svg",
         "favicon.ico",
         "robots.txt",
