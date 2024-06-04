@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import svgr from "vite-plugin-svgr";
 
 /**
  * https://vitejs.dev/config/
@@ -10,6 +11,7 @@ export default {
     react({
       include: ["**/*.bs.mjs"],
     }),
+    svgr(),
     VitePWA({
       includeAssets: [
         "logo.svg",
