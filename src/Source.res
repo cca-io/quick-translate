@@ -14,7 +14,7 @@ let make = (data: array<Message.t>, fileName): t => {
   let rows =
     data->Array.map(({id, defaultMessage, description}) => [
       Cell.makeRO(id),
-      Cell.make(~className="description", description->Option.getWithDefault("")),
+      Cell.make(~className="description", description->Option.getOr("")),
       Cell.make(defaultMessage),
     ])
 
@@ -28,7 +28,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
     ->Belt.Map.String.fromArray
 
   let header =
-    data[0]->Option.mapWithDefault([], header =>
+    data[0]->Option.mapOr([], header =>
       header->Array.concat([Cell.makeRO(fileName->FileUtils.fileNameWithoutExt)])
     )
 
@@ -39,7 +39,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
       let value =
         b[0]
         ->Option.flatMap(key => targetMap->Belt.Map.String.get(key.value))
-        ->Option.mapWithDefault(Cell.empty(), value => Cell.make(value))
+        ->Option.mapOr(Cell.empty(), value => Cell.make(value))
 
       b->Array.concat([value])
     })
@@ -54,7 +54,7 @@ let addMultiple = (data: t, targets: array<(string, array<JSON.t>)>) => {
 }
 
 let fromCsv = rows => {
-  let header = rows[0]->Option.mapWithDefault([], hd => hd->Array.map(value => Cell.makeRO(value)))
+  let header = rows[0]->Option.mapOr([], hd => hd->Array.map(value => Cell.makeRO(value)))
 
   let body =
     rows
@@ -67,7 +67,7 @@ let fromCsv = rows => {
 }
 
 let getColIndex = (data: t, column) =>
-  data[0]->Option.getWithDefault([])->Belt.Array.getIndexBy(col => col.value === column)
+  data[0]->Option.getOr([])->Belt.Array.getIndexBy(col => col.value === column)
 
 let remove = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)

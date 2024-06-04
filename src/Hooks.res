@@ -60,14 +60,14 @@ let useKeyPress = (~omiTextfields=true, targetKey: string, callback: unit => uni
     }
   }
 
-  React.useEffect2(() => {
+  React.useEffect(() => {
     if keyPressed {
       callback()
     }
     None
   }, (callback, keyPressed))
 
-  React.useEffect0(() => {
+  React.useEffect(() => {
     window.addEventListener("keydown", downHandler)
     window.addEventListener("keyup", upHandler)
 
@@ -77,7 +77,7 @@ let useKeyPress = (~omiTextfields=true, targetKey: string, callback: unit => uni
         window.removeEventListener("keyup", upHandler)
       },
     )
-  })
+  }, [])
 }
 
 type action =
@@ -95,21 +95,21 @@ let reducer = (state, action) =>
 let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit => unit) => {
   let (keysPressed, dispatch) = React.useReducer(reducer, Belt.Set.String.empty)
 
-  let downHandler = React.useCallback1((key, evt) => {
+  let downHandler = React.useCallback((key, evt) => {
     let eventKey = evt->KeyboardEvent.key
     if !(evt->KeyboardEvent.repeat) && isTargetOk(~omiTextfields, evt) && eventKey === key {
       dispatch(SetKey(key))
     }
   }, [keysPressed])
 
-  let upHandler = React.useCallback1((key, evt) => {
+  let upHandler = React.useCallback((key, evt) => {
     let eventKey = evt->KeyboardEvent.key
     if isTargetOk(~omiTextfields, evt) && eventKey === key {
       dispatch(RemoveKey(key))
     }
   }, [keysPressed])
 
-  React.useEffect2(() => {
+  React.useEffect(() => {
     if keys->Belt.Set.String.fromArray->Belt.Set.String.eq(keysPressed) {
       callback()
       dispatch(Reset)
@@ -117,7 +117,7 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
     None
   }, (callback, keysPressed))
 
-  React.useEffect0(() => {
+  React.useEffect(() => {
     keys->Array.forEach(key => window.addEventListener("keydown", evt => downHandler(key, evt)))
     keys->Array.forEach(key => window.addEventListener("keyup", evt => upHandler(key, evt)))
 
@@ -129,5 +129,6 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
         keys->Array.forEach(key => window.removeEventListener("keyup", evt => upHandler(key, evt)))
       },
     )
-  })
+  }, [])
+}
 }

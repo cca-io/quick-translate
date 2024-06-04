@@ -4,12 +4,14 @@ type t
 
 @send external file: (t, string, Blob.t) => unit = "file"
 
+@send external folder: (t, string) => t = "folder"
+
 type \"type" = [#base64 | #blob]
 
 type options = {\"type": \"type"}
 
-@send external generateAsync: (t, options) => Js.Promise.t<Blob.t> = "generateAsync"
+@send external generateAsync: (t, options) => Promise.t<Blob.t> = "generateAsync"
 
 external toFile: t => File.t = "%identity"
 
-make()->Js.log
+make()->Console.log

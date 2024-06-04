@@ -1,8 +1,8 @@
 type t = DataSheet.data
 
-let make: (array<Message.t>, Js.String2.t) => t
+let make: (array<Message.t>, string) => t
 
-let add: (t, array<Message.t>, Js.String2.t) => t
+let add: (t, array<Message.t>, string) => t
 
 let addMultiple: (t, array<(string, array<JSON.t>)>) => t
 

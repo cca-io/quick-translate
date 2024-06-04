@@ -5,7 +5,7 @@ let fileNameWithoutExt = fileName => {
 
   fileNameArray->Array.length === 1
     ? fileName
-    : fileNameArray->Array.slice(~start=0, ~end=fileNameArray->Array.length - 1)->Array.joinWith("")
+    : fileNameArray->Array.slice(~start=0, ~end=fileNameArray->Array.length - 1)->Array.join("")
 }
 
 let download = (~download, ~blankTarget=true, url) => {

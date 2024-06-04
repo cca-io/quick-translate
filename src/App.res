@@ -34,7 +34,7 @@ let make = () => {
           let data =
             result
             ->File.resultToJson
-            ->Option.mapWithDefault(data, result =>
+            ->Option.mapOr(data, result =>
               switch sourceOrTarget {
               | Source =>
                 dispatch(SetMode(Json))
@@ -139,7 +139,7 @@ let make = () => {
             if sourceOrTarget === Target && file->File.isJson {
               let result = await File.read(file)
               let _ =
-                results->Js.Array2.push(
+                results->Array.push(
                   result->File.resultToJson->Option.flatMap(result => Some(file.name, result)),
                 )
             }
@@ -168,13 +168,13 @@ let make = () => {
     handleFiles(files, sourceOrTarget)
   }
 
-  let onCellsChanged = React.useCallback1(changes => {
+  let onCellsChanged = React.useCallback(changes => {
     let changedData = data->Source.update(changes)
 
     dispatch(SetData(changedData))
   }, [data])
 
-  let onExport = React.useCallback1((col, fileType) => {
+  let onExport = React.useCallback((col, fileType) => {
     let download = col ++ fileType->File.FileType.toExtension
 
     switch fileType {
@@ -186,11 +186,11 @@ let make = () => {
     }
   }, [data])
 
-  let onExportAll = React.useCallback1(_evt => {
+  let onExportAll = React.useCallback(_evt => {
     let zip = JsZip.make()
 
     data[0]
-    ->Option.getWithDefault([])
+    ->Option.getOr([])
     ->Array.forEachWithIndex((cell, i) =>
       if i > 0 {
         zip->JsZip.file(cell.value ++ ".json", data->Convert.Json.fromDataAsBlob(cell.value))
@@ -205,7 +205,24 @@ let make = () => {
     let _ = performDownload()
   }, [data])
 
-  let onExportCsv = React.useCallback2(_evt => {
+  // let onExportOdf = React.useCallback1(async _evt => {
+  //   let zip = JsZip.make()
+  //   let manifest = zip->JsZip.folder("META-INF")->JsZip.file("manifest.xml")
+
+  //   data[0]
+  //   ->Option.getOr([])
+  //   ->Array.forEachWithIndex((i, cell) =>
+  //     if i > 0 {
+  //       zip->JsZip.file(cell.value ++ ".json", data->Convert.Json.fromDataAsBlob(cell.value))
+  //     }
+  //   )
+
+  //   let blob = await (zip->JsZip.generateAsync({\"type": #blob}))
+
+  //   blob->Blob.toUrl->FileUtils.download(~download="all.zip")
+  // }, [data])
+
+  let onExportCsv = React.useCallback(_evt => {
     let (newData, delimiter) = switch state.mode {
     | Csv({commentIndex: Some(index), delimiter}) => (data->SourceUtils.swapIndex(index), delimiter)
     | Csv({delimiter}) => (data, delimiter)
@@ -227,14 +244,14 @@ let make = () => {
               <th />
               <th> {"Targets"->s} </th>
               {data[0]
-              ->Option.getWithDefault([])
+              ->Option.getOr([])
               ->Array.mapWithIndex((_cell, i) => i > 3 ? <th key={i->Int.toString} /> : React.null)
               ->React.array}
             </tr>
           : React.null}
         <tr>
           {data[0]
-          ->Option.getWithDefault([])
+          ->Option.getOr([])
           ->Array.mapWithIndex(({value}, i) =>
             <HeaderCol
               key={i->Int.toString}
@@ -277,9 +294,10 @@ let make = () => {
     </Content>
     <Sidebar sourceAvailable>
       <Sidebar.Top>
-        <IconButton title={"Add new language"} size=#Large onClick={onCreateTarget} icon=#plus />
-        <IconButton title={"Export to CSV"} size=#Large onClick={onExportCsv} icon=#csv />
-        <IconButton title={"Export all JSON files"} size=#Large onClick={onExportAll} icon=#json />
+        <IconButton title={"Add new language"} size=#large onClick={onCreateTarget} icon=#plus />
+        <IconButton title={"Export to CSV"} size=#large onClick={onExportCsv} icon=#csv />
+        <IconButton title={"Export all JSON files"} size=#large onClick={onExportAll} icon=#json />
+        // <IconButton title={"Save as ODF"} size=#Large onClick={onExportOdf} icon=#plus />
       </Sidebar.Top>
       <Sidebar.Bottom>
         <IconButton title={"Help"} onClick={onOpenHelp} icon=#help />

@@ -10,7 +10,7 @@ let make = (~size, ~fill, ~text=?, ~children) =>
       fill="#e9e9e0"
     />
     <path fill="#d9d7ca" d="M37.5.151V12h11.849z" />
-    {text->Option.mapWithDefault(React.null, text => <>
+    {text->Option.mapOr(React.null, text => <>
       <path
         d="M48.037 56H7.963A1.463 1.463 0 016.5 54.537V39h43v15.537c0 .808-.655 1.463-1.463 1.463z"
         fill

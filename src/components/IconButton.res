@@ -1,8 +1,20 @@
-type icon = [#csv | #json | #properties | #strings | #xml]
+type icon = [
+  | #csv
+  | #help
+  | #hideDescription
+  | #json
+  | #plus
+  | #properties
+  | #showDescription
+  | #strings
+  | #trash
+  | #xml
+]
+
 type size = [#small | #large]
 
 @react.component
-let make = (~icon, ~title, ~size=#small, ~onClick) => {
+let make = (~icon: icon, ~title, ~size=#small, ~onClick) => {
   let isSmall = size === #small
   let size = isSmall ? 40 : 80
 

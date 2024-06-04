@@ -79,7 +79,7 @@ let getFileType = (file: t) => {
 let isJson = (file: t) => file.\"type" === "application/json"
 
 let read = (~encoding=#"UTF-8", file: t) =>
-  Js.Promise.make((~resolve, ~reject) => {
+  Promise.make((resolve, reject) => {
     let fileReader = Reader.make()
     fileReader->Reader.readAsText(file, encoding)
     fileReader->Reader.setOnload(e => resolve(e.target.result))

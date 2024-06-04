@@ -23,7 +23,7 @@ module Prompt = {
   @react.component
   let make = (~open_, ~title, ~label, ~onSubmit, ~onClose) => {
     let (value, setValue) = React.useState(() => "")
-    let inputRef: ReactDOM.Ref.currentDomRef = React.useRef(Js.Nullable.null)
+    let inputRef: ReactDOM.Ref.currentDomRef = React.useRef(null)
     let onChange = evt => setValue(_ => evt->valueFromEvent)
     let onClick = _evt => onSubmit(value)
     let disabled = value->String.length === 0
@@ -35,18 +35,20 @@ module Prompt = {
         }
       )
 
-    React.useEffect0(() => {
-      inputRef.current->Js.Nullable.iter((. input) => input->HtmlElement.focus)
+    React.useEffect(() => {
+      inputRef.current->Nullable.forEach(input => input->HtmlElement.focus)
 
       None
-    })
+    }, [])
 
     <Info open_ title onClose>
       <div> {label} </div>
       <div>
         <input ref={inputRef->ReactDOM.Ref.domRef} type_="text" value onChange onKeyPress />
       </div>
-      <div> <button disabled onClick> {"OK"->s} </button> </div>
+      <div>
+        <button disabled onClick> {"OK"->s} </button>
+      </div>
     </Info>
   }
 }

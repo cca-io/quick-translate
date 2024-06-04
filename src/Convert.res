@@ -1,4 +1,4 @@
-@new external makeRegExp: (string, string) => Js.Re.t = "RegExp"
+@new external makeRegExp: (string, string) => Re.t = "RegExp"
 
 let toArrayHelper = (~regex, str) => {
   let rows = []
@@ -31,19 +31,19 @@ module CSV = {
     let csvData =
       data->Array.map(row => row->Array.map(cell => cell.value))->Papa.unparse(~delimiter)
 
-    `data:text/csv;charset=utf-8,\uFEFF${Js.Global.encodeURIComponent(csvData)}`
+    `data:text/csv;charset=utf-8,\uFEFF${encodeURIComponent(csvData)}`
   }
 }
 
 module Json = {
   let fromData = (data, col) => {
-    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringifyWithIndent(2)
+    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringify(~space=2)
 
-    "data:text/json;charset=utf-8," ++ Js.Global.encodeURIComponent(colData)
+    "data:text/json;charset=utf-8," ++ encodeURIComponent(colData)
   }
 
   let fromDataAsBlob = (data, col) => {
-    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringifyWithIndent(2)
+    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringify(~space=2)
 
     Blob.fromString([colData])
   }
@@ -57,7 +57,7 @@ module Properties = {
       data
       ->Source.getColData(col)
       ->Array.map(({id, defaultMessage}) => `${id}=${defaultMessage}`)
-      ->Array.joinWith("\n")
+      ->Array.join("\n")
 
     let enc = TextEncoder.makeIso8859_1()
     let encoded = enc->TextEncoder.encode(propsData)
@@ -75,9 +75,9 @@ module Strings = {
       data
       ->Source.getColData(col)
       ->Array.map(({id, defaultMessage}) => `"${id}" = "${defaultMessage}"`)
-      ->Array.joinWith("\n")
+      ->Array.join("\n")
 
-    "data:text/plain;charset=utf-8," ++ Js.Global.encodeURIComponent(propsData)
+    "data:text/plain;charset=utf-8," ++ encodeURIComponent(propsData)
   }
 
   let toArray = str => toArrayHelper(~regex, str)
@@ -91,11 +91,11 @@ module Xml = {
       data
       ->Source.getColData(col)
       ->Array.map(({id, defaultMessage}) => `    <string name="${id}">${defaultMessage}</string>`)
-      ->Array.joinWith("\n")
+      ->Array.join("\n")
 
     let propsData = "<resources>\n" ++ propsData ++ "\n</resources>"
 
-    "data:text/xml;charset=utf-8," ++ Js.Global.encodeURIComponent(propsData)
+    "data:text/xml;charset=utf-8," ++ encodeURIComponent(propsData)
   }
 
   let toArray = str => toArrayHelper(~regex, str)
