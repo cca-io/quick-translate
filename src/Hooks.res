@@ -131,4 +131,29 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
     )
   }, [])
 }
-}
+
+// let documentEvents = ["click", "mousedown", "keypress", "DOMMouseScroll", "mousewheel"]
+
+// let useIsIdle = (~hasChanges, doIfIdle: unit => unit) => {
+//   let intervalRef = React.useRef(None)
+//   // let (isIdle, setIdle) = React.useState(_ => false)
+
+//   React.useEffect(() => {
+//     let restartTimer = () => {
+//       if hasChanges {
+//         intervalRef.current = setInterval(() => {
+//             doIfIdle()
+//           }, 5000)->Some
+//       }
+//     }
+
+//     documentEvents->Array.forEach(e => e->Document.addEventListener(restartTimer))
+
+//     Some(
+//       () => {
+//         documentEvents->Array.forEach(e => e->Document.removeEventListener(restartTimer))
+//         intervalRef.current->Option.forEach(intervalId => intervalId->clearInterval)
+//       },
+//     )
+//   }, [hasChanges])
+// }
