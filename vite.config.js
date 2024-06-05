@@ -14,7 +14,7 @@ export default {
     svgr(),
     VitePWA({
       includeAssets: [
-        "logo.svg",
+        "./src/icons/logo.svg",
         "icon.svg",
         "favicon.ico",
         "robots.txt",
