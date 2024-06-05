@@ -33,13 +33,6 @@ let useDrag = () => {
 
 module KeyboardEvent = ReactEvent.Keyboard
 
-type window = {
-  addEventListener: (string, KeyboardEvent.t => unit) => unit,
-  removeEventListener: (string, KeyboardEvent.t => unit) => unit,
-}
-
-@val external window: window = "window"
-
 let blacklistedTargets = ["INPUT", "TEXTAREA"]
 
 let isTargetOk = (~omiTextfields=true, evt) =>
@@ -68,13 +61,13 @@ let useKeyPress = (~omiTextfields=true, targetKey: string, callback: unit => uni
   }, (callback, keyPressed))
 
   React.useEffect(() => {
-    window.addEventListener("keydown", downHandler)
-    window.addEventListener("keyup", upHandler)
+    Window.addKeyboardEventListener("keydown", downHandler)
+    Window.addKeyboardEventListener("keyup", upHandler)
 
     Some(
       () => {
-        window.removeEventListener("keydown", downHandler)
-        window.removeEventListener("keyup", upHandler)
+        Window.addKeyboardEventListener("keydown", downHandler)
+        Window.addKeyboardEventListener("keyup", upHandler)
       },
     )
   }, [])
@@ -118,42 +111,21 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
   }, (callback, keysPressed))
 
   React.useEffect(() => {
-    keys->Array.forEach(key => window.addEventListener("keydown", evt => downHandler(key, evt)))
-    keys->Array.forEach(key => window.addEventListener("keyup", evt => upHandler(key, evt)))
+    keys->Array.forEach(key =>
+      Window.addKeyboardEventListener("keydown", evt => downHandler(key, evt))
+    )
+    keys->Array.forEach(key => Window.addKeyboardEventListener("keyup", evt => upHandler(key, evt)))
 
     Some(
       () => {
         keys->Array.forEach(key =>
-          window.removeEventListener("keydown", evt => downHandler(key, evt))
+          Window.removeKeyboardEventListener("keydown", evt => downHandler(key, evt))
         )
-        keys->Array.forEach(key => window.removeEventListener("keyup", evt => upHandler(key, evt)))
+
+        keys->Array.forEach(key =>
+          Window.removeKeyboardEventListener("keyup", evt => upHandler(key, evt))
+        )
       },
     )
   }, [])
 }
-
-// let documentEvents = ["click", "mousedown", "keypress", "DOMMouseScroll", "mousewheel"]
-
-// let useIsIdle = (~hasChanges, doIfIdle: unit => unit) => {
-//   let intervalRef = React.useRef(None)
-//   // let (isIdle, setIdle) = React.useState(_ => false)
-
-//   React.useEffect(() => {
-//     let restartTimer = () => {
-//       if hasChanges {
-//         intervalRef.current = setInterval(() => {
-//             doIfIdle()
-//           }, 5000)->Some
-//       }
-//     }
-
-//     documentEvents->Array.forEach(e => e->Document.addEventListener(restartTimer))
-
-//     Some(
-//       () => {
-//         documentEvents->Array.forEach(e => e->Document.removeEventListener(restartTimer))
-//         intervalRef.current->Option.forEach(intervalId => intervalId->clearInterval)
-//       },
-//     )
-//   }, [hasChanges])
-// }

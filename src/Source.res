@@ -67,7 +67,7 @@ let fromCsv = rows => {
 }
 
 let getColIndex = (data: t, column) =>
-  data[0]->Option.getOr([])->Belt.Array.getIndexBy(col => col.value === column)
+  data[0]->Option.getOr([])->Array.findIndexOpt(col => col.value === column)
 
 let remove = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)

@@ -1,4 +1,7 @@
-type mode = Json | Csv({commentIndex: option<int>, delimiter: string}) | Other
+type mode =
+  | Json
+  | Csv({commentIndex: option<int>, delimiter: string})
+  | Other
 
 type dialog =
   | Closed
@@ -76,10 +79,33 @@ let reducer = (state, action) =>
   | SetDialog(dialog) => {...state, dialog}
   }
 
-let initialState = {
-  data: Source.empty(),
+let makeInitialState = (localStorage: JSON.t) => {
+  data: switch localStorage {
+  | Array(a) => a->Obj.magic
+  | _ => Source.empty()
+  },
   history: {past: [], future: []},
   dialog: Closed,
   mode: Other,
   useDescription: false,
+}
+
+@inline
+let key = "quick-translate-data"
+
+let useAppState = () => {
+  let (localStorage, setLocalStorage) = Storage.useLocalStorage(
+    ~key,
+    ~initialValue="{}"->JSON.parseExn,
+  )
+
+  let (state, dispatch) = React.useReducerWithMapState(reducer, localStorage, makeInitialState)
+
+  React.useEffect(() => {
+    state.data->Obj.magic->setLocalStorage
+
+    None
+  }, [state.data])
+
+  (state, dispatch)
 }

@@ -2,7 +2,7 @@ open ReactUtils
 
 @react.component
 let make = () => {
-  let (state, dispatch) = React.useReducer(AppState.reducer, AppState.initialState)
+  let (state, dispatch) = AppState.useAppState()
   let (dragging, setDragging, onDragOver, onDragLeave) = Hooks.useDrag()
   let {data, useDescription} = state
 
@@ -58,7 +58,7 @@ let make = () => {
             let commentIndex =
               parseResult
               ->Array.getUnsafe(0)
-              ->Belt.Array.getIndexBy(text => text->SourceUtils.isCommentColumn)
+              ->Array.findIndexOpt(text => text->SourceUtils.isCommentColumn)
 
             dispatch(SetMode(Csv({commentIndex, delimiter})))
 
