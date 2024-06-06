@@ -3,7 +3,11 @@ open ReactUtils
 type shortcut = Simple | Ctrl | CtrlShift
 
 module Shortcut = {
-  let add = (a, b) => <> a {" + "->s} b </>
+  let add = (a, b) => <>
+    a
+    {" + "->s}
+    b
+  </>
   let \"+" = add
   let kc = text => <kbd> {text->s} </kbd>
 
@@ -69,5 +73,22 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       <Shortcut keycap={"Esc"} title="Close dialog" />
       <Shortcut keycap={"Enter"} title="Confirm dialog" />
     </Dialog.Info>
+
+  | WarningTranslationIncomplete(numberOfUntranslatedSegments, ignoreWarningAndExport) => {
+      let title = switch numberOfUntranslatedSegments {
+      | 1 => `There is 1 untranslated segment`
+      | _ => `There are ${numberOfUntranslatedSegments->Int.toString} untranslated segments`
+      }
+      <Dialog.Confirm
+        open_=true
+        title
+        label={"Do you really want to continue the export?"->s}
+        onSubmit={_ => {
+          ignoreWarningAndExport()
+          onClose()
+        }}
+        onClose
+      />
+    }
   }
 }
