@@ -16,13 +16,13 @@ let make = () => {
   let getnumberOfUntranslatedSegments = (data: Source.t) => {
     data
     ->Array.filter(cell =>
-      cell
-      ->Array.get(3)
-      ->Option.map(target => target.value->String.length === 0)
-      ->Option.getOr(false)
+      cell[3]->Option.mapOr(false, target => target.value->String.length === 0)
     )
     ->Array.length
   }
+
+  let numberOfSourceSegments = data->Array.map(cell => cell->Array.get(2))->Array.length
+  let numberOfTranslatedSegments = numberOfSourceSegments - getnumberOfUntranslatedSegments(data)
 
   Hooks.useMultiKeyPress(["Control", "Shift", "?"], () => dispatch(SetDialog(Help)))
   Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
@@ -284,6 +284,8 @@ let make = () => {
               value
               onExport
               dispatch
+              numberOfSourceSegments
+              numberOfTranslatedSegments
             />
           )
           ->React.array}

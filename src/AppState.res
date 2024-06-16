@@ -87,7 +87,7 @@ let makeInitialState = (localStorage: JSON.t) => {
   },
   history: {past: [], future: []},
   dialog: Closed,
-  mode: Other,
+  mode: Json,
   useDescription: false,
 }
 
