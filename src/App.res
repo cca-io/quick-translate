@@ -1,5 +1,20 @@
 open ReactUtils
 
+let makeXmlManifest = () => {
+  let files = []
+  `
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">
+  <manifest:file-entry manifest:full-path="/" manifest:version="1.2" "manifest:media-type="$1"/>
+	${files
+    ->Array.map(file =>
+      `<manifest:file-entry manifest:full-path="${file}" manifest:media-type="text/xml"/>`
+    )
+    ->Array.join("\n")}
+</manifest:manifest>
+`
+}
+
 @react.component
 let make = () => {
   let (state, dispatch) = AppState.useAppState()
@@ -13,16 +28,13 @@ let make = () => {
   let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
   let onOpenHelp = _evt => dispatch(SetDialog(Help))
 
-  let getnumberOfUntranslatedSegments = (data: Source.t) => {
+  let getnumberOfUntranslatedSegments = (data: Source.t, i) =>
     data
-    ->Array.filter(cell =>
-      cell[3]->Option.mapOr(false, target => target.value->String.length === 0)
-    )
+    ->Array.filter(col => col[i]->Option.mapOr(false, target => target.value->String.length === 0))
     ->Array.length
-  }
 
-  let numberOfSourceSegments = data->Array.map(cell => cell->Array.get(2))->Array.length
-  let numberOfTranslatedSegments = numberOfSourceSegments - getnumberOfUntranslatedSegments(data)
+  let numberOfSourceSegments =
+    data->Array.map(col => showDescriptionCol ? col[3] : col[2])->Array.length
 
   Hooks.useMultiKeyPress(["Control", "Shift", "?"], () => dispatch(SetDialog(Help)))
   Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
@@ -185,7 +197,7 @@ let make = () => {
     dispatch(SetData(changedData))
   }, [data])
 
-  let onExport = React.useCallback((col, fileType) => {
+  let onExport = React.useCallback((col, fileType, numberOfUntranslatedSegments) => {
     let export = () => {
       let download = col ++ fileType->File.FileType.toExtension
 
@@ -200,8 +212,6 @@ let make = () => {
 
     let onExportIfTranslationUnfinished = numberOfUntranslatedSegments =>
       dispatch(SetDialog(WarningTranslationIncomplete(numberOfUntranslatedSegments, export)))
-
-    let numberOfUntranslatedSegments = getnumberOfUntranslatedSegments(data)
 
     switch numberOfUntranslatedSegments {
     | 0 => export()
@@ -275,7 +285,9 @@ let make = () => {
         <tr>
           {data[0]
           ->Option.getOr([])
-          ->Array.mapWithIndex(({value}, i) =>
+          ->Array.mapWithIndex(({value}, i) => {
+            let numberOfUntranslatedSegments = getnumberOfUntranslatedSegments(data, i)
+
             <HeaderCol
               key={i->Int.toString}
               index={i}
@@ -285,9 +297,9 @@ let make = () => {
               onExport
               dispatch
               numberOfSourceSegments
-              numberOfTranslatedSegments
+              numberOfUntranslatedSegments
             />
-          )
+          })
           ->React.array}
         </tr>
       </thead>
