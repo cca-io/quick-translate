@@ -9,6 +9,7 @@ type dialog =
   | RemoveTarget(string)
   | RemoveSource
   | Help
+  | WarningTranslationIncomplete(int, unit => unit)
 
 type history = {
   past: array<Source.t>,
@@ -86,7 +87,7 @@ let makeInitialState = (localStorage: JSON.t) => {
   },
   history: {past: [], future: []},
   dialog: Closed,
-  mode: Other,
+  mode: Json,
   useDescription: false,
 }
 

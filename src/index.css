@@ -20,7 +20,7 @@ body {
   padding: 20px 0px;
   background-color: #24283a;
   border-radius: 10px;
-  opacity: 1.;
+  opacity: 1;
 }
 
 .ImportOverlay {
@@ -293,4 +293,31 @@ kbd {
   line-height: 1;
   padding: 2px 4px;
   white-space: nowrap;
+}
+
+.InfoTag {
+  padding: 8px;
+  margin: 4px;
+  border: 1px solid rgb(143, 143, 143);
+  border-radius: 5px;
+  box-shadow: 4px 4px 7px silver;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.complete {
+  background-color: #67dba5;
+  font-weight: bold;
+}
+
+.incomplete {
+  background-color: rgba(255, 99, 71, 0.2);
+}
+
+.InfoText {
+  font-size: 14px;
+  font-weight: normal;
+  text-align: center;
 }

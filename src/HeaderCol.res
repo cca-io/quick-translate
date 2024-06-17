@@ -1,3 +1,5 @@
+open ReactUtils
+
 type colType = Id | Description | Source | Target
 
 let getColType = (index, canToggleDescription) => {
@@ -31,10 +33,28 @@ module ExportButtonRow = {
 
 module ActionButtonRow = {
   @react.component
-  let make = (~value, ~onRemoveTarget) =>
+  let make = (~value, ~onRemoveTarget, ~numberOfSourceSegments, ~numberOfTranslatedSegments) => {
+    let translationComplete = numberOfTranslatedSegments === numberOfSourceSegments
     <div className="ActionButtonRow">
+      <div className={`InfoTag ${translationComplete ? "complete" : "incomplete"}`}>
+        <div className="InfoText">
+          {if translationComplete {
+            "Translation complete"->s
+          } else {
+            <>
+              <b>
+                {`${(numberOfSourceSegments - numberOfTranslatedSegments)->Int.toString}${nbsp}`->s}
+              </b>
+              {"of"->s}
+              <b> {`${nbsp}${numberOfSourceSegments->Int.toString}${nbsp}`->s} </b>
+              {"translations missing"->React.string}
+            </>
+          }}
+        </div>
+      </div>
       <IconButton title={"Remove column"} onClick={_evt => onRemoveTarget(value)} icon=#trash />
     </div>
+  }
 }
 
 module IdButtonRow = {
@@ -52,7 +72,16 @@ module IdButtonRow = {
 }
 
 @react.component
-let make = (~index, ~useDescription, ~canToggleDescription, ~value, ~onExport, ~dispatch) => {
+let make = (
+  ~index,
+  ~useDescription,
+  ~canToggleDescription,
+  ~value,
+  ~onExport,
+  ~dispatch,
+  ~numberOfSourceSegments,
+  ~numberOfTranslatedSegments,
+) => {
   let colType = getColType(index, canToggleDescription)
   let onToggleDescriptions = _evt => dispatch(AppState.ToggleUseDescription)
   let onRemoveTarget = column => dispatch(SetDialog(RemoveTarget(column)))
@@ -68,7 +97,7 @@ let make = (~index, ~useDescription, ~canToggleDescription, ~value, ~onExport, ~
       | Target =>
         <>
           <ExportButtonRow value onExport />
-          <ActionButtonRow value onRemoveTarget />
+          <ActionButtonRow value onRemoveTarget numberOfSourceSegments numberOfTranslatedSegments />
         </>
       }}
     </div>

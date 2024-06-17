@@ -13,6 +13,17 @@ let make = () => {
   let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
   let onOpenHelp = _evt => dispatch(SetDialog(Help))
 
+  let getnumberOfUntranslatedSegments = (data: Source.t) => {
+    data
+    ->Array.filter(cell =>
+      cell[3]->Option.mapOr(false, target => target.value->String.length === 0)
+    )
+    ->Array.length
+  }
+
+  let numberOfSourceSegments = data->Array.map(cell => cell->Array.get(2))->Array.length
+  let numberOfTranslatedSegments = numberOfSourceSegments - getnumberOfUntranslatedSegments(data)
+
   Hooks.useMultiKeyPress(["Control", "Shift", "?"], () => dispatch(SetDialog(Help)))
   Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
   Hooks.useMultiKeyPress(["Control", "Shift", "R"], () => dispatch(SetDialog(RemoveSource)))
@@ -175,14 +186,26 @@ let make = () => {
   }, [data])
 
   let onExport = React.useCallback((col, fileType) => {
-    let download = col ++ fileType->File.FileType.toExtension
+    let export = () => {
+      let download = col ++ fileType->File.FileType.toExtension
 
-    switch fileType {
-    | Json => data->Convert.Json.fromData(col)->FileUtils.download(~download)
-    | Properties => data->Convert.Properties.fromData(col)->FileUtils.download(~download)
-    | Strings => data->Convert.Strings.fromData(col)->FileUtils.download(~download)
-    | Xml => data->Convert.Xml.fromData(col)->FileUtils.download(~download)
-    | _ => ()
+      switch fileType {
+      | Json => data->Convert.Json.fromData(col)->FileUtils.download(~download)
+      | Properties => data->Convert.Properties.fromData(col)->FileUtils.download(~download)
+      | Strings => data->Convert.Strings.fromData(col)->FileUtils.download(~download)
+      | Xml => data->Convert.Xml.fromData(col)->FileUtils.download(~download)
+      | _ => ()
+      }
+    }
+
+    let onExportIfTranslationUnfinished = numberOfUntranslatedSegments =>
+      dispatch(SetDialog(WarningTranslationIncomplete(numberOfUntranslatedSegments, export)))
+
+    let numberOfUntranslatedSegments = getnumberOfUntranslatedSegments(data)
+
+    switch numberOfUntranslatedSegments {
+    | 0 => export()
+    | _ => onExportIfTranslationUnfinished(numberOfUntranslatedSegments)
     }
   }, [data])
 
@@ -261,6 +284,8 @@ let make = () => {
               value
               onExport
               dispatch
+              numberOfSourceSegments
+              numberOfTranslatedSegments
             />
           )
           ->React.array}
