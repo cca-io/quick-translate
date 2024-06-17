@@ -25,6 +25,21 @@ module Shortcut = {
     </div>
 }
 
+module Footer = {
+  module Separator = {
+    @react.component
+    let make = () => {(nbsp ++ "|" ++ nbsp)->s}
+  }
+
+  @react.component
+  let make = (~children) =>
+    <div className="DialogFooter">
+      <Separator />
+      children
+      <Separator />
+    </div>
+}
+
 @react.component
 let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
   let onClose = _evt => dispatch(AppState.SetDialog(Closed))
@@ -72,6 +87,21 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       <h4> {"Dialogs"->s} </h4>
       <Shortcut keycap={"Esc"} title="Close dialog" />
       <Shortcut keycap={"Enter"} title="Confirm dialog" />
+      <Footer>
+        <a
+          target="_blank"
+          href="https://github.com/cca-io/quick-translate"
+          rel="noopener noreferrer">
+          {"Code"->s}
+        </a>
+        <Footer.Separator />
+        <a
+          target="_blank"
+          href="https://github.com/cca-io/quick-translate/issues/new"
+          rel="noopener noreferrer">
+          {"Report an issue"->s}
+        </a>
+      </Footer>
     </Dialog.Info>
 
   | WarningTranslationIncomplete(numberOfUntranslatedSegments, ignoreWarningAndExport) => {
