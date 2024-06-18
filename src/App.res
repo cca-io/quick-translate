@@ -194,12 +194,11 @@ let make = () => {
     switch tableRef.current {
     | Null | Undefined => ()
     | Value(table) =>
-      (table->Obj.magic)["rows"][rowIndex]
-      ->Option.flatMap(row => (row["cells"]->Obj.magic)[cellIndex])
+      (table->HtmlElement.rows)[rowIndex]
+      ->Option.flatMap(row => (row->HtmlElement.cells)[cellIndex])
       ->Option.forEach(cell => {
-        Console.warn("select")
-        let _id = setTimeout(() => cell["dispatchEvent"](MouseEvent.make(#mousedown)), 0)
-        let _id = setTimeout(() => cell["dispatchEvent"](MouseEvent.make(#mouseup)), 0)
+        let _id = setTimeout(() => cell->HtmlElement.dispatchEvent(MouseEvent.make(#mousedown)), 0)
+        let _id = setTimeout(() => cell->HtmlElement.dispatchEvent(MouseEvent.make(#mouseup)), 0)
       })
     }
   }
