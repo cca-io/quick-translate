@@ -28,11 +28,6 @@ let make = () => {
   let onCreateTarget = _evt => dispatch(SetDialog(CreateTarget))
   let onOpenHelp = _evt => dispatch(SetDialog(Help))
 
-  let getnumberOfUntranslatedSegments = (data: Source.t, i) =>
-    data
-    ->Array.filter(col => col[i]->Option.mapOr(false, target => target.value->String.length === 0))
-    ->Array.length
-
   let numberOfSourceSegments =
     data->Array.map(col => showDescriptionCol ? col[3] : col[2])->Array.length
 
@@ -191,10 +186,32 @@ let make = () => {
     handleFiles(files, sourceOrTarget)
   }
 
+  let tableRef: ReactDOM.Ref.currentDomRef = React.useRef(null)
+
+  let onSelectNextEmptyCellByIndex = (data, cellIndex) => {
+    let rowIndex = data->Source.getFirstEmptyCell(cellIndex)
+
+    switch tableRef.current {
+    | Null | Undefined => ()
+    | Value(table) =>
+      (table->HtmlElement.rows)[rowIndex]
+      ->Option.flatMap(row => (row->HtmlElement.cells)[cellIndex])
+      ->Option.forEach(cell => {
+        let _id = setTimeout(() => cell->HtmlElement.dispatchEvent(MouseEvent.make(#mousedown)), 0)
+        let _id = setTimeout(() => cell->HtmlElement.dispatchEvent(MouseEvent.make(#mouseup)), 0)
+      })
+    }
+  }
+
   let onCellsChanged = React.useCallback(changes => {
     let changedData = data->Source.update(changes)
-
     dispatch(SetData(changedData))
+
+    switch changes[0] {
+    | Some({col, value}) if value != "" =>
+      let _id = setTimeout(() => onSelectNextEmptyCellByIndex(changedData, col), 0)
+    | _ => ()
+    }
   }, [data])
 
   let onExport = React.useCallback((col, fileType, numberOfUntranslatedSegments) => {
@@ -268,7 +285,10 @@ let make = () => {
   }, (state.mode, data))
 
   let sheetRenderer = ({data, className, children}: DataSheet.SheetProps.t) =>
-    <table className={className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
+    <table
+      id="quick-translate-table"
+      ref={tableRef->ReactDOM.Ref.domRef}
+      className={className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
       <thead>
         {sourceAvailable
           ? <tr>
@@ -286,7 +306,7 @@ let make = () => {
           {data[0]
           ->Option.getOr([])
           ->Array.mapWithIndex(({value}, i) => {
-            let numberOfUntranslatedSegments = getnumberOfUntranslatedSegments(data, i)
+            let numberOfUntranslatedSegments = Source.getNumberOfUntranslatedSegments(data, i)
 
             <HeaderCol
               key={i->Int.toString}
@@ -295,6 +315,7 @@ let make = () => {
               canToggleDescription
               value
               onExport
+              onTranslationProgressButtonClick={_evt => onSelectNextEmptyCellByIndex(data, i)}
               dispatch
               numberOfSourceSegments
               numberOfUntranslatedSegments

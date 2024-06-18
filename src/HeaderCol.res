@@ -1,5 +1,3 @@
-open ReactUtils
-
 type colType = Id | Description | Source | Target
 
 let getColType = (index, canToggleDescription) =>
@@ -39,25 +37,17 @@ module ExportButtonRow = {
 
 module ActionButtonRow = {
   @react.component
-  let make = (~value, ~onRemoveTarget, ~numberOfSourceSegments, ~numberOfTranslatedSegments) => {
-    let translationComplete = numberOfTranslatedSegments === numberOfSourceSegments
+  let make = (
+    ~value,
+    ~onRemoveTarget,
+    ~onTranslationProgressButtonClick,
+    ~numberOfSourceSegments,
+    ~numberOfTranslatedSegments,
+  ) => {
     <div className="ActionButtonRow">
-      <div className={`InfoTag ${translationComplete ? "complete" : "incomplete"}`}>
-        <div className="InfoText">
-          {if translationComplete {
-            "Translation complete"->s
-          } else {
-            <>
-              <b>
-                {`${(numberOfSourceSegments - numberOfTranslatedSegments)->Int.toString}${nbsp}`->s}
-              </b>
-              {"of"->s}
-              <b> {`${nbsp}${numberOfSourceSegments->Int.toString}${nbsp}`->s} </b>
-              {"translations missing"->React.string}
-            </>
-          }}
-        </div>
-      </div>
+      <TranslationProgressButton
+        numberOfSourceSegments numberOfTranslatedSegments onClick=onTranslationProgressButtonClick
+      />
       <IconButton title={"Remove column"} onClick={_evt => onRemoveTarget(value)} icon=#trash />
     </div>
   }
@@ -84,6 +74,7 @@ let make = (
   ~canToggleDescription,
   ~value,
   ~onExport,
+  ~onTranslationProgressButtonClick,
   ~dispatch,
   ~numberOfSourceSegments,
   ~numberOfUntranslatedSegments,
@@ -92,6 +83,7 @@ let make = (
   let onToggleDescriptions = _evt => dispatch(AppState.ToggleUseDescription)
   let onRemoveTarget = column => dispatch(SetDialog(RemoveTarget(column)))
   let onRemoveSource = _evt => dispatch(SetDialog(RemoveSource))
+
   let numberOfTranslatedSegments = numberOfSourceSegments - numberOfUntranslatedSegments
 
   <th>
@@ -104,7 +96,13 @@ let make = (
       | Target =>
         <>
           <ExportButtonRow value onExport numberOfUntranslatedSegments />
-          <ActionButtonRow value onRemoveTarget numberOfSourceSegments numberOfTranslatedSegments />
+          <ActionButtonRow
+            value
+            onRemoveTarget
+            onTranslationProgressButtonClick
+            numberOfSourceSegments
+            numberOfTranslatedSegments
+          />
         </>
       }}
     </div>

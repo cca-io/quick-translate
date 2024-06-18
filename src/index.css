@@ -312,6 +312,10 @@ kbd {
   justify-content: center;
 }
 
+.InfoTag.incomplete:hover {
+  cursor: pointer;
+}
+
 .complete {
   background-color: #67dba5;
   font-weight: bold;
