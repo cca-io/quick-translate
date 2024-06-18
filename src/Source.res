@@ -114,3 +114,19 @@ let getColData = (data: t, column: string) => {
   | None => []
   }
 }
+
+let getNumberOfUntranslatedSegments = (data: t, colIndex) =>
+  data
+  ->Array.filter(col =>
+    col[colIndex]->Option.mapOr(false, target => target.value->String.length === 0)
+  )
+  ->Array.length
+
+// First two rows are not part of data.
+@inline
+let offset = 2
+
+let getFirstEmptyCell = (data: t, colIndex) =>
+  data
+  ->Array.filterMap(col => col[colIndex])
+  ->Array.findIndex(target => !target.readOnly && target.value->String.length === 0) + offset
