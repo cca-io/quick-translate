@@ -9,6 +9,7 @@ type dialog =
   | RemoveTarget(string)
   | RemoveSource
   | Help
+  | DuplicateTargetImport(string, unit => unit, unit => unit)
   | WarningTranslationIncomplete(int, unit => unit)
 
 type history = {

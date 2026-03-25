@@ -4,9 +4,15 @@ let make: (array<Message.t>, string) => t
 
 let add: (t, array<Message.t>, string) => t
 
+let mergeTarget: (t, array<Message.t>, string) => t
+
+let replaceTarget: (t, array<Message.t>, string) => t
+
 let addMultiple: (t, array<(string, array<JSON.t>)>) => t
 
 let fromCsv: array<array<string>> => t
+
+let hasColumn: (t, string) => bool
 
 let remove: (t, string) => t
 

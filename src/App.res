@@ -39,6 +39,19 @@ let make = () => {
   Hooks.useMultiKeyPress(["Control", "z"], () => dispatch(Undo))
   Hooks.useMultiKeyPress(["Control", "Shift", "Z"], () => dispatch(Redo))
 
+  let importTarget = (target, fileName) => {
+    let column = fileName->FileUtils.fileNameWithoutExt
+
+    if data->Source.hasColumn(column) {
+      let onMerge = () => dispatch(SetData(data->Source.mergeTarget(target, fileName)))
+      let onReplace = () => dispatch(SetData(data->Source.replaceTarget(target, fileName)))
+
+      dispatch(SetDialog(DuplicateTargetImport(column, onMerge, onReplace)))
+    } else {
+      dispatch(SetData(data->Source.add(target, fileName)))
+    }
+  }
+
   let handleFiles = (files, sourceOrTarget: FileUtils.file) => {
     if files->Array.length === 1 {
       let file = files[0]
@@ -58,11 +71,16 @@ let make = () => {
                 dispatch(SetMode(Json))
 
                 result->Message.fromJson->Source.make(file.name)
-              | Target => data->Source.add(result->Message.fromJson, file.name)
+              | Target =>
+                importTarget(result->Message.fromJson, file.name)
+                data
               }
             )
 
-          dispatch(SetData(data))
+          switch sourceOrTarget {
+          | Source => dispatch(SetData(data))
+          | Target => ()
+          }
         }
 
         let _ = readFile()
@@ -99,12 +117,12 @@ let make = () => {
           let source = result->File.FileResult.toString->Convert.Xml.toArray
 
           dispatch(
-            SetData(
-              switch sourceOrTarget {
-              | Source => source->Source.make(file.name)
-              | Target => data->Source.add(source, file.name)
-              },
-            ),
+            switch sourceOrTarget {
+            | Source => SetData(source->Source.make(file.name))
+            | Target =>
+              importTarget(source, file.name)
+              SetDialog(Closed)
+            },
           )
         }
 
@@ -116,12 +134,12 @@ let make = () => {
           let source = result->File.FileResult.toString->Convert.Strings.toArray
 
           dispatch(
-            SetData(
-              switch sourceOrTarget {
-              | Source => source->Source.make(file.name)
-              | Target => data->Source.add(source, file.name)
-              },
-            ),
+            switch sourceOrTarget {
+            | Source => SetData(source->Source.make(file.name))
+            | Target =>
+              importTarget(source, file.name)
+              SetDialog(Closed)
+            },
           )
         }
 
@@ -133,12 +151,12 @@ let make = () => {
           let source = result->File.FileResult.toString->Convert.Properties.toArray
 
           dispatch(
-            SetData(
-              switch sourceOrTarget {
-              | Source => source->Source.make(file.name)
-              | Target => data->Source.add(source, file.name)
-              },
-            ),
+            switch sourceOrTarget {
+            | Source => SetData(source->Source.make(file.name))
+            | Target =>
+              importTarget(source, file.name)
+              SetDialog(Closed)
+            },
           )
         }
 

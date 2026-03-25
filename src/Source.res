@@ -47,6 +47,73 @@ let add = (data: t, target: array<Message.t>, fileName) => {
   [header]->Array.concat(body)
 }
 
+let getColIndex = (data: t, column) =>
+  data[0]->Option.getOr([])->Array.findIndexOpt(col => col.value === column)
+
+let mergeTarget = (data: t, target: array<Message.t>, fileName) => {
+  let column = fileName->FileUtils.fileNameWithoutExt
+  let targetMap =
+    target
+    ->Array.map(({Message.id: id, defaultMessage}) => (id, defaultMessage))
+    ->Belt.Map.String.fromArray
+
+  switch getColIndex(data, column) {
+  | Some(colIndex) =>
+    data->Array.mapWithIndex((row, rowIndex) =>
+      if rowIndex === 0 {
+        row
+      } else {
+        row->Array.mapWithIndex((cell, cellIndex) =>
+          if cellIndex === colIndex {
+            switch row[0] {
+            | Some(idCell) =>
+              targetMap
+              ->Belt.Map.String.get(idCell.value)
+              ->Option.mapOr(cell, value => Cell.make(value))
+            | None => cell
+            }
+          } else {
+            cell
+          }
+        )
+      }
+    )
+  | None => add(data, target, fileName)
+  }
+}
+
+let replaceTarget = (data: t, target: array<Message.t>, fileName) => {
+  let column = fileName->FileUtils.fileNameWithoutExt
+  let targetMap =
+    target
+    ->Array.map(({Message.id: id, defaultMessage}) => (id, defaultMessage))
+    ->Belt.Map.String.fromArray
+
+  switch getColIndex(data, column) {
+  | Some(colIndex) =>
+    data->Array.mapWithIndex((row, rowIndex) =>
+      if rowIndex === 0 {
+        row
+      } else {
+        row->Array.mapWithIndex((cell, cellIndex) =>
+          if cellIndex === colIndex {
+            switch row[0] {
+            | Some(idCell) =>
+              targetMap
+              ->Belt.Map.String.get(idCell.value)
+              ->Option.mapOr(Cell.empty(), value => Cell.make(value))
+            | None => cell
+            }
+          } else {
+            cell
+          }
+        )
+      }
+    )
+  | None => add(data, target, fileName)
+  }
+}
+
 let addMultiple = (data: t, targets: array<(string, array<JSON.t>)>) => {
   targets->Array.reduce(data, (newData, (fileName, target)) =>
     newData->add(target->Message.fromJson, fileName)
@@ -66,8 +133,7 @@ let fromCsv = rows => {
   [header]->Array.concat(body)
 }
 
-let getColIndex = (data: t, column) =>
-  data[0]->Option.getOr([])->Array.findIndexOpt(col => col.value === column)
+let hasColumn = (data: t, column) => data->getColIndex(column)->Option.isSome
 
 let remove = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)

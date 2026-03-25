@@ -74,6 +74,29 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       onClose
     />
 
+  | DuplicateTargetImport(column, onMerge, onReplace) =>
+    <Dialog.Info open_=true title={"Target already open"} onClose>
+      <div>
+        {`The target "${column}" is already open. Do you want to merge the imported translations into the existing column, or replace the existing column with the imported file?`->s}
+      </div>
+      <div>
+        <button
+          onClick={_evt => {
+            onClose()
+            onReplace()
+          }}>
+          {"REPLACE"->s}
+        </button>
+        <button
+          onClick={_evt => {
+            onClose()
+            onMerge()
+          }}>
+          {"MERGE"->s}
+        </button>
+      </div>
+    </Dialog.Info>
+
   | Help =>
     <Dialog.Info open_=true title={"Help"} onClose>
       <h3> {"Keyboard shortcuts"->s} </h3>
