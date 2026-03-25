@@ -23,7 +23,7 @@ Agents working here should optimize for small, targeted changes and preserve exi
 - [`src/components/`](/Users/florian-cca/oss/quick-translate/src/components): React UI components
 - [`src/bindings/`](/Users/florian-cca/oss/quick-translate/src/bindings): JS interop bindings
 - [`vendor/`](/Users/florian-cca/oss/quick-translate/vendor): vendored browser/runtime support code; spreadsheet behavior now lives in `src/`
-- [`examples/`](/Users/florian-cca/oss/quick-translate/examples): sample import/export fixtures
+- [`tests/fixtures/`](/Users/florian-cca/oss/quick-translate/tests/fixtures): fixture files for conversion and round-trip tests
 
 ## Development Workflow
 
@@ -81,7 +81,7 @@ Current judgment on `re:dce` output:
   [`src/FileUtils.res`](/Users/florian-cca/oss/quick-translate/src/FileUtils.res) for `download`'s optional `blankTarget`, and [`src/Hooks.res`](/Users/florian-cca/oss/quick-translate/src/Hooks.res) for `useMultiKeyPress`'s optional `omiTextfields`.
 - So `npm run re:dce` is now fairly high-signal, but even these remaining warnings should still be reviewed before cleanup because optional arguments can reflect intended API shape, not just dead code.
 
-If the change affects import/export logic, also validate manually with fixtures from [`examples/`](/Users/florian-cca/oss/quick-translate/examples) when practical.
+If the change affects import/export logic, run [`npm run test:node`](/Users/florian-cca/oss/quick-translate/package.json) and use fixtures from [`tests/fixtures/`](/Users/florian-cca/oss/quick-translate/tests/fixtures) for additional manual spot checks when practical.
 
 If the change affects drag/drop, dialogs, shortcuts, or spreadsheet behavior, run the dev server and perform a quick browser smoke test.
 
@@ -90,7 +90,7 @@ If the change affects drag/drop, dialogs, shortcuts, or spreadsheet behavior, ru
 - The worktree may already contain unrelated user changes. Check `git status --short` before editing.
 - Do not revert or overwrite existing unowned changes.
 
-At the time this file was written, the repo already had local modifications and untracked files under `src/` and `examples/`. Work around them unless the task explicitly targets those files.
+At the time this file was written, the repo already had local modifications and untracked files under `src/`. Work around them unless the task explicitly targets those files.
 
 ## Preferred Agent Behavior
 

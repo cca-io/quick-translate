@@ -7,8 +7,8 @@ let toArrayHelper = (~regex, str) => {
     | None => ()
     | Some(re) =>
       let arr = re->RegExp.Result.matches
-      let key = arr->Array.getUnsafe(1)
-      let value = arr->Array.getUnsafe(2)
+      let key = arr->Array.getUnsafe(0)
+      let value = arr->Array.getUnsafe(1)
 
       switch (key, value) {
       | (Some(key), Some(value)) => rows->Array.push(Message.make(key, value))
@@ -66,13 +66,13 @@ module Properties = {
 }
 
 module Strings = {
-  let regex = "\"(.+|\r?\n|\r|^)\".\=.\"(.+|\r\n)\";"
+  let regex = "\"([^\"]+)\"\\s*=\\s*\"([^\"]*)\";"
 
   let fromData = (data, col) => {
     let propsData =
       data
       ->Source.getColData(col)
-      ->Array.map(({id, defaultMessage}) => `"${id}" = "${defaultMessage}"`)
+      ->Array.map(({id, defaultMessage}) => `"${id}" = "${defaultMessage}";`)
       ->Array.join("\n")
 
     "data:text/plain;charset=utf-8," ++ encodeURIComponent(propsData)
