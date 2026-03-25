@@ -84,6 +84,8 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       <Shortcut type_=CtrlShift keycap={"N"} title="Create a new target" />
       <Shortcut type_=CtrlShift keycap={"R"} title="Remove source" />
       <Shortcut type_=CtrlShift keycap={"?"} title="Help dialog" />
+      <Shortcut keycap={"Alt + ↑"} title="Jump to previous untranslated field in current column" />
+      <Shortcut keycap={"Alt + ↓"} title="Jump to next untranslated field in current column" />
       <h4> {"Dialogs"->s} </h4>
       <Shortcut keycap={"Esc"} title="Close dialog" />
       <Shortcut keycap={"Enter"} title="Confirm dialog" />

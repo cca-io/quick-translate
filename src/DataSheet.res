@@ -81,6 +81,7 @@ let makeChange = (~cell: Cell.t, ~row, ~col, ~value): Change.t => {cell, row, co
 @react.component
 let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) => {
   let isHiddenCol = colIndex => hiddenCols->Array.includes(colIndex)
+  let isUntranslatedCell = (cell: Cell.t) => !cell.readOnly && cell.value->String.trim->String.length === 0
 
   let focusGridPosition = (rowIndex, colIndex) =>
     if !isHiddenCol(colIndex) {
@@ -94,6 +95,25 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
       | None => ()
       }
     }
+
+  let jumpToUntranslated = (rowIndex, colIndex, step) => {
+    let rec loop = nextRowIndex =>
+      switch data[nextRowIndex] {
+      | Some(row) =>
+        switch row[colIndex] {
+        | Some((cell: Cell.t)) =>
+          if cell->isUntranslatedCell {
+            focusGridPosition(nextRowIndex, colIndex)
+          } else {
+            loop(nextRowIndex + step)
+          }
+        | None => ()
+        }
+      | None => ()
+      }
+
+    loop(rowIndex + step)
+  }
 
   let moveVertical = (rowIndex, colIndex, step) => {
     let loop = nextRowIndex =>
@@ -157,6 +177,12 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
     open ReactEvent.Keyboard
 
     switch evt->key {
+    | "ArrowUp" if evt->altKey =>
+      evt->preventDefault
+      jumpToUntranslated(rowIndex, colIndex, -1)
+    | "ArrowDown" if evt->altKey =>
+      evt->preventDefault
+      jumpToUntranslated(rowIndex, colIndex, 1)
     | "ArrowUp" =>
       evt->preventDefault
       moveVertical(rowIndex, colIndex, -1)
@@ -183,6 +209,12 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
     open ReactEvent.Keyboard
 
     switch evt->key {
+    | "ArrowUp" if evt->altKey =>
+      evt->preventDefault
+      jumpToUntranslated(rowIndex, colIndex, -1)
+    | "ArrowDown" if evt->altKey =>
+      evt->preventDefault
+      jumpToUntranslated(rowIndex, colIndex, 1)
     | "ArrowUp" =>
       evt->preventDefault
       moveVertical(rowIndex, colIndex, -1)

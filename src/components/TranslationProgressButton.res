@@ -3,8 +3,13 @@ open ReactUtils
 @react.component
 let make = (~numberOfTranslatedSegments, ~numberOfSourceSegments, ~onClick) => {
   let translationComplete = numberOfTranslatedSegments === numberOfSourceSegments
+  let title = translationComplete
+    ? "Translation complete"
+    : "Jump to next untranslated field"
 
   <button
+    title
+    ariaLabel=title
     className={`InfoTag ${translationComplete ? "complete" : "incomplete"}`}
     onClick=?{translationComplete ? None : Some(onClick)}>
     <div className="InfoText">

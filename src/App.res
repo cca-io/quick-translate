@@ -190,7 +190,7 @@ let make = () => {
     let rowIndex = data->Source.getFirstEmptyCell(cellIndex)
 
     Document.document
-    ->Document.getElementById(DataSheet.inputId(rowIndex - 1, cellIndex))
+    ->Document.getElementById(DataSheet.inputId(rowIndex, cellIndex))
     ->Option.forEach(input => {
       let _id = setTimeout(() => input->HtmlElement.focus, 0)
     })

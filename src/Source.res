@@ -122,11 +122,7 @@ let getNumberOfUntranslatedSegments = (data: t, colIndex) =>
   ->Array.filter(col => col[colIndex]->Option.mapOr(false, isEmptyCell))
   ->Array.length
 
-// First two rows are not part of data.
-@inline
-let offset = 2
-
 let getFirstEmptyCell = (data: t, colIndex) =>
   data
   ->Array.filterMap(col => col[colIndex])
-  ->Array.findIndex(target => !target.readOnly && target->isEmptyCell) + offset
+  ->Array.findIndex(target => !target.readOnly && target->isEmptyCell)
