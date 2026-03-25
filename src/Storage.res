@@ -22,7 +22,7 @@ let useLocalStorage = (~key, ~initialValue) => {
       | Null | Undefined => localStorage->removeItem(key)
       }
     } catch {
-    | Exn.Error(error) => Console.error(error)
+    | JsExn(error) => Console.error(error)
     }
   }, (key, store))
 
@@ -36,7 +36,7 @@ let useLocalStorage = (~key, ~initialValue) => {
   }, (key, initialValue))
 
   let newStore = switch store {
-  | Some(store) => store->JSON.parseExn
+  | Some(store) => store->JSON.parseOrThrow
   | None => initialValue
   }
 

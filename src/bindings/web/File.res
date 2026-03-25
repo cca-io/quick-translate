@@ -87,4 +87,4 @@ let read = (~encoding=#"UTF-8", file: t) =>
   })
 
 let resultToJson = (result: FileResult.t) =>
-  result->FileResult.toString->JSON.parseExn->JSON.Decode.array
+  result->FileResult.toString->JSON.parseOrThrow->JSON.Decode.array

@@ -18,5 +18,5 @@ let make: (
   ~icon: icon,
   ~title: string,
   ~size: size=?,
-  ~onClick: JsxEventU.Mouse.t => unit,
+  ~onClick: ReactEvent.Mouse.t => unit,
 ) => Jsx.element

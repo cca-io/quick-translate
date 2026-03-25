@@ -1,6 +1,5 @@
 {
   "name": "quick-translate",
-  "version": "0.1.0",
   "sources": {
     "dir": "src",
     "subdirs": true
@@ -11,12 +10,10 @@
       "in-source": true
     }
   ],
-  "suffix": ".bs.mjs",
-  "bs-dependencies": [
-    "@rescript/core",
+  "suffix": ".mjs",
+  "dependencies": [
     "@rescript/react"
   ],
-  "bsc-flags": ["-open RescriptCore"],
   "warnings": {
     "error": "+101"
   },

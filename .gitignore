@@ -3,7 +3,8 @@ node_modules/
 
 # ReScript
 lib/
-*.bs.mjs
+src/*.mjs
+src/**/*.mjs
 .merlin
 .bsb.lock
 

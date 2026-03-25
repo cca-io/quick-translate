@@ -1,16 +1,14 @@
-@new external makeRegExp: (string, string) => Re.t = "RegExp"
-
 let toArrayHelper = (~regex, str) => {
   let rows = []
-  let pattern = makeRegExp(regex, "gi")
+  let pattern = RegExp.fromString(regex, ~flags="gi")
 
   let rec loop = () => {
     switch pattern->RegExp.exec(str) {
     | None => ()
     | Some(re) =>
       let arr = re->RegExp.Result.matches
-      let key = arr[1]
-      let value = arr[2]
+      let key = arr->Array.getUnsafe(1)
+      let value = arr->Array.getUnsafe(2)
 
       switch (key, value) {
       | (Some(key), Some(value)) => rows->Array.push(Message.make(key, value))

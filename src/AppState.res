@@ -54,7 +54,7 @@ let reducer = (state, action) =>
         data: nextData,
         history: {
           past: past->Array.concat([state.data]),
-          future: future->Array.sliceToEnd(~start=1),
+          future: future->Array.slice(~start=1, ~end=future->Array.length),
         },
       }
     | None => state
@@ -97,7 +97,7 @@ let key = "quick-translate-data"
 let useAppState = () => {
   let (localStorage, setLocalStorage) = Storage.useLocalStorage(
     ~key,
-    ~initialValue="{}"->JSON.parseExn,
+    ~initialValue="{}"->JSON.parseOrThrow,
   )
 
   let (state, dispatch) = React.useReducerWithMapState(reducer, localStorage, makeInitialState)

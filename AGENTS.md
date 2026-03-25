@@ -42,7 +42,7 @@ Notes:
 ## ReScript Conventions
 
 - Source files live in `src/`.
-- Generated `*.bs.mjs` artifacts and `lib/` output are ignored by git; do not add them to commits.
+- Generated `*.mjs` artifacts under `src/` and `lib/` output are ignored by git; do not add them to commits.
 - Prefer following existing ReScript style in the touched file rather than reformatting unrelated code.
 - Keep changes type-safe and local. Most behavior is driven by `AppState`, `Source`, and `Convert`.
 

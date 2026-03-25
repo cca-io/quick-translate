@@ -34,7 +34,7 @@ let add = (data: t, target: array<Message.t>, fileName) => {
 
   let body =
     data
-    ->Array.sliceToEnd(~start=1)
+    ->Array.slice(~start=1, ~end=data->Array.length)
     ->Array.map(b => {
       let value =
         b[0]
@@ -58,7 +58,7 @@ let fromCsv = rows => {
 
   let body =
     rows
-    ->Array.sliceToEnd(~start=1)
+    ->Array.slice(~start=1, ~end=rows->Array.length)
     ->Array.map(row =>
       row->Array.mapWithIndex((text, i) => i > 0 ? text->Cell.make : text->Cell.makeRO)
     )
@@ -95,7 +95,7 @@ let empty = () => []
 
 let getColData = (data: t, column: string) => {
   let colIndex = getColIndex(data, column)
-  let body = data->Array.sliceToEnd(~start=1)
+  let body = data->Array.slice(~start=1, ~end=data->Array.length)
 
   switch colIndex {
   | Some(index) =>
