@@ -31,7 +31,8 @@ Agents working here should optimize for small, targeted changes and preserve exi
 - Start dev mode: `npm run dev`
 - Production-style CI build: `npm run buildCI`
 - Full local build flow: `npm run build`
-- Run transformation tests: `npm test`
+- Run fixture-based conversion tests: `npm test`
+- Run Cucumber behavior tests: `npm run cucumber`
 - Run ReScript dead-code analysis: `npm run re:dce`
 - Format ReScript sources: `npm run re:format`
 
@@ -39,7 +40,7 @@ Notes:
 
 - `npm run dev` runs both the ReScript watcher and the Vite dev server on port `8083`.
 - `npm run build` also starts `vite preview` at the end, so use `npm run buildCI` for non-interactive verification.
-- Cucumber transformation tests live under [`features/`](/Users/florian-cca/oss/quick-translate/features) and run against compiled `src/*.res.mjs` plus generated step-definition modules under `features/step_definitions/`.
+- Cucumber behavior tests live under [`features/`](/Users/florian-cca/oss/quick-translate/features) and run against compiled `src/*.res.mjs` plus generated step-definition modules under `features/step_definitions/`.
 - `npm run re:dce` currently runs `rescript && rescript-tools reanalyze`. The compile step matters: running reanalyze on stale generated output can report outdated findings.
 - `npm run re:format` runs `rescript format` and is the canonical formatter for ReScript sources in this repo.
 
@@ -66,9 +67,13 @@ For most code changes, run:
 
 - `npm run buildCI`
 
-If the change affects transformation or import/merge/replace logic, also run:
+If the change affects import/export logic or conversion behavior, also run:
 
 - `npm test`
+
+If the change affects workflow behavior such as merge/replace interactions, keyboard shortcuts, or higher-level scenarios, also run:
+
+- `npm run cucumber`
 
 If the change is a cleanup/refactor or you suspect unused helpers, also consider:
 
@@ -81,7 +86,7 @@ Current judgment on `re:dce` output:
   [`src/FileUtils.res`](/Users/florian-cca/oss/quick-translate/src/FileUtils.res) for `download`'s optional `blankTarget`, and [`src/Hooks.res`](/Users/florian-cca/oss/quick-translate/src/Hooks.res) for `useMultiKeyPress`'s optional `omiTextfields`.
 - So `npm run re:dce` is now fairly high-signal, but even these remaining warnings should still be reviewed before cleanup because optional arguments can reflect intended API shape, not just dead code.
 
-If the change affects import/export logic, run [`npm run test:node`](/Users/florian-cca/oss/quick-translate/package.json) and use fixtures from [`tests/fixtures/`](/Users/florian-cca/oss/quick-translate/tests/fixtures) for additional manual spot checks when practical.
+If the change affects import/export logic, run [`npm test`](/Users/florian-cca/oss/quick-translate/package.json) and use fixtures from [`tests/fixtures/`](/Users/florian-cca/oss/quick-translate/tests/fixtures) for additional manual spot checks when practical.
 
 If the change affects drag/drop, dialogs, shortcuts, or spreadsheet behavior, run the dev server and perform a quick browser smoke test.
 

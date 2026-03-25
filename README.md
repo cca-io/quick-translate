@@ -119,14 +119,14 @@ CI-style production build without starting preview:
 npm run buildCI
 ```
 
-Run the Cucumber behavior tests:
+Run the fixture-based Node conversion tests:
 
 ```sh
 npm test
 ```
 
-Run the fixture-based Node conversion tests:
+Run the Cucumber behavior tests:
 
 ```sh
-npm run test:node
+npm run cucumber
 ```
