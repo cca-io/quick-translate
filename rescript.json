@@ -1,9 +1,16 @@
 {
   "name": "quick-translate",
-  "sources": {
-    "dir": "src",
-    "subdirs": true
-  },
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "features/step_definitions",
+      "subdirs": true,
+      "type": "dev"
+    }
+  ],
   "package-specs": [
     {
       "module": "esmodule",

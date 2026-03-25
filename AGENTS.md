@@ -31,17 +31,18 @@ Agents working here should optimize for small, targeted changes and preserve exi
 - Start dev mode: `npm run dev`
 - Production-style CI build: `npm run buildCI`
 - Full local build flow: `npm run build`
+- Run transformation tests: `npm test`
 
 Notes:
 
 - `npm run dev` runs both the ReScript watcher and the Vite dev server on port `8083`.
 - `npm run build` also starts `vite preview` at the end, so use `npm run buildCI` for non-interactive verification.
-- There is no dedicated test suite or lint task in this repo today.
+- Cucumber transformation tests live under [`features/`](/Users/florian-cca/oss/quick-translate/features) and run against compiled `src/*.mjs` plus generated step-definition modules under `features/step_definitions/`.
 
 ## ReScript Conventions
 
 - Source files live in `src/`.
-- Generated `*.mjs` artifacts under `src/` and `lib/` output are ignored by git; do not add them to commits.
+- Generated `*.mjs` artifacts under `src/`, `features/step_definitions/`, and `lib/` output are ignored by git; do not add them to commits.
 - Prefer following existing ReScript style in the touched file rather than reformatting unrelated code.
 - Keep changes type-safe and local. Most behavior is driven by `AppState`, `Source`, and `Convert`.
 
@@ -58,6 +59,10 @@ Notes:
 For most code changes, run:
 
 - `npm run buildCI`
+
+If the change affects transformation or import/merge/replace logic, also run:
+
+- `npm test`
 
 If the change affects import/export logic, also validate manually with fixtures from [`examples/`](/Users/florian-cca/oss/quick-translate/examples) when practical.
 

@@ -4,9 +4,11 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "dev": "run-p re:watch vite:serve",
+    "dev": "run-p re:build vite:serve",
     "build": "run-s re:build vite:build vite:preview",
     "buildCI": "run-s re:build vite:buildCI",
+    "test": "run-s re:build test:cucumber",
+    "test:cucumber": "cucumber-js --import 'features/step_definitions/**/*.mjs' 'features/**/*.feature'",
     "vite:preview": "vite preview --port 8083",
     "vite:serve": "vite --port 8083",
     "vite:build": "vite build",
@@ -23,6 +25,7 @@
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^12.7.0",
     "@vitejs/plugin-react": "^5.2.0",
     "npm-run-all": "^4.1.5",
     "rescript": "^12.2.0",

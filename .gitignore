@@ -5,6 +5,8 @@ node_modules/
 lib/
 src/*.mjs
 src/**/*.mjs
+features/*.mjs
+features/**/*.mjs
 .merlin
 .bsb.lock
 
