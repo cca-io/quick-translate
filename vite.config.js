@@ -9,7 +9,7 @@ import svgr from "vite-plugin-svgr";
 export default {
   plugins: [
     react({
-      include: ["src/**/*.mjs"],
+      include: ["src/**/*.res.mjs"],
     }),
     svgr(),
     VitePWA({

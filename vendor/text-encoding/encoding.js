@@ -1,4 +1,4 @@
-import encodingIndexes from "./encodingIndexes";
+import encodingIndexes from "./encodingIndexes.js";
 
 //
 // Utilities

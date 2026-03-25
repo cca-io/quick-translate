@@ -39,14 +39,14 @@ Notes:
 
 - `npm run dev` runs both the ReScript watcher and the Vite dev server on port `8083`.
 - `npm run build` also starts `vite preview` at the end, so use `npm run buildCI` for non-interactive verification.
-- Cucumber transformation tests live under [`features/`](/Users/florian-cca/oss/quick-translate/features) and run against compiled `src/*.mjs` plus generated step-definition modules under `features/step_definitions/`.
+- Cucumber transformation tests live under [`features/`](/Users/florian-cca/oss/quick-translate/features) and run against compiled `src/*.res.mjs` plus generated step-definition modules under `features/step_definitions/`.
 - `npm run re:dce` currently runs `rescript && rescript-tools reanalyze`. The compile step matters: running reanalyze on stale generated output can report outdated findings.
 - `npm run re:format` runs `rescript format` and is the canonical formatter for ReScript sources in this repo.
 
 ## ReScript Conventions
 
 - Source files live in `src/`.
-- Generated `*.mjs` artifacts under `src/`, `features/step_definitions/`, and `lib/` output are ignored by git; do not add them to commits.
+- Generated `*.res.mjs` artifacts under `src/`, `tests/`, `features/step_definitions/`, and `lib/` output are ignored by git; do not add them to commits.
 - Prefer following existing ReScript style in the touched file rather than reformatting unrelated code.
 - If formatting is needed, prefer `npm run re:format` over manual style edits, but avoid formatting-only churn outside the files you are already changing unless the task is explicitly a formatting pass.
 - Keep changes type-safe and local. Most behavior is driven by `AppState`, `Source`, and `Convert`.

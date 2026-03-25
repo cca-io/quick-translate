@@ -6,6 +6,11 @@
       "subdirs": true
     },
     {
+      "dir": "tests",
+      "subdirs": true,
+      "type": "dev"
+    },
+    {
       "dir": "features/step_definitions",
       "subdirs": true,
       "type": "dev"
@@ -17,7 +22,7 @@
       "in-source": true
     }
   ],
-  "suffix": ".mjs",
+  "suffix": ".res.mjs",
   "dependencies": [
     "@rescript/react"
   ],

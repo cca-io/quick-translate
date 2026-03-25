@@ -39,9 +39,12 @@ module UnparseConfig = {
   type t = {delimiter: string}
 }
 
-@module("papaparse") @val external parse: string => ParseResults.t = "parse"
-@module("papaparse") @val
-external unparse: (parseData, UnparseConfig.t) => string = "unparse"
+type t
 
-let parse = csv => parse(csv)->ParseResults.toResult
-let unparse = (~delimiter=";", parseData) => unparse(parseData, {delimiter: delimiter})
+@module("papaparse") external default: t = "default"
+@get external parseImpl: t => (string => ParseResults.t) = "parse"
+@get external unparseImpl: t => ((parseData, UnparseConfig.t) => string) = "unparse"
+
+let parse = csv => parseImpl(default)(csv)->ParseResults.toResult
+let unparse = (~delimiter=";", parseData) =>
+  unparseImpl(default)(parseData, {delimiter: delimiter})
