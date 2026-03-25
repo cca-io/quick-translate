@@ -106,5 +106,6 @@ let make = (
         </>
       }}
     </div>
+    <div className="HeaderColTitle"> {value->ReactUtils.s} </div>
   </th>
 }

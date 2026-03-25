@@ -7,6 +7,7 @@ type t = Dom.element
 @send external removeChild: (t, t) => unit = "removeChild"
 @send external click: t => unit = "click"
 @send external focus: t => unit = "focus"
+@send external select: t => unit = "select"
 
 @send external rows: t => array<t> = "rows"
 @send external cells: t => array<t> = "cells"

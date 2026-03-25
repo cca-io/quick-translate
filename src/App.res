@@ -186,21 +186,14 @@ let make = () => {
     handleFiles(files, sourceOrTarget)
   }
 
-  let tableRef: ReactDOM.Ref.currentDomRef = React.useRef(null)
-
   let onSelectNextEmptyCellByIndex = (data, cellIndex) => {
     let rowIndex = data->Source.getFirstEmptyCell(cellIndex)
 
-    switch tableRef.current {
-    | Null | Undefined => ()
-    | Value(table) =>
-      (table->HtmlElement.rows)[rowIndex]
-      ->Option.flatMap(row => (row->HtmlElement.cells)[cellIndex])
-      ->Option.forEach(cell => {
-        let _id = setTimeout(() => cell->HtmlElement.dispatchEvent(MouseEvent.make(#mousedown)), 0)
-        let _id = setTimeout(() => cell->HtmlElement.dispatchEvent(MouseEvent.make(#mouseup)), 0)
-      })
-    }
+    Document.document
+    ->Document.getElementById(DataSheet.inputId(rowIndex - 1, cellIndex))
+    ->Option.forEach(input => {
+      let _id = setTimeout(() => input->HtmlElement.focus, 0)
+    })
   }
 
   let onCellsChanged = React.useCallback(changes => {
@@ -284,69 +277,58 @@ let make = () => {
     ->FileUtils.download(~download=FileUtils.timestampFilename("export.csv"))
   }, (state.mode, data))
 
-  let sheetRenderer = ({data, className, children}: DataSheet.SheetProps.t) =>
-    <table
-      id="quick-translate-table"
-      ref={tableRef->ReactDOM.Ref.domRef}
-      className={className->Cn.addIf(!showDescriptionCol, "withoutDescription")}>
-      <thead>
-        {sourceAvailable
-          ? <tr>
-              <th> {"Source"->s} </th>
-              <th />
-              <th />
-              <th> {"Targets"->s} </th>
-              {data[0]
-              ->Option.getOr([])
-              ->Array.mapWithIndex((_cell, i) => i > 3 ? <th key={i->Int.toString} /> : React.null)
-              ->React.array}
-            </tr>
-          : React.null}
-        <tr>
-          {data[0]
-          ->Option.getOr([])
-          ->Array.mapWithIndex(({value}, i) => {
-            let numberOfUntranslatedSegments = Source.getNumberOfUntranslatedSegments(data, i)
-
-            <HeaderCol
-              key={i->Int.toString}
-              index={i}
-              useDescription
-              canToggleDescription
-              value
-              onExport
-              onTranslationProgressButtonClick={_evt => onSelectNextEmptyCellByIndex(data, i)}
-              dispatch
-              numberOfSourceSegments
-              numberOfUntranslatedSegments
-            />
-          })
-          ->React.array}
-        </tr>
-      </thead>
-      <tbody> {children} </tbody>
-    </table>
-
-  let cellRenderer = (
-    {cell, className, children, onDoubleClick, onMouseDown, onMouseOver}: DataSheet.CellProps.t,
-  ) => {
-    let className =
-      className->Cn.addIf(
-        cell.value->String.length === 0 ||
-          (cell.value === nbsp &&
-          !(className->String.includes("description")) &&
-          !(className->String.includes("read-only"))),
-        "blank",
-      )
-
-    <td onMouseDown onMouseOver onDoubleClick className> {children} </td>
-  }
-
   <div className="App" onDragOver>
     <Content sourceAvailable>
-      <DataSheet
-        data onCellsChanged sheetRenderer cellRenderer valueRenderer={cell => cell.value}
-      />
+      <table
+        id="quick-translate-table"
+        className={"data-grid"->Cn.addIf(!showDescriptionCol, "withoutDescription")}
+      >
+        <thead>
+          {sourceAvailable
+            ? <tr>
+                <th> {"Source"->s} </th>
+                <th />
+                <th />
+                <th> {"Targets"->s} </th>
+                {data[0]
+                ->Option.getOr([])
+                ->Array.mapWithIndex((_cell, i) =>
+                  i > 3 ? <th key={i->Int.toString} /> : React.null
+                )
+                ->React.array}
+              </tr>
+            : React.null}
+          <tr>
+            {data[0]
+            ->Option.getOr([])
+            ->Array.mapWithIndex(({value}, i) => {
+              let numberOfUntranslatedSegments = Source.getNumberOfUntranslatedSegments(data, i)
+
+              <HeaderCol
+                key={i->Int.toString}
+                index={i}
+                useDescription
+                canToggleDescription
+                value
+                onExport
+                onTranslationProgressButtonClick={_evt => onSelectNextEmptyCellByIndex(data, i)}
+                dispatch
+                numberOfSourceSegments
+                numberOfUntranslatedSegments
+              />
+            })
+            ->React.array}
+          </tr>
+        </thead>
+        <tbody>
+          <DataSheet
+            data
+            onCellsChanged
+            hiddenCols={!showDescriptionCol ? [1] : []}
+            valueRenderer={cell => cell.value}
+          />
+        </tbody>
+      </table>
       <NoDataView dragging sourceAvailable handleUploadClicked />
       <ImportOverlay dragging sourceAvailable onDragLeave handleDrop />
     </Content>
