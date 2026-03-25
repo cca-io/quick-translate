@@ -18,7 +18,7 @@ let make = (~icon: icon, ~title, ~size=#small, ~onClick) => {
   let isSmall = size === #small
   let size = isSmall ? 40 : 80
 
-  <button title className={"IconButton"->Cn.addIf(!isSmall, "IconButtonLarge")} onClick>
+  <button title className={"icon-button"->Cn.addIf(!isSmall, "icon-button-large")} onClick>
     {switch icon {
     | #csv => <Icons.Csv size />
     | #help => <Icons.Help size />

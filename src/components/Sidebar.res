@@ -1,13 +1,13 @@
 module Top = {
   @react.component
-  let make = (~children) => <div className="SidebarTop"> {children} </div>
+  let make = (~children) => <div className="sidebar-top"> {children} </div>
 }
 
 module Bottom = {
   @react.component
-  let make = (~children) => <div className="SidebarBottom"> {children} </div>
+  let make = (~children) => <div className="sidebar-bottom"> {children} </div>
 }
 
 @react.component
 let make = (~sourceAvailable, ~children) =>
-  sourceAvailable ? <aside className="Sidebar"> {children} </aside> : React.null
+  sourceAvailable ? <aside className="sidebar"> {children} </aside> : React.null

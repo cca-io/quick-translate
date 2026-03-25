@@ -12,13 +12,13 @@ let fileTypes = [
 let make = (~sourceAvailable, ~dragging, ~handleUploadClicked) =>
   sourceAvailable || dragging
     ? React.null
-    : <div className="NoDataView">
+    : <div className="no-data-view">
         <div>
-          <Icons.Logo height="300" className="AppLogo" />
+          <Icons.Logo height="300" className="app-logo" />
         </div>
         <div> {"No data."->s} </div>
         <div> {"Please drag a language file here."->s} </div>
-        <div className="FileTypes">
+        <div className="file-types">
           {"Supported file types:"->s}
           <ul>
             {fileTypes

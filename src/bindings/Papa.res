@@ -42,9 +42,8 @@ module UnparseConfig = {
 type t
 
 @module("papaparse") external default: t = "default"
-@get external parseImpl: t => (string => ParseResults.t) = "parse"
-@get external unparseImpl: t => ((parseData, UnparseConfig.t) => string) = "unparse"
+@get external parseImpl: t => string => ParseResults.t = "parse"
+@get external unparseImpl: t => (parseData, UnparseConfig.t) => string = "unparse"
 
 let parse = csv => parseImpl(default)(csv)->ParseResults.toResult
-let unparse = (~delimiter=";", parseData) =>
-  unparseImpl(default)(parseData, {delimiter: delimiter})
+let unparse = (~delimiter=";", parseData) => unparseImpl(default)(parseData, {delimiter: delimiter})

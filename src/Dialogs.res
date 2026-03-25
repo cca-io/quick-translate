@@ -13,8 +13,8 @@ module Shortcut = {
 
   @react.component
   let make = (~title, ~type_=Simple, ~keycap) =>
-    <div className="Shortcut">
-      <div className="ShortcutKeycaps">
+    <div className="shortcut">
+      <div className="shortcut-keycaps">
         {switch type_ {
         | Simple => kc(keycap)
         | Ctrl => kc("Ctrl") + kc(keycap)
@@ -33,7 +33,7 @@ module Footer = {
 
   @react.component
   let make = (~children) =>
-    <div className="DialogFooter">
+    <div className="dialog-footer">
       <Separator />
       children
       <Separator />

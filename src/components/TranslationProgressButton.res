@@ -8,10 +8,10 @@ let make = (~numberOfTranslatedSegments, ~numberOfSourceSegments, ~onClick) => {
   <button
     title
     ariaLabel=title
-    className={`InfoTag ${translationComplete ? "complete" : "incomplete"}`}
+    className={`info-tag ${translationComplete ? "complete" : "incomplete"}`}
     onClick=?{translationComplete ? None : Some(onClick)}
   >
-    <div className="InfoText">
+    <div className="info-text">
       {if translationComplete {
         "Translation complete"->s
       } else {

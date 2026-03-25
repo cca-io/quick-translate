@@ -280,7 +280,7 @@ let make = () => {
     ->FileUtils.download(~download=FileUtils.timestampFilename("export.csv"))
   }, (state.mode, data))
 
-  <div className="App" onDragOver>
+  <div className="app" onDragOver>
     <Content sourceAvailable>
       <table
         id="quick-translate-table"

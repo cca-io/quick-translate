@@ -5,7 +5,7 @@ module HoverHighlight = {
   let make = (~title, ~onDrop) => {
     let (dragging, onDragOver) = Hooks.useDragOver()
 
-    <div onDragOver onDrop className={"HoverHighlight"->Cn.addIf(dragging, "dragging")}>
+    <div onDragOver onDrop className={"hover-highlight"->Cn.addIf(dragging, "dragging")}>
       {title->s}
     </div>
   }
@@ -14,7 +14,7 @@ module HoverHighlight = {
 @react.component
 let make = (~dragging, ~sourceAvailable, ~onDragLeave, ~handleDrop) =>
   dragging
-    ? <div className="ImportOverlay" onDragLeave>
+    ? <div className="import-overlay" onDragLeave>
         <HoverHighlight
           title="Insert source language file here" onDrop={e => handleDrop(e, FileUtils.Source)}
         />

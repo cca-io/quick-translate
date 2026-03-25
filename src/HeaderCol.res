@@ -11,7 +11,7 @@ let getColType = (index, canToggleDescription) =>
 module ExportButtonRow = {
   @react.component
   let make = (~value, ~numberOfUntranslatedSegments, ~onExport) =>
-    <div className="ExportButtonRow">
+    <div className="export-button-row">
       <IconButton
         title={"Export JSON file"}
         onClick={_evt => onExport(value, File.FileType.Json, numberOfUntranslatedSegments)}
@@ -44,7 +44,7 @@ module ActionButtonRow = {
     ~numberOfSourceSegments,
     ~numberOfTranslatedSegments,
   ) => {
-    <div className="ActionButtonRow">
+    <div className="action-button-row">
       <TranslationProgressButton
         numberOfSourceSegments numberOfTranslatedSegments onClick=onTranslationProgressButtonClick
       />
@@ -60,7 +60,7 @@ module IdButtonRow = {
       ? ("Hide descriptions", #hideDescription)
       : ("Show descriptions", #showDescription)
 
-    <div className="IdButtonRow">
+    <div className="id-button-row">
       <IconButton onClick=onRemoveSource title={"Remove source"} icon=#trash />
       {canToggleDescription ? <IconButton onClick=onToggleDescriptions title icon /> : React.null}
     </div>
@@ -87,7 +87,7 @@ let make = (
   let numberOfTranslatedSegments = numberOfSourceSegments - numberOfUntranslatedSegments
 
   <th>
-    <div className="ButtonRow">
+    <div className="button-row">
       {switch colType {
       | Id =>
         <IdButtonRow useDescription canToggleDescription onRemoveSource onToggleDescriptions />
@@ -106,6 +106,6 @@ let make = (
         </>
       }}
     </div>
-    <div className="HeaderColTitle"> {value->ReactUtils.s} </div>
+    <div className="header-col-title"> {value->ReactUtils.s} </div>
   </th>
 }

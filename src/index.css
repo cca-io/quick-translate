@@ -7,7 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.App {
+.app {
   text-align: left;
   display: flex;
   flex-direction: row;
@@ -15,7 +15,7 @@ body {
   overflow-y: hidden;
 }
 
-.AppLogo {
+.app-logo {
   margin-bottom: 50px;
   padding: 20px 0px;
   background-color: #24283a;
@@ -23,7 +23,7 @@ body {
   opacity: 1;
 }
 
-.ImportOverlay {
+.import-overlay {
   position: absolute;
   z-index: 5;
   top: 0;
@@ -34,7 +34,7 @@ body {
   flex-direction: row;
 }
 
-.NoDataView {
+.no-data-view {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -47,18 +47,18 @@ body {
   color: #3c3c3c;
 }
 
-.FileTypes {
+.file-types {
   padding-top: 32px;
   font-size: 2rem;
   text-align: left;
 }
 
-.FileTypes > ul {
+.file-types > ul {
   font-size: 1.4rem;
   margin-top: 4px;
 }
 
-.HoverHighlight {
+.hover-highlight {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -75,7 +75,7 @@ body {
   opacity: 0.8;
 }
 
-.Content {
+.content {
   display: flex;
   flex: 1;
 }
@@ -90,26 +90,26 @@ body {
   padding-bottom: 16px;
 }
 
-.Sidebar {
+.sidebar {
   padding: 8px 8px 8px 0;
   display: flex;
   flex-direction: column;
 }
 
-.SidebarTop {
+.sidebar-top {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
-.SidebarBottom {
+.sidebar-bottom {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
 
-.IconButton {
+.icon-button {
   width: 50px;
   padding: 4px 0 1px 0;
   margin: 4px;
@@ -119,7 +119,7 @@ body {
   box-shadow: 4px 4px 7px silver;
 }
 
-.IconButtonLarge {
+.icon-button-large {
   margin: 8px;
   width: 100px;
   height: 100px;
@@ -127,32 +127,32 @@ body {
   box-shadow: 10px 10px 15px silver;
 }
 
-.IconButton:hover {
+.icon-button:hover {
   cursor: pointer;
   opacity: 0.8;
 }
 
-.ButtonRow {
+.button-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding-bottom: 8px;
 }
 
-.ExportButtonRow {
+.export-button-row {
   padding-right: 8px;
   display: flex;
   flex: 1;
 }
 
-.ActionButtonRow {
+.action-button-row {
   padding-left: 8px;
   display: flex;
   justify-content: flex-end;
   flex: 1;
 }
 
-.Dialog {
+.dialog {
   position: fixed;
   z-index: 5;
   left: 0;
@@ -163,7 +163,7 @@ body {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.DialogWindow {
+.dialog-window {
   background-color: #fefefe;
   border-radius: 10px;
   margin: 10% auto;
@@ -171,28 +171,28 @@ body {
   width: 600px;
 }
 
-.DialogTop {
+.dialog-top {
   display: flex;
   justify-content: space-between;
 }
 
-.DialogTitle {
+.dialog-title {
   font-size: 30px;
   font-weight: bold;
   padding: 10px 20px 0;
 }
 
-.DialogContent {
+.dialog-content {
   padding: 0 20px 20px;
 }
 
-.DialogFooter {
+.dialog-footer {
   padding-top: 20px;
   text-align: center;
   font-size: small;
 }
 
-.CloseButton {
+.close-button {
   font-size: 28px;
   width: 40px;
   height: 40px;
@@ -202,20 +202,20 @@ body {
   font-weight: bold;
 }
 
-.CloseButton:hover,
-.CloseButton:focus {
+.close-button:hover,
+.close-button:focus {
   color: tomato;
   text-decoration: none;
   cursor: pointer;
 }
 
-.Shortcut {
+.shortcut {
   display: flex;
   align-items: flex-end;
   padding-bottom: 4px;
 }
 
-.ShortcutKeycaps {
+.shortcut-keycaps {
   width: 180px;
 }
 
@@ -315,7 +315,7 @@ thead > tr:first-child > th {
   z-index: 2;
 }
 
-.HeaderColTitle {
+.header-col-title {
   padding: 0 4px 6px;
   font-weight: bold;
   text-align: left;
@@ -367,7 +367,7 @@ kbd {
   white-space: nowrap;
 }
 
-.InfoTag {
+.info-tag {
   padding: 8px;
   margin: 4px;
   border: 1px solid rgb(143, 143, 143);
@@ -379,7 +379,7 @@ kbd {
   justify-content: center;
 }
 
-.InfoTag.incomplete:hover {
+.info-tag.incomplete:hover {
   cursor: pointer;
 }
 
@@ -392,7 +392,7 @@ kbd {
   background-color: rgba(255, 99, 71, 0.2);
 }
 
-.InfoText {
+.info-text {
   font-size: 14px;
   font-weight: normal;
   text-align: center;

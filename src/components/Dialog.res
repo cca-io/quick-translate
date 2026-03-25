@@ -6,13 +6,13 @@ module Info = {
     Hooks.useKeyPress(~omiTextfields=false, "Escape", () => onClose())
 
     open_
-      ? <div className="Dialog">
-          <div className="DialogWindow">
-            <div className="DialogTop">
-              <div className="DialogTitle"> {s(title)} </div>
-              <button className="CloseButton" onClick={_evt => onClose()}> {"x"->s} </button>
+      ? <div className="dialog">
+          <div className="dialog-window">
+            <div className="dialog-top">
+              <div className="dialog-title"> {s(title)} </div>
+              <button className="close-button" onClick={_evt => onClose()}> {"x"->s} </button>
             </div>
-            <div className="DialogContent"> {children} </div>
+            <div className="dialog-content"> {children} </div>
           </div>
         </div>
       : React.null
