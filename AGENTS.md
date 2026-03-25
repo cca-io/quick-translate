@@ -51,6 +51,7 @@ Notes:
 - Prefer following existing ReScript style in the touched file rather than reformatting unrelated code.
 - If formatting is needed, prefer `npm run re:format` over manual style edits, but avoid formatting-only churn outside the files you are already changing unless the task is explicitly a formatting pass.
 - Keep changes type-safe and local. Most behavior is driven by `AppState`, `Source`, and `Convert`.
+- Before adding a new binding for standard JS/runtime functionality, check whether ReScript already provides it directly. When unsure, inspect the published ReScript package sources, especially `lib/ocaml`, before rebinding globals. Prefer existing language or stdlib support such as plain `Promise.all` over custom bindings.
 - Some modules now use `@@live` annotations, for example [`src/DataSheet.res`](/Users/florian-cca/oss/quick-translate/src/DataSheet.res) and [`src/icons/Icons_Logo.res`](/Users/florian-cca/oss/quick-translate/src/icons/Icons_Logo.res), to suppress dead-code false positives. Do not remove those casually without rerunning `npm run re:dce` and checking the impact.
 
 ## Editing Guidance
