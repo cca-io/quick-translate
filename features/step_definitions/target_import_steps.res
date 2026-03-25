@@ -30,17 +30,15 @@ let requireData = () =>
   }
 
 let cellValue = (data: Source.t, rowId, columnName) => {
-  let header =
-    switch data[0] {
-    | Some(header) => header
-    | None => failwith("Expected source data header row")
-    }
+  let header = switch data[0] {
+  | Some(header) => header
+  | None => failwith("Expected source data header row")
+  }
 
-  let colIndex =
-    switch header->Array.findIndexOpt(cell => cell.value === columnName) {
-    | Some(index) => index
-    | None => failwith(`Column "${columnName}" not found`)
-    }
+  let colIndex = switch header->Array.findIndexOpt(cell => cell.value === columnName) {
+  | Some(index) => index
+  | None => failwith(`Column "${columnName}" not found`)
+  }
 
   let row =
     data
@@ -62,29 +60,38 @@ let cellValue = (data: Source.t, rowId, columnName) => {
   }
 }
 
-Cucumber.given2("a source file {string} with messages", (fileName, dataTable: Cucumber.DataTable.t) => {
+Cucumber.given2("a source file {string} with messages", (
+  fileName,
+  dataTable: Cucumber.DataTable.t,
+) => {
   currentData := Some(Source.make(messagesFromTable(dataTable), fileName))
 })
 
-Cucumber.given2("an existing target file {string} with messages", (fileName, dataTable: Cucumber.DataTable.t) => {
+Cucumber.given2("an existing target file {string} with messages", (
+  fileName,
+  dataTable: Cucumber.DataTable.t,
+) => {
   currentData := Some(Source.add(requireData(), messagesFromTable(dataTable), fileName))
 })
 
-Cucumber.when2(
-  "I merge an imported target file {string} with messages",
-  (fileName, dataTable: Cucumber.DataTable.t) => {
-    currentData := Some(Source.mergeTarget(requireData(), messagesFromTable(dataTable), fileName))
-  },
-)
+Cucumber.when2("I merge an imported target file {string} with messages", (
+  fileName,
+  dataTable: Cucumber.DataTable.t,
+) => {
+  currentData := Some(Source.mergeTarget(requireData(), messagesFromTable(dataTable), fileName))
+})
 
-Cucumber.when2(
-  "I replace an imported target file {string} with messages",
-  (fileName, dataTable: Cucumber.DataTable.t) => {
-    currentData := Some(Source.replaceTarget(requireData(), messagesFromTable(dataTable), fileName))
-  },
-)
+Cucumber.when2("I replace an imported target file {string} with messages", (
+  fileName,
+  dataTable: Cucumber.DataTable.t,
+) => {
+  currentData := Some(Source.replaceTarget(requireData(), messagesFromTable(dataTable), fileName))
+})
 
-Cucumber.then2("the target column {string} should contain", (columnName, dataTable: Cucumber.DataTable.t) => {
+Cucumber.then2("the target column {string} should contain", (
+  columnName,
+  dataTable: Cucumber.DataTable.t,
+) => {
   dataTable
   ->Cucumber.DataTable.hashes
   ->Array.forEach(row => {
@@ -93,7 +100,10 @@ Cucumber.then2("the target column {string} should contain", (columnName, dataTab
 
     if actualValue !== expectedValue {
       failwith(
-        `Expected row "${getRequired(row, "id")}" in column "${columnName}" to be "${expectedValue}" but got "${actualValue}"`,
+        `Expected row "${getRequired(
+            row,
+            "id",
+          )}" in column "${columnName}" to be "${expectedValue}" but got "${actualValue}"`,
       )
     }
   })

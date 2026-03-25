@@ -32,12 +32,14 @@ Agents working here should optimize for small, targeted changes and preserve exi
 - Production-style CI build: `npm run buildCI`
 - Full local build flow: `npm run build`
 - Run transformation tests: `npm test`
+- Run ReScript dead-code analysis: `npm run re:dce`
 
 Notes:
 
 - `npm run dev` runs both the ReScript watcher and the Vite dev server on port `8083`.
 - `npm run build` also starts `vite preview` at the end, so use `npm run buildCI` for non-interactive verification.
 - Cucumber transformation tests live under [`features/`](/Users/florian-cca/oss/quick-translate/features) and run against compiled `src/*.mjs` plus generated step-definition modules under `features/step_definitions/`.
+- `npm run re:dce` currently runs `rescript && rescript-tools reanalyze`. The compile step matters: running reanalyze on stale generated output can report outdated findings.
 
 ## ReScript Conventions
 
@@ -45,6 +47,7 @@ Notes:
 - Generated `*.mjs` artifacts under `src/`, `features/step_definitions/`, and `lib/` output are ignored by git; do not add them to commits.
 - Prefer following existing ReScript style in the touched file rather than reformatting unrelated code.
 - Keep changes type-safe and local. Most behavior is driven by `AppState`, `Source`, and `Convert`.
+- Some modules now use `@@live` annotations, for example [`src/DataSheet.res`](/Users/florian-cca/oss/quick-translate/src/DataSheet.res) and [`src/icons/Icons_Logo.res`](/Users/florian-cca/oss/quick-translate/src/icons/Icons_Logo.res), to suppress dead-code false positives. Do not remove those casually without rerunning `npm run re:dce` and checking the impact.
 
 ## Editing Guidance
 
@@ -63,6 +66,17 @@ For most code changes, run:
 If the change affects transformation or import/merge/replace logic, also run:
 
 - `npm test`
+
+If the change is a cleanup/refactor or you suspect unused helpers, also consider:
+
+- `npm run re:dce`
+
+Current judgment on `re:dce` output:
+
+- `@@live` annotations have reduced the previous false positives substantially.
+- Current observed output is 2 warnings, both `Unused Argument` findings:
+  [`src/FileUtils.res`](/Users/florian-cca/oss/quick-translate/src/FileUtils.res) for `download`'s optional `blankTarget`, and [`src/Hooks.res`](/Users/florian-cca/oss/quick-translate/src/Hooks.res) for `useMultiKeyPress`'s optional `omiTextfields`.
+- So `npm run re:dce` is now fairly high-signal, but even these remaining warnings should still be reviewed before cleanup because optional arguments can reflect intended API shape, not just dead code.
 
 If the change affects import/export logic, also validate manually with fixtures from [`examples/`](/Users/florian-cca/oss/quick-translate/examples) when practical.
 

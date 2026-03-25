@@ -84,14 +84,16 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
           onClick={_evt => {
             onClose()
             onReplace()
-          }}>
+          }}
+        >
           {"REPLACE"->s}
         </button>
         <button
           onClick={_evt => {
             onClose()
             onMerge()
-          }}>
+          }}
+        >
           {"MERGE"->s}
         </button>
       </div>
@@ -107,23 +109,25 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       <Shortcut type_=CtrlShift keycap={"N"} title="Create a new target" />
       <Shortcut type_=CtrlShift keycap={"R"} title="Remove source" />
       <Shortcut type_=CtrlShift keycap={"?"} title="Help dialog" />
-      <Shortcut keycap={"Alt + ↑"} title="Jump to previous untranslated field in current column" />
+      <Shortcut
+        keycap={"Alt + ↑"} title="Jump to previous untranslated field in current column"
+      />
       <Shortcut keycap={"Alt + ↓"} title="Jump to next untranslated field in current column" />
       <h4> {"Dialogs"->s} </h4>
       <Shortcut keycap={"Esc"} title="Close dialog" />
       <Shortcut keycap={"Enter"} title="Confirm dialog" />
       <Footer>
         <a
-          target="_blank"
-          href="https://github.com/cca-io/quick-translate"
-          rel="noopener noreferrer">
+          target="_blank" href="https://github.com/cca-io/quick-translate" rel="noopener noreferrer"
+        >
           {"Code"->s}
         </a>
         <Footer.Separator />
         <a
           target="_blank"
           href="https://github.com/cca-io/quick-translate/issues/new"
-          rel="noopener noreferrer">
+          rel="noopener noreferrer"
+        >
           {"Report an issue"->s}
         </a>
       </Footer>

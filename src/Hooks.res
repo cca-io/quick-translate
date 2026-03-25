@@ -35,10 +35,10 @@ module KeyboardEvent = ReactEvent.Keyboard
 
 let blacklistedTargets = ["INPUT", "TEXTAREA"]
 
-let isTargetOk = (~omiTextfields=true, evt) =>
+let isTargetOk = (~omiTextfields, evt) =>
   !omiTextfields || !(blacklistedTargets->Array.includes((evt->KeyboardEvent.target)["tagName"]))
 
-let useKeyPress = (~omiTextfields=true, targetKey: string, callback: unit => unit) => {
+let useKeyPress = (~omiTextfields, targetKey: string, callback: unit => unit) => {
   let (keyPressed, setKeyPressed) = React.useState(() => false)
 
   let downHandler = evt => {

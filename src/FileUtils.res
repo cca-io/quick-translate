@@ -27,7 +27,7 @@ let download = (~download, ~blankTarget=true, url) => {
 let timestampFilename = filename => {
   let timestamp = Date.make()->Date.toISOString->String.split(".")
   let formatted =
-    timestamp->Array.getUnsafe(0)->String.replace("T", "_")->String.replaceRegExp(%re("/:/g"), "-")
+    timestamp->Array.getUnsafe(0)->String.replace("T", "_")->String.replaceRegExp(/:/g, "-")
 
   formatted ++ "-" ++ filename
 }

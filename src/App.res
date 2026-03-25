@@ -1,20 +1,5 @@
 open ReactUtils
 
-let makeXmlManifest = () => {
-  let files = []
-  `
-<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">
-  <manifest:file-entry manifest:full-path="/" manifest:version="1.2" "manifest:media-type="$1"/>
-	${files
-    ->Array.map(file =>
-      `<manifest:file-entry manifest:full-path="${file}" manifest:media-type="text/xml"/>`
-    )
-    ->Array.join("\n")}
-</manifest:manifest>
-`
-}
-
 @react.component
 let make = () => {
   let (state, dispatch) = AppState.useAppState()
@@ -210,7 +195,7 @@ let make = () => {
     Document.document
     ->Document.getElementById(DataSheet.inputId(rowIndex, cellIndex))
     ->Option.forEach(input => {
-      let _id = setTimeout(() => input->HtmlElement.focus, 0)
+      let _ = setTimeout(() => input->HtmlElement.focus, 0)
     })
   }
 
@@ -220,7 +205,7 @@ let make = () => {
 
     switch changes[0] {
     | Some({col, value}) if value != "" =>
-      let _id = setTimeout(() => onSelectNextEmptyCellByIndex(changedData, col), 0)
+      let _ = setTimeout(() => onSelectNextEmptyCellByIndex(changedData, col), 0)
     | _ => ()
     }
   }, [data])

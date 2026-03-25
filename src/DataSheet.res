@@ -1,4 +1,6 @@
 module Cell = {
+  @@live
+
   type t = {
     value: string,
     expr: option<string>,
@@ -31,7 +33,7 @@ module Cell = {
 type data = array<array<Cell.t>>
 
 module Change = {
-  type t = {cell: Cell.t, col: int, row: int, value: string}
+  type t = {@live cell: Cell.t, col: int, row: int, value: string}
 }
 
 let update = (grid, {Change.row: _row as rowIndex, col, value}) => {
@@ -47,11 +49,9 @@ let update = (grid, {Change.row: _row as rowIndex, col, value}) => {
 let inputId = (row, col) => `data-grid-input-${row->Int.toString}-${col->Int.toString}`
 let cellId = (row, col) => `data-grid-cell-${row->Int.toString}-${col->Int.toString}`
 
-let focusCell = (~row, ~col, ~selectInput=false) =>
+let focusCell = (~row, ~col, ~selectInput) =>
   Document.document
-  ->Document.getElementById(
-    selectInput ? inputId(row, col) : cellId(row, col),
-  )
+  ->Document.getElementById(selectInput ? inputId(row, col) : cellId(row, col))
   ->Option.forEach(element => {
     element->HtmlElement.focus
     if selectInput {
@@ -71,25 +71,22 @@ let cellClassName = (cell: Cell.t) =>
   "cell"
   ->Cn.addIf(cell.readOnly, "read-only")
   ->Cn.addIf(cell.className != "", cell.className)
-  ->Cn.addIf(
-    !cell.readOnly && (cell.value === "" || cell.value === ReactUtils.nbsp),
-    "blank",
-  )
+  ->Cn.addIf(!cell.readOnly && (cell.value === "" || cell.value === ReactUtils.nbsp), "blank")
 
 let makeChange = (~cell: Cell.t, ~row, ~col, ~value): Change.t => {cell, row, col, value}
 
 @react.component
 let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) => {
   let isHiddenCol = colIndex => hiddenCols->Array.includes(colIndex)
-  let isUntranslatedCell = (cell: Cell.t) => !cell.readOnly && cell.value->String.trim->String.length === 0
+  let isUntranslatedCell = (cell: Cell.t) =>
+    !cell.readOnly && cell.value->String.trim->String.length === 0
 
   let focusGridPosition = (rowIndex, colIndex) =>
     if !isHiddenCol(colIndex) {
       switch data[rowIndex] {
       | Some(row) =>
         switch row[colIndex] {
-        | Some((cell: Cell.t)) =>
-          focusCell(~row=rowIndex, ~col=colIndex, ~selectInput=!cell.readOnly)
+        | Some(cell: Cell.t) => focusCell(~row=rowIndex, ~col=colIndex, ~selectInput=!cell.readOnly)
         | None => ()
         }
       | None => ()
@@ -101,7 +98,7 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
       switch data[nextRowIndex] {
       | Some(row) =>
         switch row[colIndex] {
-        | Some((cell: Cell.t)) =>
+        | Some(cell: Cell.t) =>
           if cell->isUntranslatedCell {
             focusGridPosition(nextRowIndex, colIndex)
           } else {
@@ -173,76 +170,81 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
     loop(rowIndex, colIndex + step)
   }
 
-  let onInputKeyDown = (rowIndex, colIndex) => evt => {
-    open ReactEvent.Keyboard
+  let onInputKeyDown = (rowIndex, colIndex) =>
+    evt => {
+      open ReactEvent.Keyboard
 
-    switch evt->key {
-    | "ArrowUp" if evt->altKey =>
-      evt->preventDefault
-      jumpToUntranslated(rowIndex, colIndex, -1)
-    | "ArrowDown" if evt->altKey =>
-      evt->preventDefault
-      jumpToUntranslated(rowIndex, colIndex, 1)
-    | "ArrowUp" =>
-      evt->preventDefault
-      moveVertical(rowIndex, colIndex, -1)
-    | "ArrowDown" =>
-      evt->preventDefault
-      moveVertical(rowIndex, colIndex, 1)
-    | "ArrowLeft" =>
-      evt->preventDefault
-      moveHorizontal(rowIndex, colIndex, -1)
-    | "ArrowRight" =>
-      evt->preventDefault
-      moveHorizontal(rowIndex, colIndex, 1)
-    | "Enter" =>
-      evt->preventDefault
-      moveVertical(rowIndex, colIndex, 1)
-    | "Tab" =>
-      evt->preventDefault
-      moveTab(rowIndex, colIndex, evt->shiftKey)
-    | _ => ()
+      switch evt->key {
+      | "ArrowUp" if evt->altKey =>
+        evt->preventDefault
+        jumpToUntranslated(rowIndex, colIndex, -1)
+      | "ArrowDown" if evt->altKey =>
+        evt->preventDefault
+        jumpToUntranslated(rowIndex, colIndex, 1)
+      | "ArrowUp" =>
+        evt->preventDefault
+        moveVertical(rowIndex, colIndex, -1)
+      | "ArrowDown" =>
+        evt->preventDefault
+        moveVertical(rowIndex, colIndex, 1)
+      | "ArrowLeft" =>
+        evt->preventDefault
+        moveHorizontal(rowIndex, colIndex, -1)
+      | "ArrowRight" =>
+        evt->preventDefault
+        moveHorizontal(rowIndex, colIndex, 1)
+      | "Enter" =>
+        evt->preventDefault
+        moveVertical(rowIndex, colIndex, 1)
+      | "Tab" =>
+        evt->preventDefault
+        moveTab(rowIndex, colIndex, evt->shiftKey)
+      | _ => ()
+      }
     }
-  }
 
-  let onReadOnlyKeyDown = (rowIndex, colIndex) => evt => {
-    open ReactEvent.Keyboard
+  let onReadOnlyKeyDown = (rowIndex, colIndex) =>
+    evt => {
+      open ReactEvent.Keyboard
 
-    switch evt->key {
-    | "ArrowUp" if evt->altKey =>
-      evt->preventDefault
-      jumpToUntranslated(rowIndex, colIndex, -1)
-    | "ArrowDown" if evt->altKey =>
-      evt->preventDefault
-      jumpToUntranslated(rowIndex, colIndex, 1)
-    | "ArrowUp" =>
-      evt->preventDefault
-      moveVertical(rowIndex, colIndex, -1)
-    | "ArrowDown" =>
-      evt->preventDefault
-      moveVertical(rowIndex, colIndex, 1)
-    | "ArrowLeft" =>
-      evt->preventDefault
-      moveHorizontal(rowIndex, colIndex, -1)
-    | "ArrowRight" =>
-      evt->preventDefault
-      moveHorizontal(rowIndex, colIndex, 1)
-    | "Enter" =>
-      evt->preventDefault
-      moveVertical(rowIndex, colIndex, 1)
-    | "Tab" =>
-      evt->preventDefault
-      moveTab(rowIndex, colIndex, evt->shiftKey)
-    | _ => ()
+      switch evt->key {
+      | "ArrowUp" if evt->altKey =>
+        evt->preventDefault
+        jumpToUntranslated(rowIndex, colIndex, -1)
+      | "ArrowDown" if evt->altKey =>
+        evt->preventDefault
+        jumpToUntranslated(rowIndex, colIndex, 1)
+      | "ArrowUp" =>
+        evt->preventDefault
+        moveVertical(rowIndex, colIndex, -1)
+      | "ArrowDown" =>
+        evt->preventDefault
+        moveVertical(rowIndex, colIndex, 1)
+      | "ArrowLeft" =>
+        evt->preventDefault
+        moveHorizontal(rowIndex, colIndex, -1)
+      | "ArrowRight" =>
+        evt->preventDefault
+        moveHorizontal(rowIndex, colIndex, 1)
+      | "Enter" =>
+        evt->preventDefault
+        moveVertical(rowIndex, colIndex, 1)
+      | "Tab" =>
+        evt->preventDefault
+        moveTab(rowIndex, colIndex, evt->shiftKey)
+      | _ => ()
+      }
     }
-  }
 
-  let onInputChange = (rowIndex, colIndex, cell) => evt =>
-    onCellsChanged([makeChange(~cell, ~row=rowIndex, ~col=colIndex, ~value=ReactUtils.valueFromEvent(evt))])
+  let onInputChange = (rowIndex, colIndex, cell) =>
+    evt =>
+      onCellsChanged([
+        makeChange(~cell, ~row=rowIndex, ~col=colIndex, ~value=ReactUtils.valueFromEvent(evt)),
+      ])
 
-  let onInputPaste = (rowIndex, colIndex) => evt => {
-    let changes =
-      switch evt->Clipboard.getText {
+  let onInputPaste = (rowIndex, colIndex) =>
+    evt => {
+      let changes = switch evt->Clipboard.getText {
       | Some(text) =>
         let changes = []
         let rows = text->parseClipboard
@@ -255,8 +257,10 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
             switch data[targetRowIndex] {
             | Some(targetRow) =>
               switch targetRow[targetColIndex] {
-              | Some((cell: Cell.t)) if !cell.readOnly =>
-                changes->Array.push(Some(makeChange(~cell, ~row=targetRowIndex, ~col=targetColIndex, ~value)))
+              | Some(cell: Cell.t) if !cell.readOnly =>
+                changes->Array.push(
+                  Some(makeChange(~cell, ~row=targetRowIndex, ~col=targetColIndex, ~value)),
+                )
               | _ => ()
               }
             | None => ()
@@ -268,11 +272,11 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
       | None => []
       }
 
-    if changes->Array.length > 0 {
-      evt->ReactEvent.Clipboard.preventDefault
-      onCellsChanged(changes)
+      if changes->Array.length > 0 {
+        evt->ReactEvent.Clipboard.preventDefault
+        onCellsChanged(changes)
+      }
     }
-  }
 
   <>
     {data
@@ -291,7 +295,8 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
             id={cellId(rowIndex, colIndex)}
             className={cell->cellClassName}
             tabIndex={cell.readOnly ? 0 : -1}
-            onKeyDown={cell.readOnly ? onReadOnlyKeyDown(rowIndex, colIndex) : _evt => ()}>
+            onKeyDown={cell.readOnly ? onReadOnlyKeyDown(rowIndex, colIndex) : _evt => ()}
+          >
             {cell.readOnly
               ? <div className="text"> {value->ReactUtils.s} </div>
               : <input

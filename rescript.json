@@ -27,5 +27,10 @@
   "jsx": {
     "version": 4,
     "mode": "automatic"
+  },
+  "reanalyze": {
+    "suppress": [
+      "src/bindings"
+    ]
   }
 }
