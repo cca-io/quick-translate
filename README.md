@@ -90,8 +90,8 @@ The app allows to
 - export the whole sheet as-is to CSV
 - import the aforementioned CSV again
 
-> **NOTE**: Currently the app state is not stored anywhere, which means a refresh deletes all your data.
-> To save your data, use the export/import CSV functionality for now.
+> **NOTE**: The current sheet state is persisted in `localStorage`, so a browser refresh keeps your session on the same device/browser profile.
+> You should still use export/import for backups, sharing, or moving work between browsers/devices.
 
 ## Development
 
@@ -111,4 +111,22 @@ Production build:
 
 ```sh
 npm run build
+```
+
+CI-style production build without starting preview:
+
+```sh
+npm run buildCI
+```
+
+Run the Cucumber behavior tests:
+
+```sh
+npm test
+```
+
+Run the fixture-based Node conversion tests:
+
+```sh
+npm run test:node
 ```
