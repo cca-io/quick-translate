@@ -16,7 +16,8 @@
     "re:build": "rescript",
     "re:watch": "rescript clean && rescript watch",
     "re:clean": "rescript clean",
-    "re:dce": "rescript && rescript-tools reanalyze"
+    "re:dce": "rescript && rescript-tools reanalyze",
+    "re:format": "rescript format"
   },
   "dependencies": {
     "@rescript/react": "^0.14.2",
