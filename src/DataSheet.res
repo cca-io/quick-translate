@@ -49,15 +49,20 @@ let update = (grid, {Change.row: _row as rowIndex, col, value}) => {
 let inputId = (row, col) => `data-grid-input-${row->Int.toString}-${col->Int.toString}`
 let cellId = (row, col) => `data-grid-cell-${row->Int.toString}-${col->Int.toString}`
 
-let focusCell = (~row, ~col, ~selectInput) =>
+let focusCell = (~row, ~col, ~selectInput) => {
+  open WebAPI
+
   document
-  ->WebDocument.getElementById(selectInput ? inputId(row, col) : cellId(row, col))
-  ->Option.forEach(element => {
-    element->HtmlElement.focus
+  ->Document.getElementById(selectInput ? inputId(row, col) : cellId(row, col))
+  ->Null.forEach(element => {
+    let element = element->HtmlCast.inputFromWebElement
+    element->HTMLInputElement.focus
+
     if selectInput {
-      element->HtmlElement.select
+      element->HTMLInputElement.select
     }
   })
+}
 
 let parseClipboard = text =>
   text
@@ -77,9 +82,14 @@ let makeChange = (~cell: Cell.t, ~row, ~col, ~value): Change.t => {cell, row, co
 
 module Editor = {
   let resizeToFit = element => {
-    let style = element->HtmlElement.style
-    style->HtmlElement.setProperty("height", "0px")
-    style->HtmlElement.setProperty("height", `${element->HtmlElement.scrollHeight->Int.toString}px`)
+    open WebAPI
+
+    let element = element->HtmlCast.textAreaFromLegacyDomElement
+    element.style->CSSStyleDeclaration.setProperty(~property="height", ~value="0px")
+    element.style->CSSStyleDeclaration.setProperty(
+      ~property="height",
+      ~value=`${element.scrollHeight->Int.toString}px`,
+    )
   }
 
   @react.component

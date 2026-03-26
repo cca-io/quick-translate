@@ -9,19 +9,19 @@ let fileNameWithoutExt = fileName => {
 }
 
 let download = (~download, ~blankTarget=true, url) => {
-  switch (HtmlElement.create("a"), HtmlElement.documentBody) {
-  | (Some(tempLink), Some(documentBody)) =>
-    tempLink->HtmlElement.setAttribute("style", "display: none")
-    tempLink->HtmlElement.setAttribute("href", url)
-    tempLink->HtmlElement.setAttribute("download", download)
-    blankTarget ? tempLink->HtmlElement.setAttribute("target", "_blank") : ()
+  open WebAPI
+  let tempLink = document->Document.createElement("a")
+  let documentBody = document.body
 
-    documentBody->HtmlElement.appendChild(tempLink)
-    tempLink->HtmlElement.click
-    documentBody->HtmlElement.removeChild(tempLink)
+  tempLink->Element.setAttribute(~qualifiedName="style", ~value="display: none")
+  tempLink->Element.setAttribute(~qualifiedName="href", ~value=url)
+  tempLink->Element.setAttribute(~qualifiedName="download", ~value=download)
 
-  | _ => ()
-  }
+  blankTarget ? tempLink->Element.setAttribute(~qualifiedName="target", ~value="_blank") : ()
+
+  documentBody->HTMLElement.appendChild(tempLink)->ignore
+  tempLink->HtmlCast.fromWebElement->HTMLElement.click
+  documentBody->HTMLElement.removeChild(tempLink)->ignore
 }
 
 let timestampFilename = filename => {

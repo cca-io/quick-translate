@@ -24,8 +24,7 @@
   ],
   "suffix": ".res.mjs",
   "compiler-flags": [
-    "-open",
-    "WebAPI.Global"
+    "-open WebAPI.Global"
   ],
   "dependencies": [
     "@rescript/react",

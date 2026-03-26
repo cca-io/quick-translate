@@ -210,13 +210,13 @@ let make = () => {
   let onSelectNextEmptyCellByIndex = (data, colIndex) => {
     let rowIndex = data->Source.getFirstEmptyCell(colIndex)
 
+    open WebAPI
     document
-    ->WebDocument.getElementById(
-      `data-grid-input-${rowIndex->Int.toString}-${colIndex->Int.toString}`,
-    )
-    ->Option.forEach(element => {
-      element->HtmlElement.focus
-      element->HtmlElement.select
+    ->Document.getElementById(`data-grid-input-${rowIndex->Int.toString}-${colIndex->Int.toString}`)
+    ->Null.forEach(element => {
+      let element = element->HtmlCast.inputFromWebElement
+      element->HTMLInputElement.focus
+      element->HTMLInputElement.select
     })
   }
 

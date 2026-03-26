@@ -36,7 +36,9 @@ module Prompt = {
       )
 
     React.useEffect(() => {
-      inputRef.current->Nullable.forEach(input => input->HtmlElement.focus)
+      inputRef.current->Nullable.forEach(input =>
+        input->HtmlCast.inputFromLegacyDomElement->WebAPI.HTMLInputElement.focus
+      )
 
       None
     }, [])
