@@ -50,8 +50,8 @@ let inputId = (row, col) => `data-grid-input-${row->Int.toString}-${col->Int.toS
 let cellId = (row, col) => `data-grid-cell-${row->Int.toString}-${col->Int.toString}`
 
 let focusCell = (~row, ~col, ~selectInput) =>
-  Document.document
-  ->Document.getElementById(selectInput ? inputId(row, col) : cellId(row, col))
+  document
+  ->WebDocument.getElementById(selectInput ? inputId(row, col) : cellId(row, col))
   ->Option.forEach(element => {
     element->HtmlElement.focus
     if selectInput {

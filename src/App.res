@@ -210,8 +210,10 @@ let make = () => {
   let onSelectNextEmptyCellByIndex = (data, colIndex) => {
     let rowIndex = data->Source.getFirstEmptyCell(colIndex)
 
-    Document.document
-    ->Document.getElementById(`data-grid-input-${rowIndex->Int.toString}-${colIndex->Int.toString}`)
+    document
+    ->WebDocument.getElementById(
+      `data-grid-input-${rowIndex->Int.toString}-${colIndex->Int.toString}`,
+    )
     ->Option.forEach(element => {
       element->HtmlElement.focus
       element->HtmlElement.select

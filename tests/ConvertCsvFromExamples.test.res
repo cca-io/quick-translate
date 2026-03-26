@@ -40,9 +40,9 @@ let assertColumnRoundTrip = (data, col, expected) =>
 
 let roundTripPropertiesColumn = async (data, (col, path)) => {
   let url = Convert.Properties.fromData(data, col)
-  let response = await Fetch.fetch(url)
-  let text = await Fetch.text(response)
-  Fetch.revokeObjectURL(url)
+  let response = await fetch(url)
+  let text = await WebAPI.Response.text(response)
+  WebAPI.URL.revokeObjectURL(url)
   let actual = Convert.Properties.toArray(text)
 
   NodeAssert.deepStrictEqual(actual->normalizeMessages, readMessages(path)->normalizeMessages)

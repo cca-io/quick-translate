@@ -61,13 +61,13 @@ let useKeyPress = (~omiTextfields, targetKey: string, callback: unit => unit) =>
   }, (callback, keyPressed))
 
   React.useEffect(() => {
-    Window.addKeyboardEventListener("keydown", downHandler)
-    Window.addKeyboardEventListener("keyup", upHandler)
+    addEventListener(Keydown, downHandler)
+    addEventListener(Keyup, upHandler)
 
     Some(
       () => {
-        Window.addKeyboardEventListener("keydown", downHandler)
-        Window.addKeyboardEventListener("keyup", upHandler)
+        removeEventListener(Keydown, downHandler)
+        removeEventListener(Keyup, upHandler)
       },
     )
   }, [])
@@ -111,20 +111,14 @@ let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit
   }, (callback, keysPressed))
 
   React.useEffect(() => {
-    keys->Array.forEach(key =>
-      Window.addKeyboardEventListener("keydown", evt => downHandler(key, evt))
-    )
-    keys->Array.forEach(key => Window.addKeyboardEventListener("keyup", evt => upHandler(key, evt)))
+    keys->Array.forEach(key => addEventListener(Keydown, evt => downHandler(key, evt)))
+    keys->Array.forEach(key => addEventListener(Keyup, evt => upHandler(key, evt)))
 
     Some(
       () => {
-        keys->Array.forEach(key =>
-          Window.removeKeyboardEventListener("keydown", evt => downHandler(key, evt))
-        )
+        keys->Array.forEach(key => removeEventListener(Keydown, evt => downHandler(key, evt)))
 
-        keys->Array.forEach(key =>
-          Window.removeKeyboardEventListener("keyup", evt => upHandler(key, evt))
-        )
+        keys->Array.forEach(key => removeEventListener(Keyup, evt => upHandler(key, evt)))
       },
     )
   }, [])

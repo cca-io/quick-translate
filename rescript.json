@@ -23,8 +23,13 @@
     }
   ],
   "suffix": ".res.mjs",
+  "compiler-flags": [
+    "-open",
+    "WebAPI.Global"
+  ],
   "dependencies": [
-    "@rescript/react"
+    "@rescript/react",
+    "@rescript/webapi"
   ],
   "warnings": {
     "error": "+101"

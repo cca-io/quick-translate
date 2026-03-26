@@ -1,25 +1,26 @@
-open Dom.Storage2
+module Storage = Dom.Storage2
 
 let subscribe = callback => {
-  Window.addEventListener("storage", callback)
-  () => Window.removeEventListener("storage", callback)
+  let handler = _evt => callback()
+  addEventListener(Custom("storage"), handler)
+  () => removeEventListener(Custom("storage"), handler)
 }
 
 let setLocalStorageItem = (key, value) => {
   Console.info("Saved")
   let stringifiedValue = JSON.stringify(value)
-  localStorage->setItem(key, stringifiedValue)
+  Storage.localStorage->Storage.setItem(key, stringifiedValue)
 }
 
 let useLocalStorage = (~key, ~initialValue) => {
-  let getSnapshot = () => localStorage->getItem(key)
+  let getSnapshot = () => Storage.localStorage->Storage.getItem(key)
   let store = React.useSyncExternalStore(~subscribe, ~getSnapshot)
 
   let setState = React.useCallback((nextState: Nullable.t<JSON.t>) => {
     try {
       switch nextState {
       | Value(nextState) => setLocalStorageItem(key, nextState)
-      | Null | Undefined => localStorage->removeItem(key)
+      | Null | Undefined => Storage.localStorage->Storage.removeItem(key)
       }
     } catch {
     | JsExn(error) => Console.error(error)
@@ -27,7 +28,7 @@ let useLocalStorage = (~key, ~initialValue) => {
   }, (key, store))
 
   React.useEffect(() => {
-    switch localStorage->getItem(key) {
+    switch Storage.localStorage->Storage.getItem(key) {
     | None => setLocalStorageItem(key, initialValue)
     | Some(_) => ()
     }

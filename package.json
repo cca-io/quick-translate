@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@rescript/react": "^0.14.2",
+    "@rescript/webapi": "^0.1.0-experimental-21475fa",
     "jszip": "^3.10.1",
     "papaparse": "^5.5.3",
     "react": "^19.2.4",
