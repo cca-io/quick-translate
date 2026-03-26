@@ -73,6 +73,25 @@ NodeTest.describe("Convert.CSV.fromData", () => {
   })
 })
 
+NodeTest.describe("Source.getOrphanedTargetIds", () => {
+  NodeTest.test("returns target ids that are not present in the current source", () => {
+    let data = Source.make(
+      [Message.make("hello", "Hello"), Message.make("world", "World")],
+      "example_en.json",
+    )
+
+    let orphanedIds =
+      data->Source.getOrphanedTargetIds([
+        Message.make("hello", "Hallo"),
+        Message.make("extra", "Zusatz"),
+        Message.make("world", "Welt"),
+        Message.make("old.key", "Alt"),
+      ])
+
+    NodeAssert.deepStrictEqual(orphanedIds, ["extra", "old.key"])
+  })
+})
+
 NodeTest.describe("Convert column formats", () => {
   NodeTest.test("round-trips JSON export for every example column", () => {
     let data = exampleData()

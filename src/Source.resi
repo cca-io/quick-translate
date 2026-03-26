@@ -4,6 +4,8 @@ let make: (array<Message.t>, string) => t
 
 let add: (t, array<Message.t>, string) => t
 
+let getOrphanedTargetIds: (t, array<Message.t>) => array<string>
+
 let mergeTarget: (t, array<Message.t>, string) => t
 
 let replaceTarget: (t, array<Message.t>, string) => t

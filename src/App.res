@@ -24,16 +24,29 @@ let make = () => {
   Hooks.useMultiKeyPress(["Control", "z"], () => dispatch(Undo))
   Hooks.useMultiKeyPress(["Control", "Shift", "Z"], () => dispatch(Redo))
 
+  let warnAboutOrphanedTranslations = (fileName, orphanedIds) =>
+    if orphanedIds->Array.length > 0 {
+      dispatch(SetDialog(WarningOrphanedTranslations(fileName, orphanedIds)))
+    }
+
   let importTarget = (target, fileName) => {
     let column = fileName->FileUtils.fileNameWithoutExt
+    let orphanedIds = data->Source.getOrphanedTargetIds(target)
 
     if data->Source.hasColumn(column) {
-      let onMerge = () => dispatch(SetData(data->Source.mergeTarget(target, fileName)))
-      let onReplace = () => dispatch(SetData(data->Source.replaceTarget(target, fileName)))
+      let onMerge = () => {
+        dispatch(SetData(data->Source.mergeTarget(target, fileName)))
+        warnAboutOrphanedTranslations(fileName, orphanedIds)
+      }
+      let onReplace = () => {
+        dispatch(SetData(data->Source.replaceTarget(target, fileName)))
+        warnAboutOrphanedTranslations(fileName, orphanedIds)
+      }
 
       dispatch(SetDialog(DuplicateTargetImport(column, onMerge, onReplace)))
     } else {
       dispatch(SetData(data->Source.add(target, fileName)))
+      warnAboutOrphanedTranslations(fileName, orphanedIds)
     }
   }
 

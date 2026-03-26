@@ -47,6 +47,18 @@ let add = (data: t, target: array<Message.t>, fileName) => {
   [header]->Array.concat(body)
 }
 
+let getOrphanedTargetIds = (data: t, target: array<Message.t>) => {
+  let sourceIds =
+    data
+    ->Array.slice(~start=1, ~end=data->Array.length)
+    ->Array.filterMap(row => row[0]->Option.map(cell => cell.value))
+    ->Belt.Set.String.fromArray
+
+  target
+  ->Array.map(message => message.Message.id)
+  ->Array.filter(id => !(sourceIds->Belt.Set.String.has(id)))
+}
+
 let getColIndex = (data: t, column) =>
   data[0]->Option.getOr([])->Array.findIndexOpt(col => col.value === column)
 

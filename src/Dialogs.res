@@ -99,6 +99,33 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       </div>
     </Dialog.Info>
 
+  | WarningOrphanedTranslations(fileName, orphanedIds) =>
+    <Dialog.Info open_=true title="Some translations were ignored" onClose>
+      <div>
+        {switch orphanedIds->Array.length {
+        | 1 =>
+          `The file "${fileName}" contains 1 translation whose id does not exist in the current source. It was not imported.`->s
+        | count =>
+          `The file "${fileName}" contains ${count->Int.toString} translations whose ids do not exist in the current source. They were not imported.`->s
+        }}
+      </div>
+      <div>
+        {"Ignored ids:"->s}
+        <ul>
+          {orphanedIds
+          ->Array.slice(~start=0, ~end=min(orphanedIds->Array.length, 10))
+          ->Array.map(id => <li key=id> {id->s} </li>)
+          ->React.array}
+        </ul>
+      </div>
+      {orphanedIds->Array.length > 10
+        ? <div>
+            {`${(orphanedIds->Array.length - 10)
+                ->Int.toString} more ids were omitted from the list.`->s}
+          </div>
+        : React.null}
+    </Dialog.Info>
+
   | Help =>
     <Dialog.Info open_=true title={"Help"} onClose>
       <h3> {"Keyboard shortcuts"->s} </h3>

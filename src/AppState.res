@@ -10,6 +10,7 @@ type dialog =
   | RemoveSource
   | Help
   | DuplicateTargetImport(string, unit => unit, unit => unit)
+  | WarningOrphanedTranslations(string, array<string>)
   | WarningTranslationIncomplete(int, unit => unit)
 
 type history = {
