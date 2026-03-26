@@ -1,6 +1,5 @@
-let toArrayHelper = (~regex, str) => {
+let toArrayHelper = (~pattern, str) => {
   let rows = []
-  let pattern = RegExp.fromString(regex, ~flags="gi")
 
   let rec loop = () => {
     switch pattern->RegExp.exec(str) {
@@ -48,7 +47,7 @@ module Json = {
 }
 
 module Properties = {
-  let regex = "(.+|\r?\n|\r|^)\=(.+|\r\n)"
+  let pattern = /(.+|\r?\n|\r|^)\=(.+|\r\n)/gi
 
   let fromData = (data, col) => {
     let propsData =
@@ -62,11 +61,11 @@ module Properties = {
     [encoded]->Blob.fromTypedArray->Blob.toUrl
   }
 
-  let toArray = str => toArrayHelper(~regex, str)
+  let toArray = str => toArrayHelper(~pattern, str)
 }
 
 module Strings = {
-  let regex = "\"([^\"]+)\"\\s*=\\s*\"([^\"]*)\";"
+  let pattern = /"([^"]+)"\s*=\s*"([^"]*)";/gi
 
   let fromData = (data, col) => {
     let propsData =
@@ -78,11 +77,11 @@ module Strings = {
     "data:text/plain;charset=utf-8," ++ encodeURIComponent(propsData)
   }
 
-  let toArray = str => toArrayHelper(~regex, str)
+  let toArray = str => toArrayHelper(~pattern, str)
 }
 
 module Xml = {
-  let regex = "<string name=\"(.+|\r?\n|\r|^)\">(.+|\r\n)<\/string>"
+  let pattern = /<string name="(.+|\r?\n|\r|^)">(.+|\r\n)<\/string>/gi
 
   let fromData = (data, col) => {
     let propsData =
@@ -96,5 +95,5 @@ module Xml = {
     "data:text/xml;charset=utf-8," ++ encodeURIComponent(propsData)
   }
 
-  let toArray = str => toArrayHelper(~regex, str)
+  let toArray = str => toArrayHelper(~pattern, str)
 }
