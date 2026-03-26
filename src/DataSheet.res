@@ -201,38 +201,78 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
   }
 
   let onInputKeyDown = (rowIndex, colIndex) =>
-    evt => {
-      evt->ReactEvent.Keyboard.preventDefault
-
+    evt =>
       switch evt->ReactEvent.Keyboard.key {
-      | "ArrowUp" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, -1)
-      | "ArrowDown" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, 1)
-      | "ArrowUp" => moveVertical(rowIndex, colIndex, -1)
-      | "ArrowDown" => moveVertical(rowIndex, colIndex, 1)
-      | "ArrowLeft" => moveHorizontal(rowIndex, colIndex, -1)
-      | "ArrowRight" => moveHorizontal(rowIndex, colIndex, 1)
-      | "Enter" => jumpToUntranslated(rowIndex, colIndex, 1)
-      | "Tab" => moveTab(rowIndex, colIndex, evt->ReactEvent.Keyboard.shiftKey)
+      | "ArrowUp" if evt->ReactEvent.Keyboard.altKey =>
+        evt->ReactEvent.Keyboard.preventDefault
+        jumpToUntranslated(rowIndex, colIndex, -1)
+
+      | "ArrowDown" if evt->ReactEvent.Keyboard.altKey =>
+        evt->ReactEvent.Keyboard.preventDefault
+        jumpToUntranslated(rowIndex, colIndex, 1)
+
+      | "ArrowUp" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveVertical(rowIndex, colIndex, -1)
+
+      | "ArrowDown" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveVertical(rowIndex, colIndex, 1)
+
+      | "ArrowLeft" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveHorizontal(rowIndex, colIndex, -1)
+
+      | "ArrowRight" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveHorizontal(rowIndex, colIndex, 1)
+
+      | "Enter" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        jumpToUntranslated(rowIndex, colIndex, 1)
+
+      | "Tab" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveTab(rowIndex, colIndex, evt->ReactEvent.Keyboard.shiftKey)
       | _ => ()
       }
-    }
 
   let onReadOnlyKeyDown = (rowIndex, colIndex) =>
-    evt => {
-      evt->ReactEvent.Keyboard.preventDefault
-
+    evt =>
       switch evt->ReactEvent.Keyboard.key {
-      | "ArrowUp" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, -1)
-      | "ArrowDown" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, 1)
-      | "ArrowUp" => moveVertical(rowIndex, colIndex, -1)
-      | "ArrowDown" => moveVertical(rowIndex, colIndex, 1)
-      | "ArrowLeft" => moveHorizontal(rowIndex, colIndex, -1)
-      | "ArrowRight" => moveHorizontal(rowIndex, colIndex, 1)
-      | "Enter" => jumpToUntranslated(rowIndex, colIndex, 1)
-      | "Tab" => moveTab(rowIndex, colIndex, evt->ReactEvent.Keyboard.shiftKey)
+      | "ArrowUp" if evt->ReactEvent.Keyboard.altKey =>
+        evt->ReactEvent.Keyboard.preventDefault
+        jumpToUntranslated(rowIndex, colIndex, -1)
+
+      | "ArrowDown" if evt->ReactEvent.Keyboard.altKey =>
+        evt->ReactEvent.Keyboard.preventDefault
+        jumpToUntranslated(rowIndex, colIndex, 1)
+
+      | "ArrowUp" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveVertical(rowIndex, colIndex, -1)
+
+      | "ArrowDown" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveVertical(rowIndex, colIndex, 1)
+
+      | "ArrowLeft" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveHorizontal(rowIndex, colIndex, -1)
+
+      | "ArrowRight" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveHorizontal(rowIndex, colIndex, 1)
+
+      | "Enter" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        jumpToUntranslated(rowIndex, colIndex, 1)
+
+      | "Tab" =>
+        evt->ReactEvent.Keyboard.preventDefault
+        moveTab(rowIndex, colIndex, evt->ReactEvent.Keyboard.shiftKey)
       | _ => ()
       }
-    }
 
   let onInputChange = (rowIndex, colIndex, cell) =>
     evt =>
