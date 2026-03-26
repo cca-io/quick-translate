@@ -242,14 +242,14 @@ body {
 }
 
 .data-grid .cell {
-  height: 17px;
+  min-height: 17px;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   cursor: cell;
   background-color: unset;
-  vertical-align: bottom;
+  vertical-align: top;
   border: 1px solid #ddd;
   padding: 0;
   white-space: normal;
@@ -279,24 +279,29 @@ body {
 
 .data-grid .cell > .text {
   padding: 2px 5px;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font: inherit;
 }
 
-.data-grid .cell > input {
+.data-grid .cell > textarea {
   outline: none !important;
   border: 0;
   box-shadow: none;
   width: calc(100% - 10px);
   min-height: 17px;
+  overflow: hidden;
   background: none;
   display: block;
   padding: 2px 5px;
   margin: 0;
   font: inherit;
+  line-height: inherit;
   color: inherit;
   cursor: text;
+  resize: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 thead > tr:first-child > th {

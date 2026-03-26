@@ -202,26 +202,21 @@ let make = () => {
     handleFiles(files, sourceOrTarget)
   }
 
-  let onSelectNextEmptyCellByIndex = (data, cellIndex) => {
-    let rowIndex = data->Source.getFirstEmptyCell(cellIndex)
-
-    Document.document
-    ->Document.getElementById(DataSheet.inputId(rowIndex, cellIndex))
-    ->Option.forEach(input => {
-      let _ = setTimeout(() => input->HtmlElement.focus, 0)
-    })
-  }
-
   let onCellsChanged = React.useCallback(changes => {
     let changedData = data->Source.update(changes)
     dispatch(SetData(changedData))
-
-    switch changes[0] {
-    | Some({col, value}) if value != "" =>
-      let _ = setTimeout(() => onSelectNextEmptyCellByIndex(changedData, col), 0)
-    | _ => ()
-    }
   }, [data])
+
+  let onSelectNextEmptyCellByIndex = (data, colIndex) => {
+    let rowIndex = data->Source.getFirstEmptyCell(colIndex)
+
+    Document.document
+    ->Document.getElementById(`data-grid-input-${rowIndex->Int.toString}-${colIndex->Int.toString}`)
+    ->Option.forEach(element => {
+      element->HtmlElement.focus
+      element->HtmlElement.select
+    })
+  }
 
   let onExport = React.useCallback((col, fileType, numberOfUntranslatedSegments) => {
     let export = () => {

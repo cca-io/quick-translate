@@ -40,7 +40,7 @@ let update = (grid, {Change.row: _row as rowIndex, col, value}) => {
   let row = grid->Array.getUnsafe(rowIndex)
   let cell = row->Array.getUnsafe(col)
 
-  let newCell = {...cell, Cell.value: value->String.trim}
+  let newCell = {...cell, Cell.value}
   row->Array.setUnsafe(col, newCell)
 
   grid->Array.setUnsafe(rowIndex, row)
@@ -74,6 +74,36 @@ let cellClassName = (cell: Cell.t) =>
   ->Cn.addIf(!cell.readOnly && (cell.value === "" || cell.value === ReactUtils.nbsp), "blank")
 
 let makeChange = (~cell: Cell.t, ~row, ~col, ~value): Change.t => {cell, row, col, value}
+
+module Editor = {
+  let resizeToFit = element => {
+    let style = element->HtmlElement.style
+    style->HtmlElement.setProperty("height", "0px")
+    style->HtmlElement.setProperty("height", `${element->HtmlElement.scrollHeight->Int.toString}px`)
+  }
+
+  @react.component
+  let make = (~cell: Cell.t, ~rowIndex, ~colIndex, ~onChange, ~onKeyDown, ~onPaste) => {
+    let ref: ReactDOM.Ref.currentDomRef = React.useRef(null)
+    let cellValue = cell.value
+
+    React.useLayoutEffect(() => {
+      ref.current->Nullable.forEach(resizeToFit)
+      None
+    }, [cellValue])
+
+    <textarea
+      ref={ref->ReactDOM.Ref.domRef}
+      id={inputId(rowIndex, colIndex)}
+      className="data-editor"
+      rows=1
+      value={cellValue}
+      onChange
+      onKeyDown
+      onPaste
+    />
+  }
+}
 
 @react.component
 let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) => {
@@ -299,10 +329,10 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
           >
             {cell.readOnly
               ? <div className="text"> {value->ReactUtils.s} </div>
-              : <input
-                  id={inputId(rowIndex, colIndex)}
-                  className="data-editor"
-                  value
+              : <Editor
+                  cell
+                  rowIndex
+                  colIndex
                   onChange={onInputChange(rowIndex, colIndex, cell)}
                   onKeyDown={onInputKeyDown(rowIndex, colIndex)}
                   onPaste={onInputPaste(rowIndex, colIndex)}
