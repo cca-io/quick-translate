@@ -51,6 +51,11 @@ let make = () => {
   }
 
   let handleFiles = (files, sourceOrTarget: FileUtils.file) => {
+    let expectedJsonLayout = switch state.mode {
+    | Json(layout) => Some(layout)
+    | _ => None
+    }
+
     if files->Array.length === 1 {
       let file = files[0]
       let fileType = file->Option.flatMap(File.getFileType)
@@ -59,21 +64,21 @@ let make = () => {
       | (Some(file), Some(Json)) =>
         let readFile = async () => {
           let result = await File.read(file)
+          let json = result->File.resultToParsedJson
+          let expectedTargetJsonLayout = sourceOrTarget === Target ? expectedJsonLayout : None
+          let decodedTarget = Message.fromJsonWithLayout(~layout=?expectedTargetJsonLayout, json)
 
-          let data =
-            result
-            ->File.resultToJson
-            ->Option.mapOr(data, result =>
-              switch sourceOrTarget {
-              | Source =>
-                dispatch(SetMode(Json))
+          let data = decodedTarget->Option.mapOr(data, ((layout, result)) =>
+            switch sourceOrTarget {
+            | Source =>
+              dispatch(SetMode(Json(layout)))
 
-                result->Message.fromJson->Source.make(file.name)
-              | Target =>
-                importTarget(result->Message.fromJson, file.name)
-                data
-              }
-            )
+              result->Source.make(file.name)
+            | Target =>
+              importTarget(result, file.name)
+              data
+            }
+          )
 
           switch sourceOrTarget {
           | Source => dispatch(SetData(data))
@@ -172,9 +177,13 @@ let make = () => {
           | Some(file) =>
             if sourceOrTarget === Target && file->File.isJson {
               let result = await File.read(file)
+              let json = result->File.resultToParsedJson
               let _ =
                 results->Array.push(
-                  result->File.resultToJson->Option.flatMap(result => Some(file.name, result)),
+                  Message.fromJsonWithLayout(~layout=?expectedJsonLayout, json)->Option.map(((
+                    _layout,
+                    result,
+                  )) => (file.name, result)),
                 )
             }
           }
@@ -220,12 +229,12 @@ let make = () => {
     })
   }
 
-  let onExport = React.useCallback((col, fileType, numberOfUntranslatedSegments) => {
+  let onExport = React.useCallback((col, fileType, numberOfUntranslatedSegments, ~jsonLayout) => {
     let export = () => {
       let download = col ++ fileType->File.FileType.toExtension
 
       switch fileType {
-      | Json => data->Convert.Json.fromData(col)->FileUtils.download(~download)
+      | Json => data->Convert.Json.fromData(col, jsonLayout)->FileUtils.download(~download)
       | Properties => data->Convert.Properties.fromData(col)->FileUtils.download(~download)
       | Strings => data->Convert.Strings.fromData(col)->FileUtils.download(~download)
       | Xml => data->Convert.Xml.fromData(col)->FileUtils.download(~download)
@@ -244,12 +253,19 @@ let make = () => {
 
   let onExportAll = React.useCallback(_evt => {
     let zip = JsZip.make()
+    let jsonLayout = switch state.mode {
+    | Json(layout) => layout
+    | _ => Message.ArrayLayout
+    }
 
     data[0]
     ->Option.getOr([])
     ->Array.forEachWithIndex((cell, i) =>
       if i > 0 {
-        zip->JsZip.file(cell.value ++ ".json", data->Convert.Json.fromDataAsBlob(cell.value))
+        zip->JsZip.file(
+          cell.value ++ ".json",
+          data->Convert.Json.fromDataAsBlob(cell.value, jsonLayout),
+        )
       }
     )
 
@@ -259,7 +275,7 @@ let make = () => {
     }
 
     let _ = performDownload()
-  }, [data])
+  }, (data, state.mode))
 
   // let onExportOdf = React.useCallback1(async _evt => {
   //   let zip = JsZip.make()

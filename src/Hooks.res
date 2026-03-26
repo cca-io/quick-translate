@@ -11,6 +11,35 @@ let useDragOver = () => {
   (dragging, onDragOver)
 }
 
+let useClickOutside = (ref: ReactDOM.Ref.currentDomRef, ~enabled=true, callback: unit => unit) => {
+  React.useEffect(() => {
+    if enabled {
+      open WebAPI
+
+      let handler = (evt: EventAPI.event) =>
+        switch (ref.current, evt.target->Null.toOption) {
+        | (Value(element), Some(target)) =>
+          if (
+            !(
+              element
+              ->HtmlCast.nodeFromLegacyDomElement
+              ->Node.contains(target->HtmlCast.nodeFromEventTarget)
+            )
+          ) {
+            callback()
+          }
+        | _ => ()
+        }
+
+      addEventListener(Pointerdown, handler)
+
+      Some(() => removeEventListener(Pointerdown, handler))
+    } else {
+      None
+    }
+  }, (enabled, callback, ref))
+}
+
 let useDrag = () => {
   let (dragging, setDragging) = React.useState(() => false)
 

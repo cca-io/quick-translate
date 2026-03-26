@@ -9,27 +9,82 @@ let getColType = (index, canToggleDescription) =>
   }
 
 module ExportButtonRow = {
+  module JsonExportDropdown = {
+    let label = layout =>
+      switch layout {
+      | Message.ArrayLayout => "Export JSON array (id/defaultMessage)"
+      | Message.KeyValueLayout => "Export JSON object (key-value)"
+      }
+
+    @react.component
+    let make = (~value, ~numberOfUntranslatedSegments, ~onExport) => {
+      let (isOpen, setIsOpen) = React.useState(() => false)
+      let ref: ReactDOM.Ref.currentDomRef = React.useRef(null)
+
+      Hooks.useClickOutside(ref, ~enabled=isOpen, () => setIsOpen(_ => false))
+
+      <div ref={ref->ReactDOM.Ref.domRef} className="icon-dropdown">
+        <button
+          type_="button"
+          className="icon-dropdown-summary"
+          title="Export JSON file"
+          onClick={_evt => setIsOpen(isOpen => !isOpen)}
+        >
+          <Icons.Json size=40 />
+        </button>
+        {isOpen
+          ? <div className="icon-dropdown-menu">
+              {[Message.ArrayLayout, Message.KeyValueLayout]
+              ->Array.map(layout =>
+                <button
+                  key={label(layout)}
+                  type_="button"
+                  className="icon-dropdown-item"
+                  onClick={_evt => {
+                    setIsOpen(_ => false)
+                    onExport(
+                      value,
+                      File.FileType.Json,
+                      numberOfUntranslatedSegments,
+                      ~jsonLayout=layout,
+                    )
+                  }}
+                >
+                  {label(layout)->ReactUtils.s}
+                </button>
+              )
+              ->React.array}
+            </div>
+          : React.null}
+      </div>
+    }
+  }
+
   @react.component
   let make = (~value, ~numberOfUntranslatedSegments, ~onExport) =>
     <div className="export-button-row">
-      <IconButton
-        title="Export JSON file"
-        onClick={_evt => onExport(value, File.FileType.Json, numberOfUntranslatedSegments)}
-        icon=#json
-      />
+      <JsonExportDropdown value onExport numberOfUntranslatedSegments />
       <IconButton
         title="Export Properties file"
-        onClick={_evt => onExport(value, Properties, numberOfUntranslatedSegments)}
+        onClick={_evt =>
+          onExport(
+            value,
+            Properties,
+            numberOfUntranslatedSegments,
+            ~jsonLayout=Message.ArrayLayout,
+          )}
         icon=#properties
       />
       <IconButton
         title="Export Strings file"
-        onClick={_evt => onExport(value, Strings, numberOfUntranslatedSegments)}
+        onClick={_evt =>
+          onExport(value, Strings, numberOfUntranslatedSegments, ~jsonLayout=Message.ArrayLayout)}
         icon=#strings
       />
       <IconButton
         title="Export Android XML resources file"
-        onClick={_evt => onExport(value, Xml, numberOfUntranslatedSegments)}
+        onClick={_evt =>
+          onExport(value, Xml, numberOfUntranslatedSegments, ~jsonLayout=Message.ArrayLayout)}
         icon=#xml
       />
     </div>

@@ -86,5 +86,4 @@ let read = (~encoding=#"UTF-8", file: t) =>
     fileReader->Reader.setOnError(_ => reject(Reader.FileReadError))
   })
 
-let resultToJson = (result: FileResult.t) =>
-  result->FileResult.toString->JSON.parseOrThrow->JSON.Decode.array
+let resultToParsedJson = (result: FileResult.t) => result->FileResult.toString->JSON.parseOrThrow

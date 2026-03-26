@@ -126,11 +126,8 @@ let replaceTarget = (data: t, target: array<Message.t>, fileName) => {
   }
 }
 
-let addMultiple = (data: t, targets: array<(string, array<JSON.t>)>) => {
-  targets->Array.reduce(data, (newData, (fileName, target)) =>
-    newData->add(target->Message.fromJson, fileName)
-  )
-}
+let addMultiple = (data: t, targets: array<(string, array<Message.t>)>) =>
+  targets->Array.reduce(data, (newData, (fileName, target)) => newData->add(target, fileName))
 
 let fromCsv = rows => {
   let header = rows[0]->Option.mapOr([], hd => hd->Array.map(value => Cell.makeRO(value)))

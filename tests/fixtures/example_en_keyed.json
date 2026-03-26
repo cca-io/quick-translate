@@ -1,0 +1,13 @@
+{
+  "Support.appVersion": "App version",
+  "Support.browserInformation": "Browser Information",
+  "Support.build": "Build: {build}",
+  "Support.emailText": "Our support email can be reached at: {supportEmailLink}",
+  "Support.hotline.title": "Support-Hotline",
+  "Support.hotlineText": "Our support hotline can be reached at: {supportTelLink}",
+  "Support.permissions": "Permissions",
+  "Support.roles": "Roles",
+  "Support.title": "Support",
+  "Support.userGroups": "AD Groups",
+  "Support.version": "Version: {version}"
+}

@@ -1,5 +1,5 @@
 type mode =
-  | Json
+  | Json(Message.jsonLayout)
   | Csv({commentIndex: option<int>, delimiter: string})
   | Other
 
@@ -83,14 +83,56 @@ let reducer = (state, action) =>
   }
 
 let makeInitialState = (localStorage: JSON.t) => {
-  data: switch localStorage {
+  let defaultMode = Json(Message.ArrayLayout)
+  let data = switch localStorage {
   | Array(a) => a->Obj.magic
+  | Object(dict) =>
+    switch Dict.get(dict, "data") {
+    | Some(Array(a)) => a->Obj.magic
+    | _ => Source.empty()
+    }
   | _ => Source.empty()
-  },
-  history: {past: [], future: []},
-  dialog: Closed,
-  mode: Json,
-  useDescription: false,
+  }
+
+  let mode = switch localStorage {
+  | Object(dict) =>
+    switch Dict.get(dict, "mode") {
+    | Some(String("json-array")) => Json(Message.ArrayLayout)
+    | Some(String("json-key-value")) => Json(Message.KeyValueLayout)
+    | Some(Object(modeDict)) =>
+      switch Dict.get(modeDict, "tag") {
+      | Some(String("json-array")) => Json(Message.ArrayLayout)
+      | Some(String("json-key-value")) => Json(Message.KeyValueLayout)
+      | Some(String("other")) => Other
+      | Some(String("csv")) =>
+        let delimiter =
+          modeDict->Dict.get("delimiter")->Option.flatMap(JSON.Decode.string)->Option.getOr(";")
+        let commentIndex = switch modeDict->Dict.get("commentIndex") {
+        | Some(Number(f)) => Some(f->Int.fromFloat)
+        | Some(Null) | None => None
+        | _ => None
+        }
+        Csv({commentIndex, delimiter})
+      | _ => defaultMode
+      }
+    | _ => defaultMode
+    }
+  | _ => defaultMode
+  }
+
+  let useDescription = switch localStorage {
+  | Object(dict) =>
+    dict->Dict.get("useDescription")->Option.flatMap(JSON.Decode.bool)->Option.getOr(false)
+  | _ => false
+  }
+
+  {
+    data,
+    history: {past: [], future: []},
+    dialog: Closed,
+    mode,
+    useDescription,
+  }
 }
 
 @inline
@@ -105,10 +147,38 @@ let useAppState = () => {
   let (state, dispatch) = React.useReducerWithMapState(reducer, localStorage, makeInitialState)
 
   React.useEffect(() => {
-    state.data->Obj.magic->setLocalStorage
+    let mode = switch state.mode {
+    | Json(Message.ArrayLayout) => JSON.Encode.string("json-array")
+    | Json(Message.KeyValueLayout) => JSON.Encode.string("json-key-value")
+    | Csv({commentIndex, delimiter}) =>
+      JSON.Encode.object(
+        Dict.fromArray([
+          ("tag", JSON.Encode.string("csv")),
+          (
+            "commentIndex",
+            switch commentIndex {
+            | Some(index) => JSON.Encode.int(index)
+            | None => JSON.Null
+            },
+          ),
+          ("delimiter", JSON.Encode.string(delimiter)),
+        ]),
+      )
+    | Other => JSON.Encode.string("other")
+    }
+
+    Value(
+      JSON.Encode.object(
+        Dict.fromArray([
+          ("data", state.data->Obj.magic),
+          ("mode", mode),
+          ("useDescription", JSON.Encode.bool(state.useDescription)),
+        ]),
+      ),
+    )->setLocalStorage
 
     None
-  }, [state.data])
+  }, (state.data, state.mode, state.useDescription))
 
   (state, dispatch)
 }

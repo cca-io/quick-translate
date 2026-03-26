@@ -145,6 +145,61 @@ body {
   flex: 1;
 }
 
+.icon-dropdown {
+  position: relative;
+  margin: 4px;
+}
+
+.icon-dropdown-summary {
+  width: 50px;
+  padding: 4px 0 1px 0;
+  list-style: none;
+  background: none;
+  border: 1px solid rgb(143, 143, 143);
+  border-radius: 5px;
+  box-shadow: 4px 4px 7px silver;
+}
+
+.icon-dropdown-summary::-webkit-details-marker {
+  display: none;
+}
+
+.icon-dropdown-summary:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.icon-dropdown[open] .icon-dropdown-summary {
+  background-color: #f8f8f8;
+}
+
+.icon-dropdown-menu {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  background: white;
+  border: 1px solid rgb(143, 143, 143);
+  border-radius: 6px;
+  box-shadow: 4px 4px 12px silver;
+  overflow: hidden;
+}
+
+.icon-dropdown-item {
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  background: white;
+  border: 0;
+  font: inherit;
+}
+
+.icon-dropdown-item:hover {
+  cursor: pointer;
+  background-color: #f3f7fb;
+}
+
 .action-button-row {
   padding-left: 8px;
   display: flex;

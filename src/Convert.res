@@ -33,14 +33,16 @@ module CSV = {
 }
 
 module Json = {
-  let fromData = (data, col) => {
-    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringify(~space=2)
+  let fromData = (data, col, layout) => {
+    let colData =
+      data->Source.getColData(col)->Message.toJsonWithLayout(~layout)->JSON.stringify(~space=2)
 
     "data:text/json;charset=utf-8," ++ encodeURIComponent(colData)
   }
 
-  let fromDataAsBlob = (data, col) => {
-    let colData = data->Source.getColData(col)->Message.toJson->JSON.stringify(~space=2)
+  let fromDataAsBlob = (data, col, layout) => {
+    let colData =
+      data->Source.getColData(col)->Message.toJsonWithLayout(~layout)->JSON.stringify(~space=2)
 
     Blob.fromString([colData])
   }

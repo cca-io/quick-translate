@@ -10,7 +10,7 @@ let mergeTarget: (t, array<Message.t>, string) => t
 
 let replaceTarget: (t, array<Message.t>, string) => t
 
-let addMultiple: (t, array<(string, array<JSON.t>)>) => t
+let addMultiple: (t, array<(string, array<Message.t>)>) => t
 
 let fromCsv: array<array<string>> => t
 

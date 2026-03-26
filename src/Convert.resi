@@ -3,8 +3,8 @@ module CSV: {
 }
 
 module Json: {
-  let fromData: (array<array<DataSheet.Cell.t>>, string) => string
-  let fromDataAsBlob: (Source.t, string) => Blob.t
+  let fromData: (array<array<DataSheet.Cell.t>>, string, Message.jsonLayout) => string
+  let fromDataAsBlob: (Source.t, string, Message.jsonLayout) => Blob.t
 }
 
 module Properties: {
