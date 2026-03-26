@@ -13,22 +13,22 @@ module ExportButtonRow = {
   let make = (~value, ~numberOfUntranslatedSegments, ~onExport) =>
     <div className="export-button-row">
       <IconButton
-        title={"Export JSON file"}
+        title="Export JSON file"
         onClick={_evt => onExport(value, File.FileType.Json, numberOfUntranslatedSegments)}
         icon=#json
       />
       <IconButton
-        title={"Export Properties file"}
+        title="Export Properties file"
         onClick={_evt => onExport(value, Properties, numberOfUntranslatedSegments)}
         icon=#properties
       />
       <IconButton
-        title={"Export Strings file"}
+        title="Export Strings file"
         onClick={_evt => onExport(value, Strings, numberOfUntranslatedSegments)}
         icon=#strings
       />
       <IconButton
-        title={"Export Android XML resources file"}
+        title="Export Android XML resources file"
         onClick={_evt => onExport(value, Xml, numberOfUntranslatedSegments)}
         icon=#xml
       />
@@ -48,7 +48,7 @@ module ActionButtonRow = {
       <TranslationProgressButton
         numberOfSourceSegments numberOfTranslatedSegments onClick=onTranslationProgressButtonClick
       />
-      <IconButton title={"Remove column"} onClick={_evt => onRemoveTarget(value)} icon=#trash />
+      <IconButton title="Remove column" onClick={_evt => onRemoveTarget(value)} icon=#trash />
     </div>
   }
 }
@@ -61,7 +61,7 @@ module IdButtonRow = {
       : ("Show descriptions", #showDescription)
 
     <div className="id-button-row">
-      <IconButton onClick=onRemoveSource title={"Remove source"} icon=#trash />
+      <IconButton onClick=onRemoveSource title="Remove source" icon=#trash />
       {canToggleDescription ? <IconButton onClick=onToggleDescriptions title icon /> : React.null}
     </div>
   }

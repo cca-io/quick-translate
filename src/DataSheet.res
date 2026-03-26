@@ -202,66 +202,34 @@ let make = (~data, ~valueRenderer, ~onCellsChanged, ~hiddenCols: array<int>=[]) 
 
   let onInputKeyDown = (rowIndex, colIndex) =>
     evt => {
-      open ReactEvent.Keyboard
+      evt->ReactEvent.Keyboard.preventDefault
 
-      switch evt->key {
-      | "ArrowUp" if evt->altKey =>
-        evt->preventDefault
-        jumpToUntranslated(rowIndex, colIndex, -1)
-      | "ArrowDown" if evt->altKey =>
-        evt->preventDefault
-        jumpToUntranslated(rowIndex, colIndex, 1)
-      | "ArrowUp" =>
-        evt->preventDefault
-        moveVertical(rowIndex, colIndex, -1)
-      | "ArrowDown" =>
-        evt->preventDefault
-        moveVertical(rowIndex, colIndex, 1)
-      | "ArrowLeft" =>
-        evt->preventDefault
-        moveHorizontal(rowIndex, colIndex, -1)
-      | "ArrowRight" =>
-        evt->preventDefault
-        moveHorizontal(rowIndex, colIndex, 1)
-      | "Enter" =>
-        evt->preventDefault
-        moveVertical(rowIndex, colIndex, 1)
-      | "Tab" =>
-        evt->preventDefault
-        moveTab(rowIndex, colIndex, evt->shiftKey)
+      switch evt->ReactEvent.Keyboard.key {
+      | "ArrowUp" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, -1)
+      | "ArrowDown" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, 1)
+      | "ArrowUp" => moveVertical(rowIndex, colIndex, -1)
+      | "ArrowDown" => moveVertical(rowIndex, colIndex, 1)
+      | "ArrowLeft" => moveHorizontal(rowIndex, colIndex, -1)
+      | "ArrowRight" => moveHorizontal(rowIndex, colIndex, 1)
+      | "Enter" => jumpToUntranslated(rowIndex, colIndex, 1)
+      | "Tab" => moveTab(rowIndex, colIndex, evt->ReactEvent.Keyboard.shiftKey)
       | _ => ()
       }
     }
 
   let onReadOnlyKeyDown = (rowIndex, colIndex) =>
     evt => {
-      open ReactEvent.Keyboard
+      evt->ReactEvent.Keyboard.preventDefault
 
-      switch evt->key {
-      | "ArrowUp" if evt->altKey =>
-        evt->preventDefault
-        jumpToUntranslated(rowIndex, colIndex, -1)
-      | "ArrowDown" if evt->altKey =>
-        evt->preventDefault
-        jumpToUntranslated(rowIndex, colIndex, 1)
-      | "ArrowUp" =>
-        evt->preventDefault
-        moveVertical(rowIndex, colIndex, -1)
-      | "ArrowDown" =>
-        evt->preventDefault
-        moveVertical(rowIndex, colIndex, 1)
-      | "ArrowLeft" =>
-        evt->preventDefault
-        moveHorizontal(rowIndex, colIndex, -1)
-      | "ArrowRight" =>
-        evt->preventDefault
-        moveHorizontal(rowIndex, colIndex, 1)
-      | "Enter" =>
-        evt->preventDefault
-        moveVertical(rowIndex, colIndex, 1)
-      | "Tab" =>
-        evt->preventDefault
-        moveTab(rowIndex, colIndex, evt->shiftKey)
+      switch evt->ReactEvent.Keyboard.key {
+      | "ArrowUp" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, -1)
+      | "ArrowDown" if evt->ReactEvent.Keyboard.altKey => jumpToUntranslated(rowIndex, colIndex, 1)
+      | "ArrowUp" => moveVertical(rowIndex, colIndex, -1)
+      | "ArrowDown" => moveVertical(rowIndex, colIndex, 1)
+      | "ArrowLeft" => moveHorizontal(rowIndex, colIndex, -1)
+      | "ArrowRight" => moveHorizontal(rowIndex, colIndex, 1)
+      | "Enter" => jumpToUntranslated(rowIndex, colIndex, 1)
+      | "Tab" => moveTab(rowIndex, colIndex, evt->ReactEvent.Keyboard.shiftKey)
       | _ => ()
       }
     }

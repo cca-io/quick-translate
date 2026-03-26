@@ -1,6 +1,6 @@
 open ReactUtils
 
-type shortcut = Simple | Ctrl | CtrlShift
+type shortcut = Simple | Ctrl | CtrlShift | Alt
 
 module Shortcut = {
   let add = (a, b) => <>
@@ -12,17 +12,29 @@ module Shortcut = {
   let kc = text => <kbd> {text->s} </kbd>
 
   @react.component
-  let make = (~title, ~type_=Simple, ~keycap) =>
+  let make = (~type_=Simple, ~keycap) =>
+    <div className="shortcut-combo">
+      {switch type_ {
+      | Simple => kc(keycap)
+      | Ctrl => kc("Ctrl") + kc(keycap)
+      | CtrlShift => kc("Ctrl") + kc("Shift") + kc(keycap)
+      | Alt => kc("Alt") + kc(keycap)
+      }}
+    </div>
+}
+
+module ShortcutRow = {
+  @react.component
+  let make = (~title, ~children) =>
     <div className="shortcut">
-      <div className="shortcut-keycaps">
-        {switch type_ {
-        | Simple => kc(keycap)
-        | Ctrl => kc("Ctrl") + kc(keycap)
-        | CtrlShift => kc("Ctrl") + kc("Shift") + kc(keycap)
-        }}
-      </div>
+      <div className="shortcut-keycaps"> {children} </div>
       <div> {title->s} </div>
     </div>
+}
+
+module ShortcutSeparator = {
+  @react.component
+  let make = () => <span className="shortcut-separator"> {","->s} </span>
 }
 
 module Footer = {
@@ -50,7 +62,7 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
   | CreateTarget =>
     <Dialog.Prompt
       open_=true
-      title={"Create new target"}
+      title="Create new target"
       label={"Enter file name for target"->s}
       onClose
       onSubmit={value => dispatch(SetData(data->Source.add([], value)))}
@@ -59,7 +71,7 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
   | RemoveTarget(column) =>
     <Dialog.Confirm
       open_=true
-      title={"Remove target"}
+      title="Remove target"
       label={`Delete column "${column}"?`->s}
       onClose
       onSubmit={_ => dispatch(SetData(data->Source.remove(column)))}
@@ -68,14 +80,14 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
   | RemoveSource =>
     <Dialog.Confirm
       open_=true
-      title={"Remove source"}
+      title="Remove source"
       label={`Delete all columns and reset app?`->s}
       onSubmit={_ => dispatch(SetData(Source.empty()))}
       onClose
     />
 
   | DuplicateTargetImport(column, onMerge, onReplace) =>
-    <Dialog.Info open_=true title={"Target already open"} onClose>
+    <Dialog.Info open_=true title="Target already open" onClose>
       <div>
         {`The target "${column}" is already open. Do you want to merge the imported translations into the existing column, or replace the existing column with the imported file?`->s}
       </div>
@@ -127,22 +139,42 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
     </Dialog.Info>
 
   | Help =>
-    <Dialog.Info open_=true title={"Help"} onClose>
+    <Dialog.Info open_=true title="Help" onClose>
       <h3> {"Keyboard shortcuts"->s} </h3>
       <h4> {"Main view"->s} </h4>
-      <Shortcut type_=Ctrl keycap={"Z"} title="Undo" />
-      <Shortcut type_=CtrlShift keycap={"Z"} title="Redo" />
-      <Shortcut type_=CtrlShift keycap={"D"} title="Toggle Description column" />
-      <Shortcut type_=CtrlShift keycap={"N"} title="Create a new target" />
-      <Shortcut type_=CtrlShift keycap={"R"} title="Remove source" />
-      <Shortcut type_=CtrlShift keycap={"?"} title="Help dialog" />
-      <Shortcut
-        keycap={"Alt + ↑"} title="Jump to previous untranslated field in current column"
-      />
-      <Shortcut keycap={"Alt + ↓"} title="Jump to next untranslated field in current column" />
+      <ShortcutRow title="Undo">
+        <Shortcut type_=Ctrl keycap="Z" />
+      </ShortcutRow>
+      <ShortcutRow title="Redo">
+        <Shortcut type_=CtrlShift keycap="Z" />
+      </ShortcutRow>
+      <ShortcutRow title="Toggle Description column">
+        <Shortcut type_=CtrlShift keycap="D" />
+      </ShortcutRow>
+      <ShortcutRow title="Create a new target">
+        <Shortcut type_=CtrlShift keycap="N" />
+      </ShortcutRow>
+      <ShortcutRow title="Remove source">
+        <Shortcut type_=CtrlShift keycap="R" />
+      </ShortcutRow>
+      <ShortcutRow title="Help dialog">
+        <Shortcut type_=CtrlShift keycap="?" />
+      </ShortcutRow>
+      <ShortcutRow title="Jump to previous untranslated field in current column">
+        <Shortcut type_=Alt keycap="↑" />
+      </ShortcutRow>
+      <ShortcutRow title="Jump to next untranslated field in current column">
+        <Shortcut keycap="Enter" />
+        <ShortcutSeparator />
+        <Shortcut type_=Alt keycap="↓" />
+      </ShortcutRow>
       <h4> {"Dialogs"->s} </h4>
-      <Shortcut keycap={"Esc"} title="Close dialog" />
-      <Shortcut keycap={"Enter"} title="Confirm dialog" />
+      <ShortcutRow title="Close dialog">
+        <Shortcut keycap="Esc" />
+      </ShortcutRow>
+      <ShortcutRow title="Confirm dialog">
+        <Shortcut keycap="Enter" />
+      </ShortcutRow>
       <Footer>
         <a
           target="_blank" href="https://github.com/cca-io/quick-translate" rel="noopener noreferrer"

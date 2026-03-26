@@ -345,13 +345,13 @@ let make = () => {
     </Content>
     <Sidebar sourceAvailable>
       <Sidebar.Top>
-        <IconButton title={"Add new language"} size=#large onClick={onCreateTarget} icon=#plus />
-        <IconButton title={"Export to CSV"} size=#large onClick={onExportCsv} icon=#csv />
-        <IconButton title={"Export all JSON files"} size=#large onClick={onExportAll} icon=#json />
-        // <IconButton title={"Save as ODF"} size=#Large onClick={onExportOdf} icon=#plus />
+        <IconButton title="Add new language" size=#large onClick={onCreateTarget} icon=#plus />
+        <IconButton title="Export to CSV" size=#large onClick={onExportCsv} icon=#csv />
+        <IconButton title="Export all JSON files" size=#large onClick={onExportAll} icon=#json />
+        // <IconButton title="Save as ODF" size=#Large onClick={onExportOdf} icon=#plus />
       </Sidebar.Top>
       <Sidebar.Bottom>
-        <IconButton title={"Help"} onClick={onOpenHelp} icon=#help />
+        <IconButton title="Help" onClick={onOpenHelp} icon=#help />
       </Sidebar.Bottom>
     </Sidebar>
     <Dialogs dialog=state.dialog data dispatch />

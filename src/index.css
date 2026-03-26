@@ -219,9 +219,29 @@ body {
   width: 180px;
 }
 
+.shortcut-combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shortcut-keycaps {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
 .cell.read-only {
   width: 250px;
   word-break: break-all;
+}
+
+.shortcut-keycaps > * + * {
+  margin-left: 8px;
+}
+
+.shortcut-separator {
+  margin-left: 2px;
 }
 
 .cell {
