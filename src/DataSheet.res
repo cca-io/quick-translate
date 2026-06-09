@@ -172,10 +172,17 @@ let activeElementId = () =>
   ->Option.map(element => element.id)
   ->Option.getOr("")
 
+let normalizeClipboardNewlines = text => text->String.replaceRegExp(/\r\n?/g, "\n")
+
+let containsClipboardNewline = text => text->String.includes("\n") || text->String.includes("\r")
+
+let containsClipboardTab = text => text->String.includes("\t")
+
+let shouldPasteAcrossGrid = text => !(text->containsClipboardNewline) && text->containsClipboardTab
+
 let parseClipboard = text =>
   text
-  ->String.replace("\r\n", "\n")
-  ->String.replace("\r", "\n")
+  ->normalizeClipboardNewlines
   ->String.split("\n")
   ->Array.filter(line => line != "")
   ->Array.map(line => line->String.split("\t"))
@@ -528,24 +535,33 @@ let make = (
   let onCellPaste = (rowIndex, colIndex, cell: Cell.t) =>
     evt =>
       if !cell.readOnly && !isEditorFocused(rowIndex, colIndex) {
-        let changes = switch evt->Clipboard.getText {
-        | Some(text) => pasteChanges(rowIndex, colIndex, text)
-        | None => []
-        }
-
-        if changes->Array.length > 0 {
+        switch evt->Clipboard.getText {
+        | Some(text) if text->containsClipboardNewline =>
           evt->ReactEvent.Clipboard.preventDefault
-          onCellsChanged(changes)
+          onCellsChanged([
+            makeChange(~cell, ~row=rowIndex, ~col=colIndex, ~value=text->normalizeClipboardNewlines),
+          ])
           scheduleCommit()
           focusEditorLater(~row=rowIndex, ~col=colIndex, ~cursorAtEnd=true)
+        | Some(text) =>
+          let changes = pasteChanges(rowIndex, colIndex, text)
+
+          if changes->Array.length > 0 {
+            evt->ReactEvent.Clipboard.preventDefault
+            onCellsChanged(changes)
+            scheduleCommit()
+            focusEditorLater(~row=rowIndex, ~col=colIndex, ~cursorAtEnd=true)
+          }
+        | None => ()
         }
       }
 
   let onInputPaste = (rowIndex, colIndex) =>
     evt => {
       let changes = switch evt->Clipboard.getText {
-      | Some(text) => pasteChanges(rowIndex, colIndex, text)
+      | Some(text) if text->shouldPasteAcrossGrid => pasteChanges(rowIndex, colIndex, text)
       | None => []
+      | Some(_) => []
       }
 
       if changes->Array.length > 0 {
