@@ -118,6 +118,130 @@ NodeTest.describe("Source.getOrphanedTargetIds", () => {
   })
 })
 
+NodeTest.describe("Source translation status", () => {
+  NodeTest.test("counts non-empty validation errors separately from untranslated cells", () => {
+    let data =
+      Source.make(
+        [Message.make("hello", "Hello {name}"), Message.make("empty", "Translate me")],
+        "en.json",
+      )->Source.add([Message.make("hello", "Hallo"), Message.make("empty", "")], "de.json")
+
+    NodeAssert.equal(Source.getNumberOfUntranslatedSegments(data, 3), 1)
+    NodeAssert.equal(Source.getNumberOfInvalidSegments(data, 3), 1)
+    NodeAssert.equal(Source.getFirstInvalidCell(data, 3), 1)
+  })
+
+  NodeTest.test("does not validate blank untranslated targets", () => {
+    let data =
+      Source.make([Message.make("hello", "Hello {name}")], "en.json")
+      ->Source.add([Message.make("hello", "")], "de.json")
+
+    NodeAssert.deepStrictEqual(Source.getIntlValidation(data, 1, 3), None)
+    NodeAssert.equal(Source.getNumberOfUntranslatedSegments(data, 3), 1)
+    NodeAssert.equal(Source.getNumberOfInvalidSegments(data, 3), 0)
+  })
+
+  NodeTest.test("validates CSV targets against the source column without descriptions", () => {
+    let data = Source.fromCsv([
+      ["id", "en", "de", "fr"],
+      ["hello", "Hello {name}", "Hallo", "Bonjour"],
+    ])
+
+    NodeAssert.deepStrictEqual(
+      Source.getIntlValidation(data, 1, 2)->Option.map(v => v.IntlValidation.missing),
+      Some(["name"]),
+    )
+    NodeAssert.deepStrictEqual(
+      Source.getIntlValidation(data, 1, 3)->Option.map(v => v.IntlValidation.missing),
+      Some(["name"]),
+    )
+    NodeAssert.equal(Source.getNumberOfInvalidSegments(data, 2), 1)
+    NodeAssert.equal(Source.getNumberOfInvalidSegments(data, 3), 1)
+  })
+
+  NodeTest.test("finds the next validation error after a row and wraps around", () => {
+    let data =
+      Source.make(
+        [
+          Message.make("first", "Hello {name}"),
+          Message.make("second", "You have {count} messages"),
+        ],
+        "en.json",
+      )->Source.add([Message.make("first", "Hallo"), Message.make("second", "Du hast Nachrichten")], "de.json")
+
+    NodeAssert.equal(Source.getNextInvalidCell(data, 3, 0), 1)
+    NodeAssert.equal(Source.getNextInvalidCell(data, 3, 1), 2)
+    NodeAssert.equal(Source.getNextInvalidCell(data, 3, 2), 1)
+  })
+
+  NodeTest.test("finds the next issue in row order across empty and invalid cells", () => {
+    let data =
+      Source.make(
+        [
+          Message.make("first", "Hello"),
+          Message.make("second", "Hello {name}"),
+          Message.make("third", "Translate me"),
+        ],
+        "en.json",
+      )->Source.add(
+        [
+          Message.make("first", "Hallo"),
+          Message.make("second", "Hallo"),
+          Message.make("third", ""),
+        ],
+        "de.json",
+      )
+
+    NodeAssert.equal(Source.getNextIssueCell(data, 3, 1), 2)
+    NodeAssert.equal(Source.getNextIssueCell(data, 3, 2), 3)
+    NodeAssert.equal(Source.getNextIssueCell(data, 3, 3), 2)
+  })
+})
+
+NodeTest.describe("IntlValidation.validate", () => {
+  NodeTest.test("flags missing ICU placeholders in translations", () => {
+    let validation = IntlValidation.validate(
+      ~source="Hello {name}, you have {count, plural, one {# message} other {# messages}}",
+      ~target="Hallo {name}",
+    )
+
+    NodeAssert.deepStrictEqual(
+      validation->Option.map(v => v.IntlValidation.missing)->Option.getOr([]),
+      ["count"],
+    )
+  })
+
+  NodeTest.test("accepts nested ICU values when they are preserved", () => {
+    let validation = IntlValidation.validate(
+      ~source="{gender, select, male {{count, plural, one {He has # file} other {He has # files}}} female {{count, plural, one {She has # file} other {She has # files}}} other {{count, plural, one {They have # file} other {They have # files}}}}",
+      ~target="{gender, select, male {{count, plural, one {Er hat # Datei} other {Er hat # Dateien}}} female {{count, plural, one {Sie hat # Datei} other {Sie hat # Dateien}}} other {{count, plural, one {Sie haben # Datei} other {Sie haben # Dateien}}}}",
+    )
+
+    NodeAssert.equal(validation, None)
+  })
+
+  NodeTest.test("flags missing rich-text tags in translations", () => {
+    let validation = IntlValidation.validate(
+      ~source="Click <link>here</link> to continue",
+      ~target="Klicke hier, um fortzufahren",
+    )
+
+    NodeAssert.deepStrictEqual(
+      validation->Option.map(v => v.IntlValidation.missing)->Option.getOr([]),
+      ["link"],
+    )
+  })
+
+  NodeTest.test("reports parser errors for invalid ICU translations", () => {
+    let validation = IntlValidation.validate(~source="Hello {name}", ~target="Hallo {name")
+
+    NodeAssert.equal(
+      validation->Option.flatMap(v => v.IntlValidation.parseError)->Option.isSome,
+      true,
+    )
+  })
+})
+
 NodeTest.describe("Convert column formats", () => {
   NodeTest.test("autodetects the source JSON layout", () => {
     let arrayMessages = readJsonMessages("tests/fixtures/example_en.json")

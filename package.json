@@ -23,6 +23,7 @@
     "re:format": "rescript format"
   },
   "dependencies": {
+    "@formatjs/icu-messageformat-parser": "^3.5.3",
     "@rescript/react": "^0.14.2",
     "@rescript/webapi": "^0.1.0-experimental-21475fa",
     "jszip": "^3.10.1",

@@ -206,7 +206,7 @@ module Editor = {
   }
 
   @react.component
-  let make = (~cell: Cell.t, ~rowIndex, ~colIndex, ~onChange, ~onKeyDown, ~onBlur) => {
+  let make = (~cell: Cell.t, ~rowIndex, ~colIndex, ~onChange, ~onKeyDown, ~onPaste, ~onBlur) => {
     let ref: ReactDOM.Ref.currentDomRef = React.useRef(null)
     let cellValue = cell.value
 
@@ -224,6 +224,7 @@ module Editor = {
       value={cellValue}
       onChange
       onKeyDown
+      onPaste
       onBlur
     />
   }
@@ -540,6 +541,26 @@ let make = (
         }
       }
 
+  let onInputPaste = (rowIndex, colIndex) =>
+    evt => {
+      let changes = switch evt->Clipboard.getText {
+      | Some(text) => pasteChanges(rowIndex, colIndex, text)
+      | None => []
+      }
+
+      if changes->Array.length > 0 {
+        evt->ReactEvent.Clipboard.preventDefault
+        onCellsChanged(changes)
+        scheduleCommit()
+      }
+    }
+
+  let onCellCopy = (rowIndex, colIndex, cell: Cell.t) =>
+    evt =>
+      if !isEditorFocused(rowIndex, colIndex) && evt->Clipboard.setText(cell.value) {
+        evt->ReactEvent.Clipboard.preventDefault
+      }
+
   let onCellMouseDown = (rowIndex, colIndex, cell: Cell.t) =>
     evt =>
       if !cell.readOnly && !isEditorFocused(rowIndex, colIndex) {
@@ -550,7 +571,7 @@ let make = (
 
   let onCellDoubleClick = (rowIndex, colIndex, cell: Cell.t) =>
     evt =>
-      if !cell.readOnly {
+      if !cell.readOnly && !isEditorFocused(rowIndex, colIndex) {
         evt->ReactEvent.Mouse.preventDefault
         commitNow()
         focusEditor(~row=rowIndex, ~col=colIndex, ~cursorAtEnd=true)
@@ -581,6 +602,7 @@ let make = (
             title=?title
             tabIndex=0
             onKeyDown={onCellKeyDown(rowIndex, colIndex, cell)}
+            onCopy={onCellCopy(rowIndex, colIndex, cell)}
             onPaste={onCellPaste(rowIndex, colIndex, cell)}
             onMouseDown={onCellMouseDown(rowIndex, colIndex, cell)}
             onDoubleClick={onCellDoubleClick(rowIndex, colIndex, cell)}
@@ -593,6 +615,7 @@ let make = (
                   colIndex
                   onChange={onInputChange(rowIndex, colIndex, cell)}
                   onKeyDown={onInputKeyDown(rowIndex, colIndex)}
+                  onPaste={onInputPaste(rowIndex, colIndex)}
                   onBlur={_evt => commitNow()}
                 />}
           </td>

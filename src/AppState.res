@@ -40,6 +40,9 @@ type action =
 
 let emptyHistory = () => {past: [], future: []}
 
+let maxPersistedHistoryEntries = 20
+let maxPersistedLocalStorageChars = 2000000
+
 let reducer = (state, action) =>
   switch action {
   | SetMode(mode) => {...state, mode}
@@ -118,6 +121,25 @@ let reducer = (state, action) =>
   | SetDialog(dialog) => {...state, dialog}
   }
 
+let decodeHistoryArray = (json: option<JSON.t>) =>
+  switch json {
+  | Some(Array(a)) => a->Obj.magic
+  | _ => []
+  }
+
+let decodeHistory = (localStorage: JSON.t) =>
+  switch localStorage {
+  | Object(dict) =>
+    switch dict->Dict.get("history") {
+    | Some(Object(historyDict)) => {
+        past: historyDict->Dict.get("past")->decodeHistoryArray,
+        future: historyDict->Dict.get("future")->decodeHistoryArray,
+      }
+    | _ => emptyHistory()
+    }
+  | _ => emptyHistory()
+  }
+
 let makeInitialState = (localStorage: JSON.t) => {
   let defaultMode = Json(Message.ArrayLayout)
   let data = switch localStorage {
@@ -164,7 +186,7 @@ let makeInitialState = (localStorage: JSON.t) => {
 
   {
     data,
-    history: emptyHistory(),
+    history: localStorage->decodeHistory,
     pendingHistoryEntry: None,
     dialog: Closed,
     mode,
@@ -196,14 +218,89 @@ let encodeMode = mode =>
   | Other => JSON.Encode.string("other")
   }
 
-let toLocalStorage = state =>
+let encodeHistory = history =>
   JSON.Encode.object(
     Dict.fromArray([
-      ("data", state.data->Obj.magic),
-      ("mode", state.mode->encodeMode),
-      ("useDescription", JSON.Encode.bool(state.useDescription)),
+      ("past", history.past->Obj.magic),
+      ("future", history.future->Obj.magic),
     ]),
   )
+
+let encodeLocalStorage = (state, history) => {
+  let entries = [
+    ("data", state.data->Obj.magic),
+    ("mode", state.mode->encodeMode),
+    ("useDescription", JSON.Encode.bool(state.useDescription)),
+  ]
+
+  JSON.Encode.object(
+    Dict.fromArray(
+      switch history {
+      | Some(history) => entries->Array.concat([("history", history->encodeHistory)])
+      | None => entries
+      },
+    ),
+  )
+}
+
+let trimHistoryEntryCount = history => {
+  let pastLength = history.past->Array.length
+  let futureLength = history.future->Array.length
+
+  {
+    past: history.past->Array.slice(
+      ~start=pastLength > maxPersistedHistoryEntries
+        ? pastLength - maxPersistedHistoryEntries
+        : 0,
+      ~end=pastLength,
+    ),
+    future: history.future->Array.slice(
+      ~start=0,
+      ~end=futureLength > maxPersistedHistoryEntries
+        ? maxPersistedHistoryEntries
+        : futureLength,
+    ),
+  }
+}
+
+let isHistoryEmpty = history =>
+  history.past->Array.length === 0 && history.future->Array.length === 0
+
+let dropOldestHistoryEntry = history =>
+  if history.past->Array.length > 0 {
+    {
+      ...history,
+      past: history.past->Array.slice(~start=1, ~end=history.past->Array.length),
+    }
+  } else if history.future->Array.length > 0 {
+    {
+      ...history,
+      future: history.future->Array.slice(~start=0, ~end=history.future->Array.length - 1),
+    }
+  } else {
+    history
+  }
+
+let boundedPersistedHistory = state =>
+  switch state.pendingHistoryEntry {
+  | Some(_) => None
+  | None =>
+    let rec fit = history => {
+      let payload = encodeLocalStorage(state, Some(history))
+
+      if isHistoryEmpty(history) {
+        None
+      } else if payload->JSON.stringify->String.length <= maxPersistedLocalStorageChars {
+        Some(history)
+      } else {
+        fit(history->dropOldestHistoryEntry)
+      }
+    }
+
+    fit(state.history->trimHistoryEntryCount)
+  }
+
+let toLocalStorage = state => state->encodeLocalStorage(state->boundedPersistedHistory)
 
 let useAppState = () => {
   let (localStorage, setLocalStorage) = Storage.useLocalStorage(
@@ -217,7 +314,7 @@ let useAppState = () => {
     Value(state->toLocalStorage)->setLocalStorage
 
     None
-  }, (state.data, state.mode, state.useDescription))
+  }, (state.data, state.history, state.pendingHistoryEntry, state.mode, state.useDescription))
 
   (state, dispatch)
 }
