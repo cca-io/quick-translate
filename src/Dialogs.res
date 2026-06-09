@@ -1,6 +1,6 @@
 open ReactUtils
 
-type shortcut = Simple | Ctrl | CtrlShift | Alt
+type shortcut = Simple | Primary | PrimaryShift | CtrlShift | Alt
 
 module Shortcut = {
   let add = (a, b) => <>
@@ -16,7 +16,8 @@ module Shortcut = {
     <div className="shortcut-combo">
       {switch type_ {
       | Simple => kc(keycap)
-      | Ctrl => kc("Ctrl") + kc(keycap)
+      | Primary => kc(Platform.primaryModifierLabel()) + kc(keycap)
+      | PrimaryShift => kc(Platform.primaryModifierLabel()) + kc("Shift") + kc(keycap)
       | CtrlShift => kc("Ctrl") + kc("Shift") + kc(keycap)
       | Alt => kc("Alt") + kc(keycap)
       }}
@@ -82,7 +83,7 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       open_=true
       title="Remove source"
       label={`Delete all columns and reset app?`->s}
-      onSubmit={_ => dispatch(SetData(Source.empty()))}
+      onSubmit={_ => dispatch(ReplaceData(Source.empty()))}
       onClose
     />
 
@@ -143,10 +144,10 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       <h3> {"Keyboard shortcuts"->s} </h3>
       <h4> {"Main view"->s} </h4>
       <ShortcutRow title="Undo">
-        <Shortcut type_=Ctrl keycap="Z" />
+        <Shortcut type_=Primary keycap="Z" />
       </ShortcutRow>
       <ShortcutRow title="Redo">
-        <Shortcut type_=CtrlShift keycap="Z" />
+        <Shortcut type_=PrimaryShift keycap="Z" />
       </ShortcutRow>
       <ShortcutRow title="Toggle Description column">
         <Shortcut type_=CtrlShift keycap="D" />
@@ -160,13 +161,18 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       <ShortcutRow title="Help dialog">
         <Shortcut type_=CtrlShift keycap="?" />
       </ShortcutRow>
-      <ShortcutRow title="Jump to previous untranslated field in current column">
+      <ShortcutRow title="Jump to previous issue in current column">
         <Shortcut type_=Alt keycap="↑" />
       </ShortcutRow>
-      <ShortcutRow title="Jump to next untranslated field in current column">
+      <ShortcutRow title="Jump to next issue in current column">
         <Shortcut keycap="Enter" />
         <ShortcutSeparator />
         <Shortcut type_=Alt keycap="↓" />
+      </ShortcutRow>
+      <ShortcutRow title="Move between cells">
+        <Shortcut keycap="↑/↓/←/→" />
+        <ShortcutSeparator />
+        <Shortcut keycap="Tab" />
       </ShortcutRow>
       <h4> {"Dialogs"->s} </h4>
       <ShortcutRow title="Close dialog">
@@ -192,10 +198,24 @@ let make = (~dialog: AppState.dialog, ~data, ~dispatch) => {
       </Footer>
     </Dialog.Info>
 
-  | WarningTranslationIncomplete(numberOfUntranslatedSegments, ignoreWarningAndExport) => {
-      let title = switch numberOfUntranslatedSegments {
-      | 1 => `There is 1 untranslated segment`
-      | _ => `There are ${numberOfUntranslatedSegments->Int.toString} untranslated segments`
+  | WarningTranslationIncomplete(numberOfUntranslatedSegments, numberOfInvalidSegments, ignoreWarningAndExport) => {
+      let untranslatedTitle = switch numberOfUntranslatedSegments {
+      | 0 => None
+      | 1 => Some("1 untranslated segment")
+      | count => Some(`${count->Int.toString} untranslated segments`)
+      }
+      let invalidTitle = switch numberOfInvalidSegments {
+      | 0 => None
+      | 1 => Some("1 validation error")
+      | count => Some(`${count->Int.toString} validation errors`)
+      }
+      let title = switch (untranslatedTitle, invalidTitle) {
+      | (Some(untranslated), Some(invalid)) => `There are ${untranslated} and ${invalid}`
+      | (Some(untranslated), None) =>
+        numberOfUntranslatedSegments === 1 ? `There is ${untranslated}` : `There are ${untranslated}`
+      | (None, Some(invalid)) =>
+        numberOfInvalidSegments === 1 ? `There is ${invalid}` : `There are ${invalid}`
+      | (None, None) => "Translation complete"
       }
       <Dialog.Confirm
         open_=true

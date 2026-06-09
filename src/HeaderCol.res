@@ -17,7 +17,7 @@ module ExportButtonRow = {
       }
 
     @react.component
-    let make = (~value, ~numberOfUntranslatedSegments, ~onExport) => {
+    let make = (~value, ~numberOfUntranslatedSegments, ~numberOfInvalidSegments, ~onExport) => {
       let (isOpen, setIsOpen) = React.useState(() => false)
       let ref: ReactDOM.Ref.currentDomRef = React.useRef(null)
 
@@ -46,6 +46,7 @@ module ExportButtonRow = {
                       value,
                       File.FileType.Json,
                       numberOfUntranslatedSegments,
+                      numberOfInvalidSegments,
                       ~jsonLayout=layout,
                     )
                   }}
@@ -61,9 +62,9 @@ module ExportButtonRow = {
   }
 
   @react.component
-  let make = (~value, ~numberOfUntranslatedSegments, ~onExport) =>
+  let make = (~value, ~numberOfUntranslatedSegments, ~numberOfInvalidSegments, ~onExport) =>
     <div className="export-button-row">
-      <JsonExportDropdown value onExport numberOfUntranslatedSegments />
+      <JsonExportDropdown value onExport numberOfUntranslatedSegments numberOfInvalidSegments />
       <IconButton
         title="Export Properties file"
         onClick={_evt =>
@@ -71,6 +72,7 @@ module ExportButtonRow = {
             value,
             Properties,
             numberOfUntranslatedSegments,
+            numberOfInvalidSegments,
             ~jsonLayout=Message.ArrayLayout,
           )}
         icon=#properties
@@ -78,13 +80,25 @@ module ExportButtonRow = {
       <IconButton
         title="Export Strings file"
         onClick={_evt =>
-          onExport(value, Strings, numberOfUntranslatedSegments, ~jsonLayout=Message.ArrayLayout)}
+          onExport(
+            value,
+            Strings,
+            numberOfUntranslatedSegments,
+            numberOfInvalidSegments,
+            ~jsonLayout=Message.ArrayLayout,
+          )}
         icon=#strings
       />
       <IconButton
         title="Export Android XML resources file"
         onClick={_evt =>
-          onExport(value, Xml, numberOfUntranslatedSegments, ~jsonLayout=Message.ArrayLayout)}
+          onExport(
+            value,
+            Xml,
+            numberOfUntranslatedSegments,
+            numberOfInvalidSegments,
+            ~jsonLayout=Message.ArrayLayout,
+          )}
         icon=#xml
       />
     </div>
@@ -98,10 +112,14 @@ module ActionButtonRow = {
     ~onTranslationProgressButtonClick,
     ~numberOfSourceSegments,
     ~numberOfTranslatedSegments,
+    ~numberOfInvalidSegments,
   ) => {
     <div className="action-button-row">
       <TranslationProgressButton
-        numberOfSourceSegments numberOfTranslatedSegments onClick=onTranslationProgressButtonClick
+        numberOfSourceSegments
+        numberOfTranslatedSegments
+        numberOfInvalidSegments
+        onClick=onTranslationProgressButtonClick
       />
       <IconButton title="Remove column" onClick={_evt => onRemoveTarget(value)} icon=#trash />
     </div>
@@ -133,6 +151,7 @@ let make = (
   ~dispatch,
   ~numberOfSourceSegments,
   ~numberOfUntranslatedSegments,
+  ~numberOfInvalidSegments,
 ) => {
   let colType = getColType(index, canToggleDescription)
   let onToggleDescriptions = _evt => dispatch(AppState.ToggleUseDescription)
@@ -147,16 +166,18 @@ let make = (
       | Id =>
         <IdButtonRow useDescription canToggleDescription onRemoveSource onToggleDescriptions />
       | Description => React.null
-      | Source => <ExportButtonRow value onExport numberOfUntranslatedSegments />
+      | Source =>
+        <ExportButtonRow value onExport numberOfUntranslatedSegments numberOfInvalidSegments />
       | Target =>
         <>
-          <ExportButtonRow value onExport numberOfUntranslatedSegments />
+          <ExportButtonRow value onExport numberOfUntranslatedSegments numberOfInvalidSegments />
           <ActionButtonRow
             value
             onRemoveTarget
             onTranslationProgressButtonClick
             numberOfSourceSegments
             numberOfTranslatedSegments
+            numberOfInvalidSegments
           />
         </>
       }}

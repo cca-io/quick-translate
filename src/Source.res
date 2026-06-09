@@ -192,12 +192,110 @@ let getColData = (data: t, column: string) => {
 
 let isEmptyCell = (cell: Cell.t) => cell.value->String.trim->String.length === 0
 
+let getSourceColIndex = (data: t) =>
+  switch data[0] {
+  | Some(header) =>
+    switch header[1] {
+    | Some(cell) if cell.value->SourceUtils.isCommentColumn || cell.className === "description" => 2
+    | _ => 1
+    }
+  | None => 1
+  }
+
+let getIntlValidation = (data: t, rowIndex, colIndex) => {
+  let sourceColIndex = data->getSourceColIndex
+
+  switch (data[rowIndex], colIndex > sourceColIndex) {
+  | (Some(row), true) =>
+    switch (row[sourceColIndex], row[colIndex]) {
+    | (Some(source), Some(target)) if !(target->isEmptyCell) =>
+      IntlValidation.validate(~source=source.value, ~target=target.value)
+    | _ => None
+    }
+  | _ => None
+  }
+}
+
+let isInvalidTranslationCell = (row, sourceColIndex, colIndex) =>
+  switch (row[sourceColIndex], row[colIndex]) {
+  | (Some(source), Some(target)) if !(target->isEmptyCell) =>
+    IntlValidation.validate(~source=source.value, ~target=target.value)->Option.isSome
+  | _ => false
+  }
+
 let getNumberOfUntranslatedSegments = (data: t, colIndex) =>
   data
   ->Array.filter(col => col[colIndex]->Option.mapOr(false, isEmptyCell))
   ->Array.length
 
-let getFirstEmptyCell = (data: t, colIndex) =>
-  data
-  ->Array.filterMap(col => col[colIndex])
-  ->Array.findIndex(target => !target.readOnly && target->isEmptyCell)
+let getNumberOfInvalidSegments = (data: t, colIndex) => {
+  let sourceColIndex = data->getSourceColIndex
+
+  colIndex > sourceColIndex
+    ? data
+      ->Array.slice(~start=1, ~end=data->Array.length)
+      ->Array.filter(row => row->isInvalidTranslationCell(sourceColIndex, colIndex))
+      ->Array.length
+    : 0
+}
+
+let findNextBodyRow = (data, ~startRowIndex, ~predicate) => {
+  let bodyLength = data->Array.length - 1
+
+  if bodyLength <= 0 {
+    -1
+  } else {
+    let currentBodyIndex =
+      startRowIndex >= 1 && startRowIndex < data->Array.length ? startRowIndex - 1 : -1
+
+    let rec loop = offset =>
+      if offset > bodyLength {
+        -1
+      } else {
+        let wrappedBodyIndex = (currentBodyIndex + offset) % bodyLength
+        let rowIndex = 1 + wrappedBodyIndex
+
+        switch data[rowIndex] {
+        | Some(row) if predicate(row) => rowIndex
+        | _ => loop(offset + 1)
+        }
+      }
+
+    loop(1)
+  }
+}
+
+let getNextEmptyCell = (data: t, colIndex, startRowIndex) =>
+  data->findNextBodyRow(~startRowIndex, ~predicate=row =>
+    row[colIndex]->Option.mapOr(false, target => !target.readOnly && target->isEmptyCell)
+  )
+
+let getFirstEmptyCell = (data: t, colIndex) => data->getNextEmptyCell(colIndex, 0)
+
+let getNextInvalidCell = (data: t, colIndex, startRowIndex) => {
+  let sourceColIndex = data->getSourceColIndex
+
+  colIndex > sourceColIndex
+    ? data->findNextBodyRow(~startRowIndex, ~predicate=row =>
+        row->isInvalidTranslationCell(sourceColIndex, colIndex)
+      )
+    : -1
+}
+
+let getFirstInvalidCell = (data: t, colIndex) => data->getNextInvalidCell(colIndex, 0)
+
+let getNextIssueCell = (data: t, colIndex, startRowIndex) => {
+  let sourceColIndex = data->getSourceColIndex
+
+  data->findNextBodyRow(~startRowIndex, ~predicate=row =>
+    row[colIndex]->Option.mapOr(false, target =>
+      !target.readOnly &&
+        (
+          target->isEmptyCell ||
+          (colIndex > sourceColIndex && row->isInvalidTranslationCell(sourceColIndex, colIndex))
+        )
+    )
+  )
+}
+
+let getFirstIssueCell = (data: t, colIndex) => data->getNextIssueCell(colIndex, 0)

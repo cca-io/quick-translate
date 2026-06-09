@@ -102,53 +102,36 @@ let useKeyPress = (~omiTextfields, targetKey: string, callback: unit => unit) =>
   }, [])
 }
 
-type action =
-  | SetKey(string)
-  | RemoveKey(string)
-  | Reset
+let modifierKeys = ["Alt", "Control", "Meta", "Shift"]
 
-let reducer = (state, action) =>
-  switch action {
-  | SetKey(key) => state->Belt.Set.String.add(key)
-  | RemoveKey(key) => state->Belt.Set.String.remove(key)
-  | Reset => Belt.Set.String.empty
+let isModifierKey = key => modifierKeys->Array.includes(key)
+
+let isEventKeyPressed = (evt, key) =>
+  switch key {
+  | "Alt" => evt->KeyboardEvent.altKey
+  | "Control" => evt->KeyboardEvent.ctrlKey
+  | "Meta" => evt->KeyboardEvent.metaKey
+  | "Shift" => evt->KeyboardEvent.shiftKey
+  | key => evt->KeyboardEvent.key === key
   }
 
+let isShortcutTrigger = (keys, evt) =>
+  keys->Array.some(key => !isModifierKey(key) && evt->KeyboardEvent.key === key)
+
+let isShortcutPressed = (keys, evt) =>
+  isShortcutTrigger(keys, evt) && keys->Array.every(key => isEventKeyPressed(evt, key))
+
 let useMultiKeyPress = (~omiTextfields=true, keys: array<string>, callback: unit => unit) => {
-  let (keysPressed, dispatch) = React.useReducer(reducer, Belt.Set.String.empty)
-
-  let downHandler = React.useCallback((key, evt) => {
-    let eventKey = evt->KeyboardEvent.key
-    if !(evt->KeyboardEvent.repeat) && isTargetOk(~omiTextfields, evt) && eventKey === key {
-      dispatch(SetKey(key))
-    }
-  }, [keysPressed])
-
-  let upHandler = React.useCallback((key, evt) => {
-    let eventKey = evt->KeyboardEvent.key
-    if isTargetOk(~omiTextfields, evt) && eventKey === key {
-      dispatch(RemoveKey(key))
-    }
-  }, [keysPressed])
-
   React.useEffect(() => {
-    if keys->Belt.Set.String.fromArray->Belt.Set.String.eq(keysPressed) {
-      callback()
-      dispatch(Reset)
+    let downHandler = evt => {
+      if !(evt->KeyboardEvent.repeat) && isTargetOk(~omiTextfields, evt) && isShortcutPressed(keys, evt) {
+        evt->KeyboardEvent.preventDefault
+        callback()
+      }
     }
-    None
-  }, (callback, keysPressed))
 
-  React.useEffect(() => {
-    keys->Array.forEach(key => addEventListener(Keydown, evt => downHandler(key, evt)))
-    keys->Array.forEach(key => addEventListener(Keyup, evt => upHandler(key, evt)))
+    addEventListener(Keydown, downHandler)
 
-    Some(
-      () => {
-        keys->Array.forEach(key => removeEventListener(Keydown, evt => downHandler(key, evt)))
-
-        keys->Array.forEach(key => removeEventListener(Keyup, evt => upHandler(key, evt)))
-      },
-    )
-  }, [])
+    Some(() => removeEventListener(Keydown, downHandler))
+  }, (callback, keys, omiTextfields))
 }

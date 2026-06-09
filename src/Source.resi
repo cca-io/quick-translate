@@ -24,6 +24,20 @@ let empty: unit => t
 
 let getColData: (t, string) => array<Message.t>
 
+let getIntlValidation: (t, int, int) => option<IntlValidation.t>
+
 let getNumberOfUntranslatedSegments: (t, int) => int
 
+let getNumberOfInvalidSegments: (t, int) => int
+
+let getNextEmptyCell: (t, int, int) => int
+
 let getFirstEmptyCell: (t, int) => int
+
+let getNextInvalidCell: (t, int, int) => int
+
+let getFirstInvalidCell: (t, int) => int
+
+let getNextIssueCell: (t, int, int) => int
+
+let getFirstIssueCell: (t, int) => int

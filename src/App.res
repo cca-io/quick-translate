@@ -16,13 +16,15 @@ let make = () => {
   let numberOfSourceSegments =
     data->Array.map(col => showDescriptionCol ? col[3] : col[2])->Array.length
 
+  let primaryModifierKey = Platform.primaryModifierKey()
+
   Hooks.useMultiKeyPress(["Control", "Shift", "?"], () => dispatch(SetDialog(Help)))
   Hooks.useMultiKeyPress(["Control", "Shift", "N"], () => dispatch(SetDialog(CreateTarget)))
   Hooks.useMultiKeyPress(["Control", "Shift", "R"], () => dispatch(SetDialog(RemoveSource)))
   Hooks.useMultiKeyPress(["Control", "Shift", "D"], () => dispatch(ToggleUseDescription))
 
-  Hooks.useMultiKeyPress(["Control", "z"], () => dispatch(Undo))
-  Hooks.useMultiKeyPress(["Control", "Shift", "Z"], () => dispatch(Redo))
+  Hooks.useMultiKeyPress([primaryModifierKey, "z"], () => dispatch(Undo))
+  Hooks.useMultiKeyPress([primaryModifierKey, "Shift", "Z"], () => dispatch(Redo))
 
   let warnAboutOrphanedTranslations = (fileName, orphanedIds) =>
     if orphanedIds->Array.length > 0 {
@@ -68,21 +70,16 @@ let make = () => {
           let expectedTargetJsonLayout = sourceOrTarget === Target ? expectedJsonLayout : None
           let decodedTarget = Message.fromJsonWithLayout(~layout=?expectedTargetJsonLayout, json)
 
-          let data = decodedTarget->Option.mapOr(data, ((layout, result)) =>
+          switch decodedTarget {
+          | Some((layout, result)) =>
             switch sourceOrTarget {
             | Source =>
               dispatch(SetMode(Json(layout)))
-
-              result->Source.make(file.name)
+              dispatch(ReplaceData(result->Source.make(file.name)))
             | Target =>
               importTarget(result, file.name)
-              data
             }
-          )
-
-          switch sourceOrTarget {
-          | Source => dispatch(SetData(data))
-          | Target => ()
+          | None => ()
           }
         }
 
@@ -106,7 +103,7 @@ let make = () => {
             | None => parseResult
             }
 
-            dispatch(SetData(source->Source.fromCsv))
+            dispatch(ReplaceData(source->Source.fromCsv))
 
           | Error => ()
           }
@@ -121,7 +118,7 @@ let make = () => {
 
           dispatch(
             switch sourceOrTarget {
-            | Source => SetData(source->Source.make(file.name))
+            | Source => ReplaceData(source->Source.make(file.name))
             | Target =>
               importTarget(source, file.name)
               SetDialog(Closed)
@@ -138,7 +135,7 @@ let make = () => {
 
           dispatch(
             switch sourceOrTarget {
-            | Source => SetData(source->Source.make(file.name))
+            | Source => ReplaceData(source->Source.make(file.name))
             | Target =>
               importTarget(source, file.name)
               SetDialog(Closed)
@@ -155,7 +152,7 @@ let make = () => {
 
           dispatch(
             switch sourceOrTarget {
-            | Source => SetData(source->Source.make(file.name))
+            | Source => ReplaceData(source->Source.make(file.name))
             | Target =>
               importTarget(source, file.name)
               SetDialog(Closed)
@@ -213,23 +210,76 @@ let make = () => {
 
   let onCellsChanged = React.useCallback(changes => {
     let changedData = data->Source.update(changes)
-    dispatch(SetData(changedData))
+    dispatch(EditData(changedData))
   }, [data])
+  let onCellsCommitted = React.useCallback(() => dispatch(CommitData), [])
 
-  let onSelectNextEmptyCellByIndex = (data, colIndex) => {
-    let rowIndex = data->Source.getFirstEmptyCell(colIndex)
+  let getCellMeta = React.useCallback((rowIndex, colIndex, cell: DataSheet.Cell.t) =>
+    switch data->Source.getIntlValidation(rowIndex, colIndex) {
+    | Some(validation) =>
+      Some(
+        (
+          {
+            DataSheet.className: "intl-invalid",
+            title: Some(validation->IntlValidation.message),
+          }: DataSheet.cellMeta
+        ),
+      )
+    | None if !cell.readOnly && colIndex > 2 =>
+      Some(({DataSheet.className: "", title: None}: DataSheet.cellMeta))
+    | None => None
+    }
+  , [data])
 
-    open WebAPI
-    document
-    ->Document.getElementById(`data-grid-input-${rowIndex->Int.toString}-${colIndex->Int.toString}`)
-    ->Null.forEach(element => {
-      let element = element->HtmlCast.inputFromWebElement
-      element->HTMLInputElement.focus
-      element->HTMLInputElement.select
+  let activeGridRowIndex = colIndex => {
+    document.activeElement
+    ->Null.toOption
+    ->Option.flatMap(element => {
+      let parts = element.id->String.split("-")
+
+      switch (parts[0], parts[1], parts[2], parts[3], parts[4]) {
+      | (Some("data"), Some("grid"), Some("input"), Some(row), Some(col)) =>
+        switch (row->Int.fromString, col->Int.fromString) {
+        | (Some(row), Some(col)) if col === colIndex => Some(row)
+        | _ => None
+        }
+      | (Some("data"), Some("grid"), Some("cell"), Some(row), Some(col)) =>
+        switch (row->Int.fromString, col->Int.fromString) {
+        | (Some(row), Some(col)) if col === colIndex => Some(row)
+        | _ => None
+        }
+      | _ => None
+      }
     })
+    ->Option.getOr(0)
   }
 
-  let onExport = React.useCallback((col, fileType, numberOfUntranslatedSegments, ~jsonLayout) => {
+  let onSelectNextIssueCellByIndex = (data, colIndex) => {
+    dispatch(CommitData)
+
+    let startRowIndex = activeGridRowIndex(colIndex)
+    let rowIndex = data->Source.getNextIssueCell(colIndex, startRowIndex)
+
+    if rowIndex >= 0 {
+      open WebAPI
+      document
+      ->Document.getElementById(
+        `data-grid-cell-${rowIndex->Int.toString}-${colIndex->Int.toString}`,
+      )
+      ->Null.forEach(element => {
+        element->Element.scrollIntoViewWithOptions({block: Center, inline: Center})
+        element->HtmlCast.fromWebElement->HTMLElement.focus
+      })
+    }
+  }
+
+  let onExport = React.useCallback((
+    col,
+    fileType,
+    numberOfUntranslatedSegments,
+    numberOfInvalidSegments,
+    ~jsonLayout,
+  ) => {
     let export = () => {
       let download = col ++ fileType->File.FileType.toExtension
 
@@ -242,12 +292,16 @@ let make = () => {
       }
     }
 
-    let onExportIfTranslationUnfinished = numberOfUntranslatedSegments =>
-      dispatch(SetDialog(WarningTranslationIncomplete(numberOfUntranslatedSegments, export)))
+    let onExportIfTranslationUnfinished = (numberOfUntranslatedSegments, numberOfInvalidSegments) =>
+      dispatch(
+        SetDialog(
+          WarningTranslationIncomplete(numberOfUntranslatedSegments, numberOfInvalidSegments, export),
+        ),
+      )
 
-    switch numberOfUntranslatedSegments {
-    | 0 => export()
-    | _ => onExportIfTranslationUnfinished(numberOfUntranslatedSegments)
+    switch (numberOfUntranslatedSegments, numberOfInvalidSegments) {
+    | (0, 0) => export()
+    | _ => onExportIfTranslationUnfinished(numberOfUntranslatedSegments, numberOfInvalidSegments)
     }
   }, [data])
 
@@ -332,6 +386,7 @@ let make = () => {
             ->Option.getOr([])
             ->Array.mapWithIndex(({value}, i) => {
               let numberOfUntranslatedSegments = Source.getNumberOfUntranslatedSegments(data, i)
+              let numberOfInvalidSegments = Source.getNumberOfInvalidSegments(data, i)
 
               <HeaderCol
                 key={i->Int.toString}
@@ -340,10 +395,11 @@ let make = () => {
                 canToggleDescription
                 value
                 onExport
-                onTranslationProgressButtonClick={_evt => onSelectNextEmptyCellByIndex(data, i)}
+                onTranslationProgressButtonClick={_evt => onSelectNextIssueCellByIndex(data, i)}
                 dispatch
                 numberOfSourceSegments
                 numberOfUntranslatedSegments
+                numberOfInvalidSegments
               />
             })
             ->React.array}
@@ -353,6 +409,8 @@ let make = () => {
           <DataSheet
             data
             onCellsChanged
+            onCellsCommitted
+            getCellMeta
             hiddenCols={!showDescriptionCol ? [1] : []}
             valueRenderer={cell => cell.value}
           />

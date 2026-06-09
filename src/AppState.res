@@ -11,7 +11,7 @@ type dialog =
   | Help
   | DuplicateTargetImport(string, unit => unit, unit => unit)
   | WarningOrphanedTranslations(string, array<string>)
-  | WarningTranslationIncomplete(int, unit => unit)
+  | WarningTranslationIncomplete(int, int, unit => unit)
 
 type history = {
   past: array<Source.t>,
@@ -21,6 +21,7 @@ type history = {
 type state = {
   data: Source.t,
   history: history,
+  pendingHistoryEntry: option<Source.t>,
   dialog: dialog,
   mode: mode,
   useDescription: bool,
@@ -29,10 +30,15 @@ type state = {
 type action =
   | SetMode(mode)
   | SetData(Source.t)
+  | EditData(Source.t)
+  | CommitData
+  | ReplaceData(Source.t)
   | Undo
   | Redo
   | ToggleUseDescription
   | SetDialog(dialog)
+
+let emptyHistory = () => {past: [], future: []}
 
 let reducer = (state, action) =>
   switch action {
@@ -44,6 +50,34 @@ let reducer = (state, action) =>
         future: [],
       },
       data,
+      pendingHistoryEntry: None,
+      dialog: Closed,
+    }
+  | EditData(data) => {
+      ...state,
+      data,
+      pendingHistoryEntry: switch state.pendingHistoryEntry {
+      | Some(_) as pendingHistoryEntry => pendingHistoryEntry
+      | None => Some(state.data)
+      },
+    }
+  | CommitData =>
+    switch state.pendingHistoryEntry {
+    | Some(historyEntry) => {
+        ...state,
+        history: {
+          past: state.history.past->Array.concat([historyEntry]),
+          future: [],
+        },
+        pendingHistoryEntry: None,
+      }
+    | None => state
+    }
+  | ReplaceData(data) => {
+      ...state,
+      history: emptyHistory(),
+      data,
+      pendingHistoryEntry: None,
       dialog: Closed,
     }
   | Redo =>
@@ -58,6 +92,7 @@ let reducer = (state, action) =>
           past: past->Array.concat([state.data]),
           future: future->Array.slice(~start=1, ~end=future->Array.length),
         },
+        pendingHistoryEntry: None,
       }
     | None => state
     }
@@ -68,13 +103,14 @@ let reducer = (state, action) =>
     let newPast = past->Array.slice(~start=0, ~end=lastIndex)
 
     switch previous {
-    | Some(previous) if lastIndex > 0 => {
+    | Some(previous) => {
         ...state,
         data: previous,
         history: {
           past: newPast,
           future: [state.data]->Array.concat(future),
         },
+        pendingHistoryEntry: None,
       }
     | _ => state
     }
@@ -128,7 +164,8 @@ let makeInitialState = (localStorage: JSON.t) => {
 
   {
     data,
-    history: {past: [], future: []},
+    history: emptyHistory(),
+    pendingHistoryEntry: None,
     dialog: Closed,
     mode,
     useDescription,
@@ -137,6 +174,36 @@ let makeInitialState = (localStorage: JSON.t) => {
 
 @inline
 let key = "quick-translate-data"
+
+let encodeMode = mode =>
+  switch mode {
+  | Json(Message.ArrayLayout) => JSON.Encode.string("json-array")
+  | Json(Message.KeyValueLayout) => JSON.Encode.string("json-key-value")
+  | Csv({commentIndex, delimiter}) =>
+    JSON.Encode.object(
+      Dict.fromArray([
+        ("tag", JSON.Encode.string("csv")),
+        (
+          "commentIndex",
+          switch commentIndex {
+          | Some(index) => JSON.Encode.int(index)
+          | None => JSON.Null
+          },
+        ),
+        ("delimiter", JSON.Encode.string(delimiter)),
+      ]),
+    )
+  | Other => JSON.Encode.string("other")
+  }
+
+let toLocalStorage = state =>
+  JSON.Encode.object(
+    Dict.fromArray([
+      ("data", state.data->Obj.magic),
+      ("mode", state.mode->encodeMode),
+      ("useDescription", JSON.Encode.bool(state.useDescription)),
+    ]),
+  )
 
 let useAppState = () => {
   let (localStorage, setLocalStorage) = Storage.useLocalStorage(
@@ -147,35 +214,7 @@ let useAppState = () => {
   let (state, dispatch) = React.useReducerWithMapState(reducer, localStorage, makeInitialState)
 
   React.useEffect(() => {
-    let mode = switch state.mode {
-    | Json(Message.ArrayLayout) => JSON.Encode.string("json-array")
-    | Json(Message.KeyValueLayout) => JSON.Encode.string("json-key-value")
-    | Csv({commentIndex, delimiter}) =>
-      JSON.Encode.object(
-        Dict.fromArray([
-          ("tag", JSON.Encode.string("csv")),
-          (
-            "commentIndex",
-            switch commentIndex {
-            | Some(index) => JSON.Encode.int(index)
-            | None => JSON.Null
-            },
-          ),
-          ("delimiter", JSON.Encode.string(delimiter)),
-        ]),
-      )
-    | Other => JSON.Encode.string("other")
-    }
-
-    Value(
-      JSON.Encode.object(
-        Dict.fromArray([
-          ("data", state.data->Obj.magic),
-          ("mode", mode),
-          ("useDescription", JSON.Encode.bool(state.useDescription)),
-        ]),
-      ),
-    )->setLocalStorage
+    Value(state->toLocalStorage)->setLocalStorage
 
     None
   }, (state.data, state.mode, state.useDescription))

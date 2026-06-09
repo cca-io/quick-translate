@@ -329,6 +329,7 @@ body {
   padding: 0;
   white-space: normal;
   position: relative;
+  scroll-margin-top: 56px;
   transition: background-color 500ms ease;
 }
 
@@ -426,6 +427,14 @@ thead > tr:first-child > th {
 
 .cell.blank:not(.selected) {
   background-color: rgba(255, 99, 71, 0.2) !important;
+}
+
+.cell.intl-invalid:not(:focus-within) {
+  background-color: rgba(255, 193, 7, 0.22) !important;
+}
+
+.data-grid > tbody > tr:focus-within > td.intl-invalid {
+  background-color: rgba(255, 193, 7, 0.28) !important;
 }
 
 h4 {

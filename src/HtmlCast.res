@@ -1,5 +1,7 @@
 external fromWebElement: WebAPI.DOMAPI.element => WebAPI.DOMAPI.htmlElement = "%identity"
 external inputFromWebElement: WebAPI.DOMAPI.element => WebAPI.DOMAPI.htmlInputElement = "%identity"
+external textAreaFromWebElement: WebAPI.DOMAPI.element => WebAPI.DOMAPI.htmlTextAreaElement =
+  "%identity"
 external nodeFromEventTarget: WebAPI.EventAPI.eventTarget => WebAPI.DOMAPI.node = "%identity"
 external nodeFromLegacyDomElement: Dom.element => WebAPI.DOMAPI.node = "%identity"
 external inputFromLegacyDomElement: Dom.element => WebAPI.DOMAPI.htmlInputElement = "%identity"
